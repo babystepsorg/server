@@ -1,53 +1,28 @@
-"use strict";
+import express from 'express';
+import payload from 'payload';
 
-import fs from "fs";
-import path from "path";
-import fastify from "fastify";
-import fastifyCors from "@fastify/cors";
-import { logger } from "./monitoring";
-import { getConfig } from "@src/config";
+require('dotenv').config();
+const app = express();
 
-(async () => {
-  const { port } = getConfig();
+// Redirect root to Admin panel
+app.get('/', (_, res) => {
+  res.redirect('/admin');
+});
 
-  const app = fastify({
-    logger,
-    http2: true,
-    https: {
-      key: fs.readFileSync(
-        path.join(__dirname, "..", "cert", "private_key.pem")
-      ),
-      cert: fs.readFileSync(
-        path.join(__dirname, "..", "cert", "certificate.crt")
-      ),
+const start = async () => {
+  // Initialize Payload
+  await payload.init({
+    secret: process.env.PAYLOAD_SECRET,
+    mongoURL: process.env.MONGODB_URI,
+    express: app,
+    onInit: async () => {
+      payload.logger.info(`Payload Admin URL: ${payload.getAdminURL()}`)
     },
-  });
+  })
 
-  app.register(fastifyCors);
+  // Add your own express routes here
 
-  app.get("/status", async (_, response) => response.status(200).send({}));
+  app.listen(3000);
+}
 
-  app.listen({ port }, (err, address) => {
-    if (err) {
-      console.error(err);
-      process.exit(1);
-    }
-
-    console.log(`Server listning on port:: ${address}`);
-  });
-
-  process.on("uncaughtException", (e) => {
-    logger.error(e, "uncaught exception");
-    process.exit(1);
-  });
-
-  process.on("SIGTERM", async () => {
-    try {
-      await app.close();
-      process.exit(0);
-    } catch (e) {
-      logger.error("shutdown error", { error: e });
-      process.exit(1);
-    }
-  });
-})();
+start();
