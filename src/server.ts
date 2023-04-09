@@ -5,8 +5,11 @@ import path from "path";
 import fastify from "fastify";
 import fastifyCors from "@fastify/cors";
 import { logger } from "./monitoring";
+import { getConfig } from "@src/config";
 
 (async () => {
+  const { port } = getConfig();
+
   const app = fastify({
     logger,
     http2: true,
@@ -22,11 +25,9 @@ import { logger } from "./monitoring";
 
   app.register(fastifyCors);
 
-  app.get("/status", async (request, response) =>
-    response.status(200).send({})
-  );
+  app.get("/status", async (_, response) => response.status(200).send({}));
 
-  app.listen({ port: 3000 }, (err, address) => {
+  app.listen({ port }, (err, address) => {
     if (err) {
       console.error(err);
       process.exit(1);

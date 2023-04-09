@@ -4,7 +4,7 @@
   "description": "Babysteps graphql server to handle the req request",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node src/server.ts"
+    "dev": "ts-node-dev --respawn src/server.ts"
   },
   "repository": {
     "type": "git",
