@@ -1,10 +1,10 @@
-import { CollectionConfig } from 'payload/types';
+import { CollectionConfig } from 'payload/types'
 
 const Todo: CollectionConfig = {
   slug: 'todos',
   admin: {
-    defaultColumns: ['listName', 'tasks', 'updatedAt'],
-    useAsTitle: 'listName',
+    defaultColumns: ['weekName', 'tasks', 'updatedAt'],
+    useAsTitle: 'weekName',
   },
   access: {
     create: () => true,
@@ -14,7 +14,7 @@ const Todo: CollectionConfig = {
   },
   fields: [
     {
-      name: 'listName',
+      name: 'weekName',
       type: 'text',
     },
     {
@@ -22,17 +22,39 @@ const Todo: CollectionConfig = {
       type: 'array',
       fields: [
         {
-          name: 'name',
+          name: 'title',
           type: 'text',
         },
         {
-          name: 'complete',
-          type: 'checkbox',
-          defaultValue: false,
-        }
-      ]
+          name: 'description',
+          type: 'text',
+        },
+        {
+          name: 'priority',
+          type: 'select',
+          options: [
+            {
+              label: 'Normal',
+              value: '1',
+            },
+            {
+              label: 'Low',
+              value: '2',
+            },
+            {
+              label: 'Medium',
+              value: '3',
+            },
+            {
+              label: 'High',
+              value: '4',
+            },
+          ],
+          defaultValue: '1',
+        },
+      ],
     },
   ],
 }
 
-export default Todo;
+export default Todo

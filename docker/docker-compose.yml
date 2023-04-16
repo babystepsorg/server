@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  kong:
+    container_name: babysteps-kong
+    image: kong:2.8.1
+    restart: unless-stopped
+    ports:
+      - ${KONG_HTTP_PORT}:8000/tcp
+      - ${KONG_HTTPS_PORT}:8443/tcp
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+    volumes:
+      - ./config/kong.yml:/var/lib/kong/kong.yml:ro
+
+  rest:
+    container_name: babysteps-rest
+    image: rest:v1
+
+  admin:
+    container_name: babysteps-admin
+    image: admin:v1

@@ -1,0 +1,26 @@
+# a very minimal declarative config file
+_format_version: "1.1"
+
+###
+### API Roles
+###
+services:
+  - name: rest
+    url: http://rest:4000/
+    routes:
+      - name: rest
+        strip_path: true
+        paths:
+          - /rest/v1
+    plugins:
+      - name: cors
+
+  - name: rest-v2
+    url: http://rest:4000/
+    routes:
+      - name: rest-v2
+        strip_path: true
+        paths:
+          - /graph/v1
+    plugins:
+      - name: cors
