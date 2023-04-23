@@ -7,14 +7,25 @@ import Symptoms from './collections/Symptoms'
 import Changes from './collections/Changes'
 import Products from './collections/Products'
 import Doctors from './collections/Doctors'
-import { Media } from './collections/Media'
+import Media from './collections/Media'
+import Slider from './collections/Slider'
 
 export default buildConfig({
   serverURL: 'http://localhost:3000',
   admin: {
     user: Users.slug,
   },
-  collections: [TodoLists, GentleReminder, Symptoms, Changes, Products, Doctors, Media, Users],
+  collections: [
+    Slider,
+    TodoLists,
+    GentleReminder,
+    Symptoms,
+    Changes,
+    Products,
+    Doctors,
+    Media,
+    Users,
+  ],
   typescript: {
     outputFile: path.resolve(__dirname, 'payload-types.ts'),
   },

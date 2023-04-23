@@ -3,7 +3,7 @@ import type { CollectionConfig } from 'payload/types'
 
 import { isAdmin } from '../access/isAdmin'
 
-export const Media: CollectionConfig = {
+const Media: CollectionConfig = {
   slug: 'media',
   upload: {
     staticDir: path.resolve(__dirname, '../../media'),
@@ -30,3 +30,5 @@ export const Media: CollectionConfig = {
     },
   ],
 }
+
+export default Media

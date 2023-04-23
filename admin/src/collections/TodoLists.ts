@@ -13,48 +13,52 @@ const Todo: CollectionConfig = {
     delete: () => true,
   },
   fields: [
+    // {
+    //   name: 'weekName',
+    //   type: 'text',
+    // },
+    // {
+    //   name: 'tasks',
+    //   type: 'array',
+    //   fields: [
     {
-      name: 'weekName',
+      name: 'title',
       type: 'text',
     },
     {
-      name: 'tasks',
-      type: 'array',
-      fields: [
+      name: 'description',
+      type: 'text',
+    },
+    {
+      name: 'Week',
+      type: 'number',
+    },
+    {
+      name: 'priority',
+      type: 'select',
+      options: [
         {
-          name: 'title',
-          type: 'text',
+          label: 'Normal',
+          value: '1',
         },
         {
-          name: 'description',
-          type: 'text',
+          label: 'Low',
+          value: '2',
         },
         {
-          name: 'priority',
-          type: 'select',
-          options: [
-            {
-              label: 'Normal',
-              value: '1',
-            },
-            {
-              label: 'Low',
-              value: '2',
-            },
-            {
-              label: 'Medium',
-              value: '3',
-            },
-            {
-              label: 'High',
-              value: '4',
-            },
-          ],
-          defaultValue: '1',
+          label: 'Medium',
+          value: '3',
+        },
+        {
+          label: 'High',
+          value: '4',
         },
       ],
+      defaultValue: '1',
     },
   ],
+  // },
+  // ],
 }
 
 export default Todo
