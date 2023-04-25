@@ -26,6 +26,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: admin/package-lock.json
 
       - name: Install Dependencies
         run: npm install
@@ -39,8 +41,10 @@ jobs:
           REMOTE_HOST: ${{ secrets.HOST_DNS }}
           REMOTE_USER: ${{ secrets.USERNAME }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          SOURCE: 'admin/dist/ admin/build/'
+          ARGS: 'cd admin'
           TARGET: ${{ secrets.TARGET }}
-          EXCLUDE: '/node_modules/'
+          EXCLUDE: 'admin/node_modules/'
           SCRIPT_AFTER: |
             cd admin
-            yarn serve
+            npm run serve
