@@ -1,0 +1,48 @@
+name: Deploy to Amazon ECS
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - name: Checkout the files
+        uses: actions/checkout@v3
+        working-directory: ./admin
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        working-directory: ./admin
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install Dependencies
+        working-directory: ./admin
+        run: npm install
+
+      - name: 'Build'
+        working-directory: ./admin
+        run: npm run build --if-present
+
+      - name: Deploy to EC2
+        working-directory: ./admin
+        uses: easingthemes/ssh-deploy@main
+        with:
+          REMOTE_HOST: ${{ secrets.HOST_DNS }}
+          REMOTE_USER: ${{ secrets.USERNAME }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          TARGET: ${{ secrets.TARGET }}
+          SOURCE: 'dist/ build/'
+          EXCLUDE: '/node_modules/'
+          SCRIPT_AFTER: |
+            cd admin
+            yarn serve
