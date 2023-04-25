@@ -9,6 +9,7 @@ import Products from './collections/Products'
 import Doctors from './collections/Doctors'
 import Media from './collections/Media'
 import Slider from './collections/Slider'
+import Posts from './collections/Post'
 
 export default buildConfig({
   serverURL: 'http://localhost:3000',
@@ -18,6 +19,7 @@ export default buildConfig({
   collections: [
     Slider,
     TodoLists,
+    Posts,
     GentleReminder,
     Symptoms,
     Changes,
