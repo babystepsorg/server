@@ -21,20 +21,19 @@ jobs:
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
-        working-directory: ./admin
         with:
           node-version: ${{ matrix.node-version }}
+        working-directory: ./admin
 
       - name: Install Dependencies
-        working-directory: ./admin
         run: npm install
+        working-directory: ./admin
 
       - name: 'Build'
-        working-directory: ./admin
         run: npm run build --if-present
+        working-directory: ./admin
 
       - name: Deploy to EC2
-        working-directory: ./admin
         uses: easingthemes/ssh-deploy@main
         with:
           REMOTE_HOST: ${{ secrets.HOST_DNS }}
@@ -46,3 +45,4 @@ jobs:
           SCRIPT_AFTER: |
             cd admin
             yarn serve
+        working-directory: ./admin
