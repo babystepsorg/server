@@ -40,7 +40,6 @@ jobs:
           REMOTE_USER: ${{ secrets.USERNAME }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
           TARGET: ${{ secrets.TARGET }}
-          SOURCE: 'dist/ build/'
           EXCLUDE: '/node_modules/'
           SCRIPT_AFTER: |
             cd admin
