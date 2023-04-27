@@ -5,7 +5,7 @@ import { MediaBlock } from '../blocks/Media'
 import richText from '../fields/richText'
 import { slugField } from '../fields/slug'
 
-const Posts: CollectionConfig = {
+const Content: CollectionConfig = {
   slug: 'posts',
   admin: {
     useAsTitle: 'title',
@@ -40,30 +40,61 @@ const Posts: CollectionConfig = {
       required: true,
     },
     {
-      name: 'image',
+      type: 'radio',
+      options: [
+        {
+          label: 'Post',
+          value: 'post',
+        },
+        {
+          label: 'Video',
+          value: 'video',
+        },
+      ],
+      defaultValue: 'post',
+      name: 'layout',
+    },
+    {
+      name: 'video',
       type: 'upload',
       relationTo: 'media',
       required: true,
+      admin: {
+        condition: (data: any) => {
+          if (data.layout === 'video') return true
+        },
+      },
+    },
+    {
+      name: 'hero_image',
+      label: 'Hero Image',
+      type: 'upload',
+      relationTo: 'media',
+      required: true,
+      admin: {
+        condition: (data: any) => {
+          if (data.layout === 'post') return true
+        },
+      },
     },
     richText({
       name: 'body',
+      admin: {
+        condition: (data: any) => {
+          if (data.layout === 'post') return true
+        },
+      },
     }),
-    // {
-    //   name: 'content',
-    //   type: 'blocks',
-    //   blocks: [MediaBlock],
-    //   required: true,
-    // },
     slugField(),
-    // {
-    //   name: 'author',
-    //   type: 'relationship',
-    //   relationTo: 'users',
-    //   required: true,
-    //   admin: {
-    //     position: 'sidebar',
-    //   },
-    // },
+    {
+      name: 'author',
+      type: 'relationship',
+      relationTo: '_users',
+      required: true,
+      admin: {
+        position: 'sidebar',
+      },
+    },
     {
       name: 'publishedOn',
       type: 'date',
@@ -78,4 +109,4 @@ const Posts: CollectionConfig = {
   ],
 }
 
-export default Posts
+export default Content
