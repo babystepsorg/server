@@ -85,6 +85,25 @@ const Content: CollectionConfig = {
         },
       },
     }),
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'weeks',
+          type: 'relationship',
+          relationTo: 'weeks',
+          hasMany: true,
+          required: true,
+        },
+        {
+          name: 'roles',
+          type: 'select',
+          hasMany: true,
+          required: true,
+          options: ['Mother', 'Father'],
+        },
+      ],
+    },
     slugField(),
     {
       name: 'author',
