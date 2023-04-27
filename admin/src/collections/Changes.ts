@@ -26,7 +26,7 @@ const Changes: CollectionConfig = {
       required: true,
     },
     {
-      name: 'week',
+      name: 'weeks',
       type: 'relationship',
       relationTo: 'weeks',
       required: true,

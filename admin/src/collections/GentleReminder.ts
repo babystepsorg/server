@@ -36,14 +36,14 @@ const GentleReminder: CollectionConfig = {
       type: 'row',
       fields: [
         {
-          name: 'week',
+          name: 'weeks',
           type: 'relationship',
           relationTo: 'weeks',
           hasMany: true,
           required: true,
         },
         {
-          name: 'role',
+          name: 'roles',
           type: 'select',
           hasMany: true,
           required: true,

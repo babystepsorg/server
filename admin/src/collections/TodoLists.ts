@@ -14,7 +14,7 @@ const Todo: CollectionConfig = {
   },
   fields: [
     {
-      name: 'week',
+      name: 'weeks',
       type: 'relationship',
       relationTo: 'weeks',
       unique: true,

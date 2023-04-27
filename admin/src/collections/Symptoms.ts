@@ -27,7 +27,7 @@ const Symptoms: CollectionConfig = {
       relationTo: 'media',
     },
     {
-      name: 'week',
+      name: 'weeks',
       type: 'relationship',
       relationTo: 'weeks',
       required: true,

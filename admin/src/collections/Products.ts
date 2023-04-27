@@ -36,14 +36,14 @@ const Products: CollectionConfig = {
       type: 'row',
       fields: [
         {
-          name: 'role',
+          name: 'roles',
           type: 'select',
           hasMany: true,
           required: true,
           options: ['Mother', 'Father'],
         },
         {
-          name: 'week',
+          name: 'weeks',
           type: 'relationship',
           relationTo: 'weeks',
           hasMany: true,
