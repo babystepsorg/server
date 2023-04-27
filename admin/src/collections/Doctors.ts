@@ -1,5 +1,6 @@
 import { CollectionConfig } from 'payload/types'
 import { isAdmin } from '../access/isAdmin'
+import richText from '../fields/richText'
 
 const Doctors: CollectionConfig = {
   slug: 'doctors',
@@ -24,6 +25,7 @@ const Doctors: CollectionConfig = {
       type: 'text',
       required: true,
     },
+    richText({ label: 'description' }),
     {
       name: 'image',
       type: 'upload',

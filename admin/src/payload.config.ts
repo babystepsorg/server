@@ -9,17 +9,21 @@ import Products from './collections/Products'
 import Doctors from './collections/Doctors'
 import Media from './collections/Media'
 import Slider from './collections/Slider'
-import Posts from './collections/Post'
+import Content from './collections/Content'
+import Weeks from './collections/Weeks'
+import Planner from './collections/Planner'
 
 export default buildConfig({
-  serverURL: 'http://localhost:3000',
+  serverURL: process.env.SERVER_URL,
   admin: {
     user: Users.slug,
   },
   collections: [
     Slider,
+    Weeks,
     TodoLists,
-    Posts,
+    Planner,
+    Content,
     GentleReminder,
     Symptoms,
     Changes,

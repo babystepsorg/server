@@ -16,6 +16,7 @@ const GentleReminder: CollectionConfig = {
     {
       name: 'title',
       type: 'text',
+      required: true,
     },
     {
       name: 'descriptions',
@@ -32,8 +33,23 @@ const GentleReminder: CollectionConfig = {
       defaultValue: false,
     },
     {
-      name: 'week',
-      type: 'text',
+      type: 'row',
+      fields: [
+        {
+          name: 'week',
+          type: 'relationship',
+          relationTo: 'weeks',
+          hasMany: true,
+          required: true,
+        },
+        {
+          name: 'role',
+          type: 'select',
+          hasMany: true,
+          required: true,
+          options: ['Mother', 'Father'],
+        },
+      ],
     },
   ],
 }

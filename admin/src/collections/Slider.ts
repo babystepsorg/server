@@ -24,6 +24,13 @@ const Slider: CollectionConfig = {
       label: 'Link',
       type: 'text',
     },
+    {
+      name: 'stage',
+      type: 'select',
+      hasMany: true,
+      required: true,
+      options: ['Preconception', 'Pregnancy', 'Postpartum'],
+    },
   ],
 }
 

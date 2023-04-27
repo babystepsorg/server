@@ -3,8 +3,8 @@ import { CollectionConfig } from 'payload/types'
 const Changes: CollectionConfig = {
   slug: 'changes',
   admin: {
-    defaultColumns: ['name', 'week', 'createdAt'],
-    useAsTitle: 'name',
+    defaultColumns: ['mother_description', 'week', 'createdAt'],
+    useAsTitle: 'mother_description',
   },
   access: {
     create: () => true,
@@ -14,21 +14,23 @@ const Changes: CollectionConfig = {
   },
   fields: [
     {
-      name: 'name',
+      name: 'mother_description',
+      label: 'Mother Description',
       type: 'text',
+      required: true,
     },
     {
-      name: 'descriptions',
+      name: 'baby_description',
+      label: 'Baby Description',
       type: 'text',
-    },
-    {
-      name: 'illustration',
-      type: 'upload',
-      relationTo: 'media',
+      required: true,
     },
     {
       name: 'week',
-      type: 'text',
+      type: 'relationship',
+      relationTo: 'weeks',
+      required: true,
+      hasMany: true,
     },
   ],
 }

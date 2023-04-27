@@ -18,17 +18,38 @@ const Products: CollectionConfig = {
       type: 'text',
     },
     {
-      name: 'image',
-      type: 'upload',
-      relationTo: 'media',
+      name: 'assets',
+      type: 'array',
+      fields: [
+        {
+          type: 'upload',
+          relationTo: 'media',
+          name: 'media',
+        },
+      ],
     },
     {
       name: 'link',
       type: 'text',
     },
     {
-      name: 'week',
-      type: 'text',
+      type: 'row',
+      fields: [
+        {
+          name: 'role',
+          type: 'select',
+          hasMany: true,
+          required: true,
+          options: ['Mother', 'Father'],
+        },
+        {
+          name: 'week',
+          type: 'relationship',
+          relationTo: 'weeks',
+          hasMany: true,
+          required: true,
+        },
+      ],
     },
   ],
 }
