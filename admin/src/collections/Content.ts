@@ -1,7 +1,6 @@
 import type { CollectionConfig } from 'payload/types'
 
 import { isAdmin } from '../access/isAdmin'
-import { MediaBlock } from '../blocks/Media'
 import richText from '../fields/richText'
 import { slugField } from '../fields/slug'
 
@@ -108,7 +107,7 @@ const Content: CollectionConfig = {
     {
       name: 'author',
       type: 'relationship',
-      relationTo: '_users',
+      relationTo: 'admin_users',
       required: true,
       admin: {
         position: 'sidebar',

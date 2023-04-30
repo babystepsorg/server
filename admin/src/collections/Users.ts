@@ -4,7 +4,7 @@ import { isAdmin, isAdminFieldLevel } from '../access/isAdmin'
 import { isAdminOrSelf, isAdminOrSelfFieldLevel } from '../access/isAdminOrSelf'
 
 export const Users: CollectionConfig = {
-  slug: '_users',
+  slug: 'admin_users',
   auth: true,
   admin: {
     useAsTitle: 'email',
@@ -47,7 +47,7 @@ export const Users: CollectionConfig = {
         create: isAdminFieldLevel,
         update: isAdminFieldLevel,
       },
-      options: ['admin', 'public'],
+      options: ['admin', 'author', 'public'],
     },
   ],
 }

@@ -11,7 +11,21 @@ import Media from './collections/Media'
 import Slider from './collections/Slider'
 import Content from './collections/Content'
 import Weeks from './collections/Weeks'
-import Planner from './collections/Planner'
+import Calender from './collections/Calender'
+import { cloudStorage } from '@payloadcms/plugin-cloud-storage'
+import { s3Adapter } from '@payloadcms/plugin-cloud-storage/s3'
+import Careers from './collections/Careers'
+
+const adapter = s3Adapter({
+  config: {
+    credentials: {
+      accessKeyId: process.env.AWS_S3_ACCESS_KEY,
+      secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY,
+    },
+    region: process.env.S3_REGION,
+  },
+  bucket: process.env.S3_BUCKET,
+})
 
 export default buildConfig({
   serverURL: process.env.SERVER_URL,
@@ -19,16 +33,17 @@ export default buildConfig({
     user: Users.slug,
   },
   collections: [
-    Slider,
     Weeks,
-    TodoLists,
-    Planner,
-    Content,
+    Slider,
+    Calender,
     GentleReminder,
     Symptoms,
     Changes,
+    Content,
     Products,
     Doctors,
+    TodoLists,
+    Careers,
     Media,
     Users,
   ],
@@ -38,4 +53,13 @@ export default buildConfig({
   graphQL: {
     schemaOutputFile: path.resolve(__dirname, 'generated-schema.graphql'),
   },
+  plugins: [
+    cloudStorage({
+      collections: {
+        media: {
+          adapter,
+        },
+      },
+    }),
+  ],
 })
