@@ -10,10 +10,10 @@ export const Users: CollectionConfig = {
     useAsTitle: 'email',
   },
   access: {
-    create: isAdmin,
+    create: () => true,
     read: () => true,
-    update: isAdminOrSelf,
-    delete: isAdminOrSelf,
+    update: () => true,
+    delete: () => true,
   },
   fields: [
     {
@@ -43,9 +43,9 @@ export const Users: CollectionConfig = {
       defaultValue: ['public'],
       required: true,
       access: {
-        read: isAdminOrSelfFieldLevel,
-        create: isAdminFieldLevel,
-        update: isAdminFieldLevel,
+        read: () => true,
+        create: () => true,
+        update: () => true,
       },
       options: ['admin', 'author', 'public'],
     },

@@ -11,8 +11,8 @@ const Media: CollectionConfig = {
   access: {
     create: () => true,
     read: () => true,
-    update: isAdmin,
-    delete: isAdmin,
+    update: () => true,
+    delete: () => true,
   },
   fields: [
     {

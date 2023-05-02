@@ -15,11 +15,11 @@ const Content: CollectionConfig = {
     drafts: true,
   },
   access: {
-    create: isAdmin,
+    create: () => true,
     read: () => true,
-    readVersions: isAdmin,
-    update: isAdmin,
-    delete: isAdmin,
+    readVersions: () => true,
+    update: () => true,
+    delete: () => true,
   },
   //   hooks: {
   //     afterChange: [

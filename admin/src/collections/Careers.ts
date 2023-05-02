@@ -12,10 +12,10 @@ const Careers: CollectionConfig = {
     useAsTitle: 'title',
   },
   access: {
-    create: isAdmin,
+    create: () => true,
     read: () => true,
-    update: isAdmin,
-    delete: isAdmin,
+    update: () => true,
+    delete: () => true,
   },
   fields: [
     {
@@ -23,8 +23,20 @@ const Careers: CollectionConfig = {
       type: 'text',
     },
     {
-      name: 'biline',
+      name: 'location',
       type: 'text',
+    },
+    {
+      name: 'job_type',
+      label: 'Job Type',
+      type: 'text',
+    },
+    {
+      name: 'category',
+      type: 'text',
+      admin: {
+        position: 'sidebar',
+      },
     },
     richText({ name: 'details' }),
     slugField(),
