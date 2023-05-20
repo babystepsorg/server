@@ -7,13 +7,21 @@ import cors from 'cors'
 require('dotenv').config()
 const app = express()
 
+// Cors
+app.use(
+  cors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST',
+  })
+)
+
 // Redirect root to Admin panel
 app.get('/', (_, res) => {
   res.redirect('/admin')
 })
 
 // Adding email to waitlist
-app.post('/api/waitlist', cors(), async (req, res) => {
+app.post('/api/waitlist', async (req, res) => {
   try {
     const checkEmail = await Waitlist.findOne({ email: req.body.email })
     if (checkEmail) {
@@ -30,7 +38,7 @@ app.post('/api/waitlist', cors(), async (req, res) => {
 })
 
 // Applying for a career
-app.post('/api/careers', cors(), upload.single('resume'), async (req, res) => {
+app.post('/api/careers', upload.single('resume'), async (req, res) => {
   const request = req as typeof req & {
     file: any
   }
