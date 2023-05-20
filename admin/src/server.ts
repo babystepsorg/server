@@ -2,6 +2,7 @@ import express from 'express'
 import payload from 'payload'
 import { Career, Waitlist } from './models'
 import upload from './utils/fileUpload'
+import cors from 'cors'
 
 require('dotenv').config()
 const app = express()
@@ -12,7 +13,7 @@ app.get('/', (_, res) => {
 })
 
 // Adding email to waitlist
-app.post('/api/waitlist', async (req, res) => {
+app.post('/api/waitlist', cors(), async (req, res) => {
   try {
     const checkEmail = await Waitlist.findOne({ email: req.body.email })
     if (checkEmail) {
@@ -29,7 +30,7 @@ app.post('/api/waitlist', async (req, res) => {
 })
 
 // Applying for a career
-app.post('/api/careers', upload.single('resume'), async (req, res) => {
+app.post('/api/careers', cors(), upload.single('resume'), async (req, res) => {
   const request = req as typeof req & {
     file: any
   }

@@ -28,6 +28,10 @@ const careerSchema = new Schema(
     cover_letter: {
       type: String,
     },
+    job: {
+      type: String,
+      required: true
+    }
   },
   {
     strict: false,
