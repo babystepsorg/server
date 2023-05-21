@@ -3,9 +3,14 @@ import payload from 'payload'
 import { Career, Waitlist } from './models'
 import upload from './utils/fileUpload'
 import cors from 'cors'
+import morgan from 'morgan'
+import { sendMail } from './utils/sendEmail'
 
 require('dotenv').config()
 const app = express()
+
+app.use(express.json())
+app.use(morgan('combined'))
 
 // Cors
 app.use(
@@ -52,9 +57,27 @@ app.post('/api/careers', upload.single('resume'), async (req, res) => {
     resume_link,
     cover_letter: req.body.cover_letter,
     portfolio_link: req.body.portfolio_link ?? '',
+    job: req.body.job,
   })
   try {
     await result.save()
+    // sendMail(
+    //   `${req.body.full_name} applied for ${req.body.job} on Careers page`,
+    //   `
+    //   <p>A new job application has been submitted for the role of ${
+    //     req.body.job
+    //   }. Please find the details of the applicant below.</p>
+    //   <br />
+
+    //   Full Name: <strong>${req.body.full_name}</strong><br />
+    //   Email: <strong>${req.body.email}</strong><br />
+    //   Phone Number: <strong>${req.body.phone}</strong><br />
+    //   LinkedIn URL: <strong>${req.body.linkedin_url}</strong><br />
+    //   Resume Link: <strong>${resume_link}</strong><br />
+    //   Cover Letter: <strong>${req.body.cover_letter}</strong><br />
+    //   Portfolio Link: <strong>${req.body.portfolio_link || 'Not provided'}</strong><br />
+    //   `
+    // )
   } catch (err) {
     res.status(500).send(err)
   }

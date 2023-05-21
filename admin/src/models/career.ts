@@ -30,8 +30,8 @@ const careerSchema = new Schema(
     },
     job: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   {
     strict: false,
@@ -39,6 +39,6 @@ const careerSchema = new Schema(
   }
 )
 
-const Career = model('career', careerSchema)
+const Career = model('careerApplication', careerSchema)
 
 export default Career
