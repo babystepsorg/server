@@ -1,29 +1,8 @@
-import Fastify from 'fastify'
-import db from './plugins/db'
+import app from './app';
 
-import { config } from './config'
-
-// Configure App
-const server = Fastify({
-  logger: true,
-})
-
-// Register Plugins
-server.register(db)
-
-server.get('/', async (request, reply) => {
-  return { hello: 'world' }
-})
-
-const start = async (): Promise<void> => {
-  try {
-    await server.listen(config.app.port)
-  } catch (err) {
-    server.log.error(err)
-    process.exit(1)
-  }
-}
-
-start()
-
-export default server
+const port = process.env.PORT || 5000;
+app.listen(port, () => {
+  /* eslint-disable no-console */
+  console.log(`Listening: http://localhost:${port}`);
+  /* eslint-enable no-console */
+});
