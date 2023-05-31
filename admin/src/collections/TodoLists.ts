@@ -3,8 +3,8 @@ import { CollectionConfig } from 'payload/types'
 const Todo: CollectionConfig = {
   slug: 'todos',
   admin: {
-    defaultColumns: ['weekName', 'tasks', 'updatedAt'],
-    useAsTitle: 'weekName',
+    defaultColumns: ['title', 'week', 'updatedAt'],
+    useAsTitle: 'title',
   },
   access: {
     create: () => true,
@@ -28,7 +28,6 @@ const Todo: CollectionConfig = {
           name: 'week',
           type: 'relationship',
           relationTo: 'weeks',
-          unique: true,
           required: true,
         },
         {
