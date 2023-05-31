@@ -4,7 +4,7 @@ const Weeks: CollectionConfig = {
   slug: 'weeks',
   admin: {
     defaultColumns: ['number', 'stage', 'createdAt'],
-    useAsTitle: 'number',
+    useAsTitle: 'title',
     hideAPIURL: true,
   },
   access: {
@@ -15,14 +15,18 @@ const Weeks: CollectionConfig = {
   },
   fields: [
     {
-      name: 'number',
-      type: 'number',
+      name: 'title',
+      type: 'text', // should be text maybe
       required: true,
       unique: true,
       index: true,
     },
     {
       name: 'stage',
+      type: 'text',
+    },
+    {
+      name: 'overview',
       type: 'text',
     },
   ],

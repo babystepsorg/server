@@ -14,23 +14,22 @@ const Todo: CollectionConfig = {
   },
   fields: [
     {
-      name: 'weeks',
-      type: 'relationship',
-      relationTo: 'weeks',
-      unique: true,
-      required: true,
+      name: 'title',
+      type: 'text',
     },
     {
-      name: 'tasks',
-      type: 'array',
+      name: 'description',
+      type: 'text',
+    },
+    {
+      type: 'row',
       fields: [
         {
-          name: 'title',
-          type: 'text',
-        },
-        {
-          name: 'description',
-          type: 'text',
+          name: 'week',
+          type: 'relationship',
+          relationTo: 'weeks',
+          unique: true,
+          required: true,
         },
         {
           name: 'priority',
