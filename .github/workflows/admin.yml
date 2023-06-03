@@ -42,5 +42,5 @@ jobs:
           REMOTE_USER: ${{ secrets.USERNAME }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
           SOURCE: 'admin/'
-          TARGET: ${{ secrets.TARGET }}
+          TARGET: ${{ secrets.ADMIN_TARKET }}
           EXCLUDE: 'admin/node_modules/'
