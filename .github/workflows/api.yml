@@ -1,9 +1,11 @@
-name: Deploy to Amazon ECS
+name: Deploy API to Amazon ECS
 
 on:
   push:
     branches:
       - 'main'
+    paths:
+      - 'api/**'
 
 defaults:
   run:

@@ -1,9 +1,11 @@
-name: Deploy to Amazon ECS
+name: Deploy Admin to Amazon ECS
 
 on:
   push:
     branches:
       - 'main'
+    paths:
+      - 'admin/**'
 
 defaults:
   run:
