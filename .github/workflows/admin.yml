@@ -11,7 +11,7 @@ defaults:
 
 jobs:
   deploy:
-    name: Deploy to EC2
+    name: Deploy Admin to EC2
     runs-on: ubuntu-latest
 
     strategy:

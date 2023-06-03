@@ -11,7 +11,7 @@ defaults:
 
 jobs:
   deploy:
-    name: Deploy to EC2
+    name: Deploy API to EC2
     runs-on: ubuntu-latest
 
     strategy:
@@ -43,4 +43,4 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
           SOURCE: 'api/'
           TARGET: ${{ secrets.API_TARGET }}
-          EXCLUDE: 'admin/node_modules/'
+          EXCLUDE: 'api/node_modules/'
