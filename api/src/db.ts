@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb'
-import dotenv from 'dotenv'
-dotenv.config()
+
+require('dotenv').config()
 
 // const {
 //   MONGO_HOST,

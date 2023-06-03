@@ -10,6 +10,7 @@ export const getAll = async (
   next: NextFunction
 ) => {
   try {
+    // Get current week based upon the stage and consive date
     const adminTodos = await Todos.find().toArray()
     const userTodos = await UserTodos.find({
       userId: req.user!._id,

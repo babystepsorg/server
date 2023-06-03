@@ -49,13 +49,13 @@ export const createUser = async (
 }
 
 export const findUserById = async (id: string) => {
-  return await Users.findOne({
+  return Users.findOne({
     _id: new ObjectId(id),
   })
 }
 
 export const findUserByEmail = async (email: string) => {
-  return await Users.findOne({
+  return Users.findOne({
     email,
   })
 }
