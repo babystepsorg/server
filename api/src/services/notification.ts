@@ -27,7 +27,7 @@ class NotificationService {
     loginLink,
     username,
   }: SendTemplate) {
-    this.sendSmtpEmail.subject = `{{${username}}} is inviting you to be his partner`
+    this.sendSmtpEmail.subject = `${username} is inviting you to be his partner`
     this.sendSmtpEmail.templateId = 2
     this.sendSmtpEmail.params = {
       USERNAME: username,
