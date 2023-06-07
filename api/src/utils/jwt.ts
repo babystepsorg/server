@@ -1,21 +1,27 @@
-import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken'
 
 type JWTOptions = {
   expiresIn?: string | number
-};
+}
+type TokenType = 'ACCESS' | 'REFRESH' | 'FORGET' | 'PARTNER'
 
-export const generateToken = (data: Object, options?: JWTOptions) => {
+type Data = {
+  [key: string]: any
+  type: TokenType
+}
+
+export const generateToken = (data: Data, options?: JWTOptions) => {
   const token = jwt.sign(data, process.env.JWT_SECRET!, {
     expiresIn: options?.expiresIn || '30m',
-  });
-  return token;
-};
+  })
+  return token
+}
 
 export const verifyToken = (token: string) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-    return decoded;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!)
+    return decoded
   } catch (err) {
-    throw new Error('Invalid token');
+    throw new Error('Invalid token')
   }
-};
+}

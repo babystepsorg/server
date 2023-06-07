@@ -1,4 +1,4 @@
-import { WithId } from 'mongodb'
+import { ObjectId, WithId } from 'mongodb'
 import * as z from 'zod'
 
 import { db } from '../db'
@@ -10,6 +10,7 @@ export const User = z.object({
   role: z.enum(['caregiver', 'nurturer']),
   stage: z.enum(['pre-conception', 'pregnancy', 'postpartum']),
   salt: z.string().nullable(),
+  partnerId: z.custom<ObjectId>().optional(),
 })
 
 export type User = z.infer<typeof User>
