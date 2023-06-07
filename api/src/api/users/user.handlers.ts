@@ -3,6 +3,10 @@ import { User, UserWithId, Users } from '../../models/user'
 import { ParamsWithId } from '../../interfaces/ParamsWithId'
 import { ObjectId } from 'mongodb'
 import { createUser, findUserById } from '../../services/user'
+import { generateToken } from '../../utils/jwt'
+
+import config from '../../config'
+import NotificationService from '../../services/notification'
 
 export async function createOne(
   req: Request<{}, Omit<UserWithId, 'password' | 'salt'>, User>,
@@ -61,3 +65,34 @@ export async function updateOne(
     next(error)
   }
 }
+
+export async function invitePartner(
+  req: Request<ParamsWithId, {}, { email: string }>,
+  res: Response<{}>,
+  next: NextFunction
+) {
+  try {
+    const userId = req.params.id
+    const token = generateToken({ type: 'PARTNER', userId }, { expiresIn: '2hr' })
+    const email = req.body.email
+    const loginLink = `${config.CLIENT_URL}/signup?token=${token}`
+    const notificationService = new NotificationService()
+    await notificationService.sendTemplateEmail({
+      email,
+      loginLink,
+      username: req.user?.name!,
+    })
+
+    res.status(200)
+    res.json({
+      message: 'Email sent to partner',
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// Add partner to a user
+// There are only some items that are going to be different for both user
+// (means that both user can see there things)
+// But most of the things will be same, what one user adds will be seen by the other

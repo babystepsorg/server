@@ -4,6 +4,7 @@ import MessageResponse from '../interfaces/MessageResponse'
 import emojis from './emojis'
 import auth from './auth/auth.route'
 import todos from './todos/todo.route'
+import users from './users/user.route'
 
 const router = express.Router()
 
@@ -16,5 +17,6 @@ router.get<{}, MessageResponse>('/', (req, res) => {
 router.use('/emojis', emojis)
 router.use('/auth', auth)
 router.use('/todos', todos)
+router.use('/users', users)
 
 export default router

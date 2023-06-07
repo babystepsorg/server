@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { comparePassword, createUser, findUserByEmail } from '../../services/user'
 import { User, UserWithId } from '../../models/user'
 import { generateToken, verifyToken } from '../../utils/jwt'
+import { ObjectId } from 'mongodb'
 
 type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
   tokens: {
@@ -11,7 +12,7 @@ type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
 }
 
 export async function signUp(
-  req: Request<{}, AuthUser, Omit<User, 'salt'>>,
+  req: Request<{}, AuthUser, Omit<User, 'salt'> & { token?: string }>,
   res: Response<AuthUser>,
   next: NextFunction
 ) {
@@ -22,9 +23,18 @@ export async function signUp(
       res.status(422)
       throw new Error('User with this email already exists')
     }
-    const user = await createUser(req.body)
-    const accessToken = generateToken({ userId: user._id })
-    const refreshToken = generateToken({ userId: user._id }, { expiresIn: '30d' })
+    // get the token from the body
+    const { token, ...rest } = req.body
+    let partnerId = undefined
+    if (token) {
+      const decoded = verifyToken(token) as {
+        userId: string
+      }
+      partnerId = new ObjectId(decoded.userId)
+    }
+    const user = await createUser({ ...rest, partnerId })
+    const accessToken = generateToken({ userId: user._id, type: 'ACCESS' })
+    const refreshToken = generateToken({ userId: user._id, type: 'REFRESH' }, { expiresIn: '30d' })
     res.status(201)
     res.json({
       ...user,
@@ -54,8 +64,8 @@ export async function logIn(
       res.status(422)
       throw new Error('Invalid credentials')
     }
-    const accessToken = generateToken({ userId: user._id })
-    const refreshToken = generateToken({ userId: user._id }, { expiresIn: '30d' })
+    const accessToken = generateToken({ userId: user._id, type: 'ACCESS' })
+    const refreshToken = generateToken({ userId: user._id, type: 'REFRESH' }, { expiresIn: '30d' })
     const { password, salt, ...rest } = user
     res.status(200)
     res.json({
@@ -93,8 +103,11 @@ export async function refreshToken(
       userId: string
     }
 
-    const accessToken = generateToken({ userId: decoded.userId })
-    const refreshToken = generateToken({ userId: decoded.userId }, { expiresIn: '30d' })
+    const accessToken = generateToken({ userId: decoded.userId, type: 'ACCESS' })
+    const refreshToken = generateToken(
+      { userId: decoded.userId, type: 'REFRESH' },
+      { expiresIn: '30d' }
+    )
 
     res.status(200)
     res.json({
