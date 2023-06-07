@@ -1,4 +1,5 @@
 import * as SibApiV3Sdk from '@sendinblue/client'
+import config from '../config'
 
 type SendTemplate = {
   template?: 'invite-partner'
@@ -15,7 +16,7 @@ class NotificationService {
     this.apiInstance = new SibApiV3Sdk.TransactionalEmailsApi()
     this.apiInstance.setApiKey(
       SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey,
-      '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'
+      config.EMAIL_API_KEY!
     )
     this.sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail()
   }
@@ -39,13 +40,14 @@ class NotificationService {
     ]
     this.sendSmtpEmail.sender = {
       email: 'noreply@babysteps.world',
-      name: 'No Reply - BabySteps',
+      name: 'No Reply <BabySteps>',
     }
 
     try {
       const response = await this.apiInstance.sendTransacEmail(this.sendSmtpEmail)
       return response.body
     } catch (err: any) {
+      console.log(err)
       throw new Error(err?.message ?? 'Email sending error')
     }
   }
