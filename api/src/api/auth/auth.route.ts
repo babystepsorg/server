@@ -28,7 +28,7 @@ router.post(
 
 router.post(
   '/refresh',
-  validateAuthentication,
+  // validateAuthentication,
   validateRequest({
     body: z.object({
       refreshToken: z.string().nonempty('Refresh token is required'),

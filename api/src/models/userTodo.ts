@@ -11,9 +11,10 @@ export const UserTodo = z.object({
   userPriority: z.enum(['normal', 'high', 'crucial']),
   completed: z.boolean().default(false),
   completedOn: z.date().optional(),
-  completionDate: z.date().optional(),
+  completionDate: z.string().datetime().optional(),
   adminTodo: z.custom<ObjectId>().optional(),
   userId: z.custom<ObjectId>(),
+  assignPartner: z.boolean().default(false),
 })
 
 export type UserTodo = z.infer<typeof UserTodo>

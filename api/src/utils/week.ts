@@ -1,4 +1,4 @@
-const getWeekNumber = (date: Date): number => {
+export const getWeekNumber = (date: Date): number => {
   const startOfYear = new Date(date.getFullYear(), 0, 1)
   const startOfWeek = new Date(
     startOfYear.setDate(startOfYear.getDate() - startOfYear.getDay() + 1)

@@ -11,6 +11,8 @@ export const User = z.object({
   stage: z.enum(['pre-conception', 'pregnancy', 'postpartum']),
   salt: z.string().nullable(),
   partnerId: z.custom<ObjectId>().optional(),
+  createdAt: z.string().datetime().default(new Date().toISOString()),
+  updatedAt: z.string().datetime().default(new Date().toISOString()),
 })
 
 export type User = z.infer<typeof User>
