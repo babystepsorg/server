@@ -3,6 +3,7 @@ import { UserTodo, UserTodoWithId, UserTodos } from '../../models/userTodo'
 import { ParamsWithId } from '../../interfaces/ParamsWithId'
 import { ObjectId } from 'mongodb'
 import { Todos } from './todo.model'
+import { getWeekNumber } from '../../utils/week'
 
 export const getAll = async (
   req: Request<{}, Array<UserTodoWithId>>,
@@ -11,17 +12,46 @@ export const getAll = async (
 ) => {
   try {
     // Get current week based upon the stage and consive date
-    // const currentStage = req.user!.stage
+    const currentStage = req.user!.stage
+    const accountCreationData = req.user!.createdAt
     // Also get the consieve date
     // const consiveDate = ''
 
     // based upon the stage and consiveDate get the current week
-    // const currentWeek = getWeekNumber(new Date())
-    // const consiveDateWeek = getWeekNumber(new Date(Date.parse(consiveDate)))
+    let createdAtWeek = getWeekNumber(new Date(accountCreationData))
+    let currentWeek = getWeekNumber(new Date())
 
-    const adminTodos = await Todos.find({
-      // week: currentWeek.toString(),
-    }).toArray()
+    if (currentStage === 'pre-conception') {
+      currentWeek = currentWeek - createdAtWeek + 1
+      if (currentWeek > 4) {
+        currentWeek = 4
+      }
+    }
+
+    // const weekId = await
+    const adminTodos = await Todos.aggregate([
+      {
+        $lookup: {
+          from: 'weeks',
+          localField: 'week',
+          foreignField: '_id',
+          as: 'week',
+        },
+      },
+      {
+        $set: {
+          week: {
+            $arrayElemAt: ['$week.title', 0],
+          },
+        },
+      },
+      {
+        $match: {
+          week: currentWeek.toString(),
+        },
+      },
+    ]).toArray()
+
     const userTodos = await UserTodos.find({
       $or: [{ userId: req.user!._id }, { userId: req.user!.partnerId }],
       // completed: false,
@@ -56,6 +86,7 @@ export const createOne = async (
   next: NextFunction
 ) => {
   try {
+    console.log(req.body)
     const insertedTodo = await UserTodos.insertOne({
       ...req.body,
       userId: req.user!._id,

@@ -18,11 +18,13 @@ router.post(
       userId: true,
       priority: true,
       week: true,
+    }).extend({
+      completionData: z.string().datetime().optional(),
     }),
   }),
   TodoHandler.createOne
 )
-router.post(
+router.patch(
   '/:id',
   validateAuthentication,
   validateRequest({
