@@ -11,20 +11,20 @@ export const getAll = async (
 ) => {
   try {
     // Get current week based upon the stage and consive date
-    const currentStage = req.user!.stage
+    // const currentStage = req.user!.stage
     // Also get the consieve date
-    const consiveDate = ''
+    // const consiveDate = ''
 
     // based upon the stage and consiveDate get the current week
-    const currentWeek = getWeekNumber(new Date())
-    const consiveDateWeek = getWeekNumber(new Date(Date.parse(consiveDate)))
+    // const currentWeek = getWeekNumber(new Date())
+    // const consiveDateWeek = getWeekNumber(new Date(Date.parse(consiveDate)))
 
     const adminTodos = await Todos.find({
-      week: currentWeek.toString(),
+      // week: currentWeek.toString(),
     }).toArray()
     const userTodos = await UserTodos.find({
       $or: [{ userId: req.user!._id }, { userId: req.user!.partnerId }],
-      completed: false,
+      // completed: false,
     }).toArray()
 
     const userTodosWithoutAdmin = userTodos.filter((todo) => todo.adminTodo === undefined)
