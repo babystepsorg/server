@@ -29,33 +29,39 @@ export const getAll = async (
     }
 
     // const weekId = await
-    const adminTodos = await Todos.aggregate([
-      {
-        $lookup: {
-          from: 'weeks',
-          localField: 'week',
-          foreignField: '_id',
-          as: 'week',
-        },
-      },
-      {
-        $set: {
-          week: {
-            $arrayElemAt: ['$week.title', 0],
+    const [adminTodos, userTodos] = await Promise.all([
+      Todos.aggregate([
+        {
+          $lookup: {
+            from: 'weeks',
+            localField: 'week',
+            foreignField: '_id',
+            as: 'week',
           },
         },
-      },
-      {
-        $match: {
-          week: currentWeek.toString(),
+        {
+          $set: {
+            week: {
+              $arrayElemAt: ['$week.title', 0],
+            },
+          },
         },
-      },
-    ]).toArray()
-
-    const userTodos = await UserTodos.find({
-      $or: [{ userId: req.user!._id }, { userId: req.user!.partnerId }],
-      // completed: false,
-    }).toArray()
+        {
+          $match: {
+            week: currentWeek.toString(),
+          },
+        },
+        {
+          $addFields: {
+            admin: true,
+          },
+        },
+      ]).toArray(),
+      UserTodos.find({
+        $or: [{ userId: req.user!._id }, { userId: req.user!.partnerId }],
+        // completed: false,
+      }).toArray(),
+    ])
 
     const userTodosWithoutAdmin = userTodos.filter((todo) => todo.adminTodo === undefined)
     const userTodosWithAdmin = userTodos.filter((todo) => todo.adminTodo !== undefined)
@@ -86,7 +92,6 @@ export const createOne = async (
   next: NextFunction
 ) => {
   try {
-    console.log(req.body)
     const insertedTodo = await UserTodos.insertOne({
       ...req.body,
       userId: req.user!._id,
@@ -112,22 +117,50 @@ export async function updateOne(
     const { admin, ...data } = req.body
     if (admin) {
       // check if it already exist
-      //   const todo = UserTodos.find({ adminTodo: new ObjectId(req.params.id) })
+      const adminTodo = UserTodos.find({
+        adminTodo: new ObjectId(req.params.id),
+        $or: [{ userId: req.user!._id }, { userId: req.user!.partnerId }],
+      })
+
+      if (adminTodo) {
+        const result = await UserTodos.findOneAndUpdate(
+          {
+            adminTodo: new ObjectId(req.params.id),
+            $or: [{ userId: req.user!._id }, { userId: req.user!.partnerId }],
+          },
+          {
+            $set: {
+              completionDate: data.completionDate,
+              assignPartner: data.assignPartner,
+              userPriority: data.userPriority,
+            },
+          }
+        )
+
+        if (result.ok) {
+          return res.json(result.value!)
+        }
+
+        throw new Error('Something went wrong while updating todo.')
+      }
       const result = await UserTodos.insertOne({
-        ...data,
         adminTodo: new ObjectId(req.params.id),
         userId: req.user!._id,
+        completionDate: data.completionDate,
+        assignPartner: data.assignPartner,
+        userPriority: data.userPriority,
+        completed: false,
       })
       if (!result.acknowledged) throw new Error('Error while updaing task')
-      res.json({
+      return res.json({
         _id: result.insertedId,
-        adminTodo: new ObjectId(req.params.id),
         ...data,
       })
     }
     const result = await UserTodos.findOneAndUpdate(
       {
         _id: new ObjectId(req.params.id),
+        $or: [{ userId: req.user!._id }, { userId: req.user!.partnerId }],
       },
       {
         $set: data,
@@ -141,6 +174,101 @@ export async function updateOne(
       throw new Error(`Todo with id "${req.params.id}" not found.`)
     }
     res.json(result.value)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function completeOne(
+  req: Request<ParamsWithId, {}, { admin?: boolean }>,
+  res: Response<{}>,
+  next: NextFunction
+) {
+  try {
+    if (req.body.admin) {
+      const adminTodo = await UserTodos.findOne({ adminTodo: new ObjectId(req.params.id) })
+      if (adminTodo) {
+        await UserTodos.findOneAndUpdate(
+          {
+            adminTodo: new ObjectId(req.params.id),
+            $or: [{ userId: req.user!._id }, { userId: req.user!.partnerId }],
+          },
+          {
+            $set: {
+              completed: true,
+              completedOn: new Date().toISOString(),
+            },
+          }
+        )
+
+        return res.json({ message: 'Task completed sucessfully' })
+      }
+
+      await UserTodos.insertOne({
+        adminTodo: new ObjectId(req.params.id),
+        completed: true,
+        completedOn: new Date().toISOString(),
+        userId: req.user!._id,
+        userPriority: 'normal',
+      })
+
+      return res.json({ message: 'Task completed sucessfully' })
+    }
+    await UserTodos.findOneAndUpdate(
+      {
+        _id: new ObjectId(req.params.id),
+        $or: [{ userId: req.user!._id }, { userId: req.user!.partnerId }],
+      },
+      {
+        $set: {
+          completed: true,
+          completedOn: new Date().toISOString(),
+        },
+      }
+    )
+
+    return res.json({ message: 'Task completed sucessfully' })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function incompleteOne(
+  req: Request<ParamsWithId, {}, { admin?: boolean }>,
+  res: Response<{}>,
+  next: NextFunction
+) {
+  try {
+    if (req.body.admin) {
+      const result = await UserTodos.findOneAndUpdate(
+        {
+          adminTodo: new ObjectId(req.params.id),
+          $or: [{ userId: req.user!._id }, { userId: req.user!.partnerId }],
+        },
+        {
+          $set: {
+            completed: false,
+            completedOn: undefined,
+          },
+        }
+      )
+
+      return res.json({ message: 'Task incompleted sucessfully' })
+    }
+    await UserTodos.findOneAndUpdate(
+      {
+        _id: new ObjectId(req.params.id),
+        $or: [{ userId: req.user!._id }, { userId: req.user!.partnerId }],
+      },
+      {
+        $set: {
+          completed: false,
+          completedOn: undefined,
+        },
+      }
+    )
+
+    return res.json({ message: 'Task incompleted sucessfully' })
   } catch (error) {
     next(error)
   }

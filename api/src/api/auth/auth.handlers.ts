@@ -103,7 +103,11 @@ export async function refreshToken(
       userId: string
     }
 
-    const accessToken = generateToken({ userId: decoded.userId, type: 'ACCESS' })
+    // Todo: need to remove the expiresIn
+    const accessToken = generateToken(
+      { userId: decoded.userId, type: 'ACCESS' },
+      { expiresIn: '4hr' }
+    )
     const refreshToken = generateToken(
       { userId: decoded.userId, type: 'REFRESH' },
       { expiresIn: '30d' }

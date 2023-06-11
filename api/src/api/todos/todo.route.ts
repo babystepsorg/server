@@ -24,24 +24,50 @@ router.post(
   }),
   TodoHandler.createOne
 )
+
 router.patch(
   '/:id',
   validateAuthentication,
   validateRequest({
     body: UserTodo.omit({
-      title: true,
-      description: true,
       completed: true,
-      adminTodo: true,
       completedOn: true,
-      userId: true,
       priority: true,
       week: true,
+      adminTodo: true,
+      userId: true,
     }).extend({
       admin: z.boolean(),
+      title: z.string().optional(),
+      description: z.string().optional(),
+      userPriority: z.enum(['normal', 'high', 'crucial']).optional(),
+      completionDate: z.string().datetime().optional(),
+      assignPartner: z.boolean().optional(),
     }),
   }),
   TodoHandler.updateOne
+)
+
+router.post(
+  '/:id/complete',
+  validateAuthentication,
+  validateRequest({
+    body: z.object({
+      admin: z.boolean().default(false),
+    }),
+  }),
+  TodoHandler.completeOne
+)
+
+router.post(
+  '/:id/incomplete',
+  validateAuthentication,
+  validateRequest({
+    body: z.object({
+      admin: z.boolean().default(false),
+    }),
+  }),
+  TodoHandler.incompleteOne
 )
 
 export default router

@@ -4,17 +4,16 @@ import * as z from 'zod'
 import { db } from '../db'
 
 export const UserTodo = z.object({
-  title: z.string().nonempty('Title is required'),
+  title: z.string().optional(),
   description: z.string().optional(),
-  priority: z.enum(['1', '2', '3', '4']),
   week: z.string().optional(),
-  userPriority: z.enum(['normal', 'high', 'crucial']),
+  userPriority: z.enum(['normal', 'high', 'crucial']).default('normal').optional(),
   completed: z.boolean().default(false),
-  completedOn: z.date().optional(),
+  completedOn: z.string().datetime().optional(),
   completionDate: z.string().datetime().optional(),
   adminTodo: z.custom<ObjectId>().optional(),
   userId: z.custom<ObjectId>(),
-  assignPartner: z.boolean().default(false),
+  assignPartner: z.boolean().default(false).optional(),
 })
 
 export type UserTodo = z.infer<typeof UserTodo>
