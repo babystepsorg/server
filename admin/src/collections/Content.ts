@@ -5,7 +5,7 @@ import richText from '../fields/richText'
 import { slugField } from '../fields/slug'
 
 const Content: CollectionConfig = {
-  slug: 'posts',
+  slug: 'content',
   admin: {
     useAsTitle: 'title',
     // preview: (doc) => 'https://babysteps.world/testing/things',

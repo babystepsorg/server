@@ -61,23 +61,23 @@ app.post('/api/careers', upload.single('resume'), async (req, res) => {
   })
   try {
     await result.save()
-    // sendMail(
-    //   `${req.body.full_name} applied for ${req.body.job} on Careers page`,
-    //   `
-    //   <p>A new job application has been submitted for the role of ${
-    //     req.body.job
-    //   }. Please find the details of the applicant below.</p>
-    //   <br />
+    sendMail(
+      `${req.body.full_name} applied for ${req.body.job} on Careers page`,
+      `
+      <p>A new job application has been submitted for the role of ${
+        req.body.job
+      }. Please find the details of the applicant below.</p>
+      <br />
 
-    //   Full Name: <strong>${req.body.full_name}</strong><br />
-    //   Email: <strong>${req.body.email}</strong><br />
-    //   Phone Number: <strong>${req.body.phone}</strong><br />
-    //   LinkedIn URL: <strong>${req.body.linkedin_url}</strong><br />
-    //   Resume Link: <strong>${resume_link}</strong><br />
-    //   Cover Letter: <strong>${req.body.cover_letter}</strong><br />
-    //   Portfolio Link: <strong>${req.body.portfolio_link || 'Not provided'}</strong><br />
-    //   `
-    // )
+      Full Name: <strong>${req.body.full_name}</strong><br />
+      Email: <strong>${req.body.email}</strong><br />
+      Phone Number: <strong>${req.body.phone}</strong><br />
+      LinkedIn URL: <strong>${req.body.linkedin_url}</strong><br />
+      Resume Link: <strong>${resume_link}</strong><br />
+      Cover Letter: <strong>${req.body.cover_letter}</strong><br />
+      Portfolio Link: <strong>${req.body.portfolio_link || 'Not provided'}</strong><br />
+      `
+    )
   } catch (err) {
     res.status(500).send(err)
   }

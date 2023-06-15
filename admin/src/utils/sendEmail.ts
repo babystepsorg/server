@@ -7,7 +7,7 @@ export const sendMail = (subject: string, body: string) => {
     secure: true, // use SSL
     auth: {
       user: 'tech@babysteps.world',
-      pass: 'Alzmqp10#',
+      pass: 'Dx2ipp99mScm',
     },
   })
 

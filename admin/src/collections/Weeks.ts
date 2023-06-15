@@ -29,6 +29,10 @@ const Weeks: CollectionConfig = {
       name: 'overview',
       type: 'text',
     },
+    {
+      name: 'message',
+      type: 'text',
+    },
   ],
 }
 
