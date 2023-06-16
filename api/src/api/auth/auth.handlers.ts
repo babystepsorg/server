@@ -3,6 +3,7 @@ import { comparePassword, createUser, findUserByEmail } from '../../services/use
 import { User, UserWithId } from '../../models/user'
 import { generateToken, verifyToken } from '../../utils/jwt'
 import { ObjectId } from 'mongodb'
+import { getCurrentWeek } from '../../utils/week'
 
 type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
   tokens: {
@@ -10,6 +11,8 @@ type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
     access: string
   }
 }
+
+type Me = Omit<UserWithId, 'password' | 'salt'> & { week: string }
 
 export async function signUp(
   req: Request<{}, AuthUser, Omit<User, 'salt'> & { token?: string }>,
@@ -80,14 +83,11 @@ export async function logIn(
   }
 }
 
-export async function me(
-  req: Request<{}, Omit<User, 'salt' | 'password'> | null>,
-  res: Response<Omit<User, 'salt' | 'password'> | null>,
-  next: NextFunction
-) {
+export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunction) {
   try {
+    const week = getCurrentWeek(req.user!.stage, req.user!.createdAt)
     res.status(200)
-    res.json(req.user)
+    res.json({ ...req.user!, week: week.toString() })
   } catch (err) {
     next(err)
   }
