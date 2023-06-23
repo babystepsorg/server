@@ -22,7 +22,7 @@ export const getAll = async (
     let currentWeek = getWeekNumber(new Date())
 
     if (currentStage === 'pre-conception') {
-      currentWeek = currentWeek - createdAtWeek + 1
+      currentWeek = currentWeek - createdAtWeek
       if (currentWeek > 4) {
         currentWeek = 4
       }
