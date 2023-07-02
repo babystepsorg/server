@@ -3,7 +3,7 @@ import { UserTodo, UserTodoWithId, UserTodos } from '../../models/userTodo'
 import { ParamsWithId } from '../../interfaces/ParamsWithId'
 import { ObjectId } from 'mongodb'
 import { Todos } from './todo.model'
-import { getWeekNumber } from '../../utils/week'
+import { getCurrentWeek, getWeekNumber } from '../../utils/week'
 
 export const getAll = async (
   req: Request<{}, Array<UserTodoWithId>>,
@@ -11,30 +11,21 @@ export const getAll = async (
   next: NextFunction
 ) => {
   try {
-    // Get current week based upon the stage and consive date
     const currentStage = req.user!.stage
     const accountCreationData = req.user!.createdAt
-    // Also get the consieve date
-    // const consiveDate = ''
+    const week = getCurrentWeek(currentStage, accountCreationData);
 
-    // based upon the stage and consiveDate get the current week
-    let createdAtWeek = getWeekNumber(new Date(accountCreationData))
-    let currentWeek = getWeekNumber(new Date())
-
-    if (currentStage === 'pre-conception') {
-      currentWeek = currentWeek - createdAtWeek
-      if (currentWeek > 4) {
-        currentWeek = 4
-      }
-    }
-
-    // const weekId = await
     const [adminTodos, userTodos] = await Promise.all([
       Todos.aggregate([
         {
+          $addFields: {
+            'weekId': {$toObjectId: "$week"}  
+          }
+        },
+        {
           $lookup: {
             from: 'weeks',
-            localField: 'week',
+            localField: 'weekId',
             foreignField: '_id',
             as: 'week',
           },
@@ -48,7 +39,7 @@ export const getAll = async (
         },
         {
           $match: {
-            week: currentWeek.toString(),
+            'week': week.toString(),
           },
         },
         {
