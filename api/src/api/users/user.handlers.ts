@@ -41,8 +41,8 @@ export async function findOne(
 }
 
 export async function updateOne(
-  req: Request<ParamsWithId, UserWithId, User>,
-  res: Response<UserWithId>,
+  req: Request<ParamsWithId, Omit<UserWithId, "password" | "salt">, User>,
+  res: Response<Omit<UserWithId, "password" | "salt">>,
   next: NextFunction
 ) {
   try {
@@ -61,7 +61,8 @@ export async function updateOne(
       res.status(404)
       throw new Error(`User with id "${req.params.id}" not found.`)
     }
-    res.json(result.value)
+    const { password, salt, ...rest } = result.value;
+    res.json(rest)
   } catch (error) {
     next(error)
   }
