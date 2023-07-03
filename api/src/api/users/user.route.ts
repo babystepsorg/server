@@ -6,6 +6,11 @@ import { User } from '../../models/user'
 const router = Router()
 
 router.post('/:id/invite-partner', validateAuthentication, UserHandler.invitePartner)
+router.get(
+  "/:id",
+  validateAuthentication,
+  UserHandler.findOne
+)
 router.patch(
   '/:id',
   validateAuthentication,
