@@ -17,6 +17,12 @@ router.patch(
   validateRequest({
     body: User.omit({
       email: true,
+      password: true,
+      stage: true,
+      salt: true,
+      createdAt: true,
+      role: true,
+      updatedAt: true,
     }),
   }),
   UserHandler.updateOne
