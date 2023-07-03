@@ -10,10 +10,7 @@ export const getAll = async (
   next: NextFunction
 ) => {
   try {
-    const calanderTasks = await Calanders.find({
-      $or: [{ userId: req.user!._id }, { userId: req.user!.partnerId }],
-    }).toArray()
-    const userTodos = await UserTodos.aggregate([
+    const calanderTasks = await Calanders.aggregate([
       {
         $match: {
           $or: [
@@ -24,9 +21,31 @@ export const getAll = async (
               userId: req.user!.partnerId,
             },
           ],
+        },
+      },
+      {
+        $lookup: {
+          from:'genetle-reminders',
+          localField: 'gentleReminderId',
+          foreignField: '_id',
+          as:'gentlereminder'
+        }
+      }
+    ]).toArray()
+    const userTodos = await UserTodos.aggregate([
+      {
+        $match: {
           completionData: {
             $exists: true,
           },
+          $or: [
+            {
+              userId: req.user!._id,
+            },
+            {
+              userId: req.user!.partnerId,
+            },
+          ],
         },
       },
     ]).toArray()
