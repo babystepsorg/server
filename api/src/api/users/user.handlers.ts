@@ -23,8 +23,8 @@ export async function createOne(
 }
 
 export async function findOne(
-  req: Request<ParamsWithId, UserWithId, {}>,
-  res: Response<UserWithId>,
+  req: Request<ParamsWithId, Omit<UserWithId, "password" | "salt">, {}>,
+  res: Response<Omit<UserWithId, "password" | "salt">>,
   next: NextFunction
 ) {
   try {
@@ -33,7 +33,8 @@ export async function findOne(
       res.status(404)
       throw new Error(`User with id "${req.params.id}" not found.`)
     }
-    res.json(result)
+    const { password, salt, ...rest} = result;
+    res.json(rest)
   } catch (error) {
     next(error)
   }
