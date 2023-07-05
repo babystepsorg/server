@@ -33,6 +33,36 @@ const Weeks: CollectionConfig = {
       name: 'message',
       type: 'text',
     },
+    {
+      name: 'planner_description',
+      label: 'Planner Descripion',
+      type: 'text',
+    },
+    {
+      name: 'symptoms_description',
+      label: 'Symptoms Descripion',
+      type: 'text',
+    },
+    {
+      name: 'todo_description',
+      label: 'Todo Descripion',
+      type: 'text',
+    },
+    {
+      name: 'content_description',
+      label: 'Content Descripion',
+      type: 'text',
+    },
+    {
+      name: 'product_description',
+      label: 'Product Descripion',
+      type: 'text',
+    },
+    {
+      name: 'specialist_description',
+      label: 'Specialist Descripion',
+      type: 'text',
+    },
   ],
 }
 
