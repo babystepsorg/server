@@ -7,6 +7,7 @@ const Media: CollectionConfig = {
   slug: 'media',
   upload: {
     staticDir: path.resolve(__dirname, '../../media'),
+    staticURL: 'https://api.babysteps.world/assets',
   },
   access: {
     create: () => true,

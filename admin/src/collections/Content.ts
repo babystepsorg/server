@@ -104,26 +104,26 @@ const Content: CollectionConfig = {
       ],
     },
     slugField(),
-    {
-      name: 'author',
-      type: 'relationship',
-      relationTo: 'admin_users',
-      required: true,
-      admin: {
-        position: 'sidebar',
-      },
-    },
-    {
-      name: 'publishedOn',
-      type: 'date',
-      required: true,
-      admin: {
-        date: {
-          pickerAppearance: 'dayAndTime',
-        },
-        position: 'sidebar',
-      },
-    },
+    // {
+    //   name: 'author',
+    //   type: 'relationship',
+    //   relationTo: 'admin_users',
+    //   required: true,
+    //   admin: {
+    //     position: 'sidebar',
+    //   },
+    // },
+    // {
+    //   name: 'publishedOn',
+    //   type: 'date',
+    //   required: true,
+    //   admin: {
+    //     date: {
+    //       pickerAppearance: 'dayAndTime',
+    //     },
+    //     position: 'sidebar',
+    //   },
+    // },
   ],
 }
 

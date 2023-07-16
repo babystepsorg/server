@@ -53,6 +53,11 @@ export default buildConfig({
   graphQL: {
     schemaOutputFile: path.resolve(__dirname, 'generated-schema.graphql'),
   },
+  upload: {
+    limits: {
+      fileSize: 10000000, // 10 MB, written in bytes
+    }
+  },
   plugins: [
     cloudStorage({
       collections: {

@@ -29,6 +29,7 @@ const Todo: CollectionConfig = {
           type: 'relationship',
           relationTo: 'weeks',
           required: true,
+          hasMany: true,
         },
         {
           name: 'priority',
