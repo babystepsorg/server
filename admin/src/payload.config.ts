@@ -15,6 +15,7 @@ import Calender from './collections/Calender'
 import { cloudStorage } from '@payloadcms/plugin-cloud-storage'
 import { s3Adapter } from '@payloadcms/plugin-cloud-storage/s3'
 import Careers from './collections/Careers'
+import Subheadings from './globals/Subheading'
 
 const adapter = s3Adapter({
   config: {
@@ -46,6 +47,9 @@ export default buildConfig({
     Careers,
     Media,
     Users,
+  ],
+  globals: [
+    Subheadings
   ],
   typescript: {
     outputFile: path.resolve(__dirname, 'payload-types.ts'),

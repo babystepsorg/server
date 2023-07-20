@@ -54,13 +54,44 @@ const Content: CollectionConfig = {
       name: 'layout',
     },
     {
+      type: 'radio',
+      options: [
+        {
+          label: 'Upload',
+          value: 'upload',
+        },
+        {
+          label: 'Link',
+          value: 'link',
+        },
+      ],
+      defaultValue: 'link',
+      name: 'type',
+      admin: {
+        condition: (data: any) => {
+          if (data.layout === 'video') return true
+        }
+      }
+    },
+    {
       name: 'video',
       type: 'upload',
       relationTo: 'media',
       required: true,
       admin: {
         condition: (data: any) => {
-          if (data.layout === 'video') return true
+          if (data.layout === 'video' && data.type === 'upload') return true
+        },
+      },
+    },
+    {
+      name: 'video_url',
+      type: 'text',
+      label: 'YouTube URL',
+      required: true,
+      admin: {
+        condition: (data: any) => {
+          if (data.layout === 'video' && data.type === 'link') return true
         },
       },
     },
