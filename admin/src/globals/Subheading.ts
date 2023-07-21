@@ -117,6 +117,10 @@ const Subheadings: GlobalConfig = {
 			],
 		}
 	],
+	access: {
+		read: () => true,
+		update: () => true,
+	}
 };
 
 export default Subheadings;
