@@ -3,12 +3,23 @@ import { Calander, CalanderWithId, Calanders } from '../../models/calander'
 import { UserTodos } from '../../models/userTodo'
 import { ParamsWithId } from '../../interfaces/ParamsWithId'
 import { ObjectId } from 'mongodb'
+import { getCurrentWeek, getCurrentWeekFromConsiveDate, getDaysOfWeekForWeek } from '../../utils/week'
 
 export const getAll = async (
-  req: Request<{}, Array<any>>,
-  res: Response<Array<any>>,
+  req: Request<{}, any>,
+  res: Response<any>,
   next: NextFunction
 ) => {
+  const userCreationDate = req.user!.createdAt
+  const userConsiveDate = req.user!.consiveDate
+
+  let week = getCurrentWeek(req.user!.stage, userCreationDate)
+  if (userConsiveDate) {
+    week = getCurrentWeekFromConsiveDate(userConsiveDate, userCreationDate)
+  }
+
+  const days = getDaysOfWeekForWeek(week, new Date(userCreationDate))
+
   try {
     const calanderTasks = await Calanders.aggregate([
       {
@@ -49,7 +60,11 @@ export const getAll = async (
         },
       },
     ]).toArray()
-    res.json([...calanderTasks, ...userTodos])
+    res.json({
+      days,
+      data: [...calanderTasks, ...userTodos]
+    })
+    // send the week dates as well...
   } catch (error) {
     next(error)
   }

@@ -3,43 +3,54 @@ import { UserTodo, UserTodoWithId, UserTodos } from '../../models/userTodo'
 import { ParamsWithId } from '../../interfaces/ParamsWithId'
 import { ObjectId } from 'mongodb'
 import { Todos } from './todo.model'
-import { getCurrentWeek, getWeekNumber } from '../../utils/week'
+import { getCurrentWeek, getCurrentWeekFromConsiveDate, getWeekNumber } from '../../utils/week'
 
 export const getAll = async (
-  req: Request<{}, Array<UserTodoWithId>>,
-  res: Response<Array<UserTodoWithId>>,
+  req: Request<any>,
+  res: Response<any>,
   next: NextFunction
 ) => {
   try {
     const currentStage = req.user!.stage
     const accountCreationData = req.user!.createdAt
-    const week = getCurrentWeek(currentStage, accountCreationData);
+    let week = getCurrentWeek(currentStage, accountCreationData);
+    if (req.user!.consiveDate) {
+      week = getCurrentWeekFromConsiveDate(req.user!.consiveDate, accountCreationData)
+    }
 
     const [adminTodos, userTodos] = await Promise.all([
       Todos.aggregate([
         {
           $addFields: {
-            'weekId': {$toObjectId: "$week"}  
+            weeks: {
+              $map: {
+                    input: "$week",
+                    as: "id",
+                    in: {
+                      $toObjectId: "$$id"
+                    }
+                }
+            }
           }
         },
         {
           $lookup: {
             from: 'weeks',
-            localField: 'weekId',
+            localField: 'weeks',
             foreignField: '_id',
             as: 'week',
           },
         },
-        {
-          $set: {
-            week: {
-              $arrayElemAt: ['$week.title', 0],
-            },
-          },
-        },
+        // {
+        //   $set: {
+        //     week: {
+        //       $arrayElemAt: ['$week.title', 0],
+        //     },
+        //   },
+        // },
         {
           $match: {
-            'week': week.toString(),
+            'week.title': week.toString(),
           },
         },
         {
@@ -47,6 +58,17 @@ export const getAll = async (
             admin: true,
           },
         },
+        {
+          $project: {
+            _id: 1,
+            title: 1,
+            description: 1,
+            priority: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            admin: 1
+          }
+        }
       ]).toArray(),
       UserTodos.find({
         $or: [{ userId: req.user!._id }, { userId: req.user!.partnerId }],
@@ -63,7 +85,7 @@ export const getAll = async (
       )
       if (adminTodo) {
         const { _id, ...rest } = userAdminTodo
-        const adminTodoIndex = adminTodos.indexOf(adminTodo)
+        const adminTodoIndex = adminTodos.indexOf((adminTodo as any))
         const updatedTodo = {
           ...adminTodo,
           ...rest,

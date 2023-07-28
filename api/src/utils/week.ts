@@ -27,3 +27,29 @@ export const getCurrentWeek = (stage: string, createdAt: string) => {
 
   return currentWeek
 }
+
+export const getCurrentWeekFromConsiveDate = (consiveDate: string, createdAt: string) => {
+  let createdAtWeek = getWeekNumber(new Date(createdAt))
+  let consiveAtWeek = getWeekNumber(new Date(consiveDate))
+
+  return (consiveAtWeek - createdAtWeek) + 1
+}
+
+
+export const getDaysOfWeekForWeek = (weekNumber: number, startDate: Date) => {
+  const daysInWeek = 7;
+  const daysOfWeek = [];
+
+  // Calculate the start date of the specified week
+  const targetWeekStart = new Date(startDate);
+  targetWeekStart.setDate(startDate.getDate() + (weekNumber - 1) * daysInWeek);
+
+  // Loop through each day of the week (0: Sunday, 1: Monday, ..., 6: Saturday)
+  for (let i = 0; i < daysInWeek; i++) {
+    const currentDate = new Date(targetWeekStart);
+    currentDate.setDate(targetWeekStart.getDate() + i);
+    daysOfWeek.push(currentDate);
+  }
+
+  return daysOfWeek;
+}

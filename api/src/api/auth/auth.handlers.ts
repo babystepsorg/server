@@ -3,7 +3,7 @@ import { comparePassword, createUser, findUserByEmail } from '../../services/use
 import { User, UserWithId } from '../../models/user'
 import { generateToken, verifyToken } from '../../utils/jwt'
 import { ObjectId } from 'mongodb'
-import { getCurrentWeek } from '../../utils/week'
+import { getCurrentWeek, getCurrentWeekFromConsiveDate } from '../../utils/week'
 
 type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
   tokens: {
@@ -85,7 +85,11 @@ export async function logIn(
 
 export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunction) {
   try {
-    const week = getCurrentWeek(req.user!.stage, req.user!.createdAt)
+    // if consive date
+    let week = getCurrentWeek(req.user!.stage, req.user!.createdAt)
+    if (req.user?.consiveDate) {
+      week = getCurrentWeekFromConsiveDate(req.user!.consiveDate, req.user!.createdAt)
+    }
     res.status(200)
     res.json({ ...req.user!, week: week.toString() })
   } catch (err) {
