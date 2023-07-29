@@ -45,6 +45,11 @@ export async function updateOne(
   res: Response<Omit<UserWithId, "password" | "salt">>,
   next: NextFunction
 ) {
+  
+  if (req.body.consiveDate) {
+    req.body.stage = "pregnancy"
+  }
+
   try {
     const result = await Users.findOneAndUpdate(
       {

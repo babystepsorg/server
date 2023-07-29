@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { validateAuthentication, validateRequest } from '../../middlewares'
 import * as UserHandler from './user.handlers'
 import { User } from '../../models/user'
+import { z } from 'zod'
 
 const router = Router()
 
@@ -23,6 +24,8 @@ router.patch(
       createdAt: true,
       role: true,
       updatedAt: true,
+    }).extend({
+      name: z.string().optional(),
     }),
   }),
   UserHandler.updateOne
