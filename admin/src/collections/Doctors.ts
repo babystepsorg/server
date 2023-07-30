@@ -53,6 +53,10 @@ const Doctors: CollectionConfig = {
               label: 'LinkedIn',
               value: 'linkedin',
             },
+            {
+              label: 'WhatsApp',
+              value: 'whatsapp'
+            }
           ],
         },
         {
