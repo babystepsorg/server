@@ -54,7 +54,7 @@ export const getAll = async (
               userId: req.user!.partnerId,
             },
           ],
-          completionData: {
+          completionDate: {
             $exists: true,
           },
         },
