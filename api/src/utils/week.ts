@@ -29,10 +29,21 @@ export const getCurrentWeek = (stage: string, createdAt: string) => {
 }
 
 export const getCurrentWeekFromConsiveDate = (consiveDate: string, createdAt: string) => {
-  let createdAtWeek = getWeekNumber(new Date(createdAt))
-  let consiveAtWeek = getWeekNumber(new Date(consiveDate))
+  let givenDate = new Date(consiveDate);
+  let currentDate = new Date();
 
-  return (consiveAtWeek - createdAtWeek) + 1
+  givenDate.setHours(0, 0, 0, 0);
+  currentDate.setHours(0, 0, 0, 0);
+
+  let weeks = 0; // Initialize weeks to 0, as the current week is considered as the first week.
+
+  // Check if givenDate is greater than currentDate, as we want to find past dates.
+  while (givenDate > currentDate) {
+    givenDate.setDate(givenDate.getDate() - 7);
+    weeks += 1;
+  }
+
+  return 40 - weeks;
 }
 
 
