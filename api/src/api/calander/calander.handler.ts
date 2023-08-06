@@ -46,9 +46,6 @@ export const getAll = async (
     const userTodos = await UserTodos.aggregate([
       {
         $match: {
-          completionData: {
-            $exists: true,
-          },
           $or: [
             {
               userId: req.user!._id,
@@ -57,6 +54,9 @@ export const getAll = async (
               userId: req.user!.partnerId,
             },
           ],
+          completionData: {
+            $exists: true,
+          },
         },
       },
     ]).toArray()
@@ -64,7 +64,6 @@ export const getAll = async (
       days,
       data: [...calanderTasks, ...userTodos]
     })
-    // send the week dates as well...
   } catch (error) {
     next(error)
   }
