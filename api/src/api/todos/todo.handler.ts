@@ -41,13 +41,6 @@ export const getAll = async (
             as: 'week',
           },
         },
-        // {
-        //   $set: {
-        //     week: {
-        //       $arrayElemAt: ['$week.title', 0],
-        //     },
-        //   },
-        // },
         {
           $match: {
             'week.title': week.toString(),
@@ -130,7 +123,7 @@ export async function updateOne(
     const { admin, ...data } = req.body
     if (admin) {
       // check if it already exist
-      const adminTodo = UserTodos.find({
+      const adminTodo = await UserTodos.findOne({
         adminTodo: new ObjectId(req.params.id),
         $or: [{ userId: req.user!._id }, { userId: req.user!.partnerId }],
       })
@@ -144,8 +137,8 @@ export async function updateOne(
           {
             $set: {
               completionDate: data.completionDate,
-              assignPartner: data.assignPartner,
-              userPriority: data.userPriority,
+              assignPartner: data?.assignPartner ?? false,
+              userPriority: data?.userPriority ?? 'normal',
             },
           }
         )
@@ -164,6 +157,7 @@ export async function updateOne(
         userPriority: data.userPriority,
         completed: false,
       })
+
       if (!result.acknowledged) throw new Error('Error while updaing task')
       return res.json({
         _id: result.insertedId,
@@ -284,5 +278,25 @@ export async function incompleteOne(
     return res.json({ message: 'Task incompleted sucessfully' })
   } catch (error) {
     next(error)
+  }
+}
+
+
+export const deleteOne = async (
+  req: Request<ParamsWithId>,
+  res: Response<any>,
+  next: NextFunction
+) => {
+  try {
+    const deletedTodo = await UserTodos.deleteOne({
+      _id: new ObjectId(req.params.id)
+    })
+    if (!deletedTodo.acknowledged) throw new Error('Error deleting todo')
+    res.status(200)
+    res.json({
+      sucess: true
+    })
+  } catch (err) {
+    next(err)
   }
 }

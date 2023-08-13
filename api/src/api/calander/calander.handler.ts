@@ -4,6 +4,7 @@ import { UserTodos } from '../../models/userTodo'
 import { ParamsWithId } from '../../interfaces/ParamsWithId'
 import { ObjectId } from 'mongodb'
 import { getCurrentWeek, getCurrentWeekFromConsiveDate, getDaysOfWeekForWeek } from '../../utils/week'
+import { Planners } from '../../models/planner'
 
 export const getAll = async (
   req: Request<{}, any>,
@@ -21,48 +22,134 @@ export const getAll = async (
   const days = getDaysOfWeekForWeek(week, new Date(userCreationDate))
 
   try {
-    const calanderTasks = await Calanders.aggregate([
-      {
-        $match: {
-          $or: [
-            {
-              userId: req.user!._id,
-            },
-            {
-              userId: req.user!.partnerId,
-            },
-          ],
+    // add the date directly from here
+    const [plannerTodos, calanderTasks, userTodos] = await Promise.all([
+      Planners.aggregate([
+        {
+          $addFields: {
+            weeks: {
+              $map: {
+                    input: "$weeks",
+                    as: "id",
+                    in: {
+                      $toObjectId: "$$id"
+                    }
+                }
+            }
+          }
         },
-      },
-      {
-        $lookup: {
-          from:'genetle-reminders',
-          localField: 'gentleReminderId',
-          foreignField: '_id',
-          as:'gentlereminder'
-        }
-      }
-    ]).toArray()
-    const userTodos = await UserTodos.aggregate([
-      {
-        $match: {
-          $or: [
-            {
-              userId: req.user!._id,
-            },
-            {
-              userId: req.user!.partnerId,
-            },
-          ],
-          completionDate: {
-            $exists: true,
+        {
+          $lookup: {
+            from: 'weeks',
+            localField: 'weeks',
+            foreignField: '_id',
+            as: 'week',
           },
         },
-      },
-    ]).toArray()
+        {
+          $match: {
+            'week.title': week.toString(),
+          },
+        },
+        {
+          $addFields: {
+            admin: true,
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            title: 1,
+            roles: 1,
+            priority: 1,
+            day: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            admin: 1,
+          }
+        }
+      ]).toArray(),
+      Calanders.aggregate([
+        {
+          $match: {
+            $or: [
+              {
+                userId: req.user!._id,
+              },
+              {
+                userId: req.user!.partnerId,
+              },
+            ],
+          },
+        },
+        {
+          $lookup: {
+            from:'genetle-reminders',
+            localField: 'gentleReminderId',
+            foreignField: '_id',
+            as:'gentlereminder'
+          }
+        }
+      ]).toArray(),
+      UserTodos.aggregate([
+        {
+          $match: {
+            $or: [
+              {
+                userId: req.user!._id,
+              },
+              {
+                userId: req.user!.partnerId,
+              },
+            ],
+            completionDate: {
+              $exists: true,
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'todos',
+            localField: 'adminTodo',
+            foreignField: '_id',
+            as: 'adminTodo',
+          }
+        },
+        {
+          $set: {
+            adminTodo: {
+              $cond: {
+                if: { $gt: [{ $size: '$adminTodo' }, 0] }, // Check if adminTodo array has elements
+                then: { $arrayElemAt: ['$adminTodo', 0] }, // If adminTodo array has elements, set the first element
+                else: null, // If adminTodo array is empty, set adminTodo to null
+              },
+            },
+            title: {
+              $cond: [
+                { $gt: [{ $size: '$adminTodo' }, 0] }, // If adminTodo array has elements
+                { $arrayElemAt: ['$adminTodo.title', 0] }, // Use adminTodo.title
+                '$title' // Use the default title value (change 'defaultTitle' to your preferred default)
+              ],
+            },
+            description: {
+              $cond: [
+                { $gt: [{ $size: '$adminTodo' }, 0] }, // If adminTodo array has elements
+                { $arrayElemAt: ['$adminTodo.description', 0] }, // Use adminTodo.description
+                '$description' // Use the default description value (change 'defaultDescription' to your preferred default)
+              ],
+            },
+          },
+        },
+        {
+          $project: {
+            adminTodo: 0
+          }
+        }
+      ]).toArray()
+    ])
     res.json({
       days,
-      data: [...calanderTasks, ...userTodos]
+      data: [...calanderTasks, ...userTodos, ...plannerTodos]
     })
   } catch (error) {
     next(error)

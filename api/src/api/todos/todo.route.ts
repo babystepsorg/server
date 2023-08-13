@@ -19,7 +19,7 @@ router.post(
       priority: true,
       week: true,
     }).extend({
-      completionData: z.string().datetime().optional(),
+      completionDate: z.string().datetime().optional(),
     }),
   }),
   TodoHandler.createOne
@@ -52,6 +52,9 @@ router.post(
   '/:id/complete',
   validateAuthentication,
   validateRequest({
+    params: z.object({
+      id: z.string()
+    }),
     body: z.object({
       admin: z.boolean().default(false),
     }),
@@ -63,11 +66,25 @@ router.post(
   '/:id/incomplete',
   validateAuthentication,
   validateRequest({
+    params: z.object({
+      id: z.string()
+    }),
     body: z.object({
       admin: z.boolean().default(false),
     }),
   }),
   TodoHandler.incompleteOne
+)
+
+router.delete(
+  '/:id',
+  validateAuthentication,
+  validateRequest({
+    params: z.object({
+      id: z.string()
+    }),
+  }),
+  TodoHandler.deleteOne
 )
 
 export default router
