@@ -15,11 +15,12 @@ export const getAll = async (
   const userConsiveDate = req.user!.consiveDate
 
   let week = getCurrentWeek(req.user!.stage, userCreationDate)
+  let days = getDaysOfWeekForWeek({weekNumber: week, createdAt: new Date(userCreationDate)})
   if (userConsiveDate) {
-    week = getCurrentWeekFromConsiveDate(userConsiveDate, userCreationDate)
+    const cw  = getCurrentWeekFromConsiveDate(userConsiveDate, userCreationDate)
+    week = cw.week
+    days = getDaysOfWeekForWeek({ weekNumber: week, consiveDate: cw.date })
   }
-
-  const days = getDaysOfWeekForWeek(week, new Date(userCreationDate))
 
   try {
     // add the date directly from here
@@ -147,9 +148,57 @@ export const getAll = async (
         }
       ]).toArray()
     ])
+
+    const currentDate = new Date()
+    currentDate.setHours(0, 0, 0, 0)
+    currentDate.setDate(currentDate.getDate() + 1)
+
+    // Map the tasks to their respective days
+    const result = days.map((day, index) => {
+      const tasks = []
+
+      day.setHours(0, 0, 0, 0);
+      tasks.push(...plannerTodos.filter(todo => todo.day === (index + 1).toString()))
+
+      let foundTasks = userTodos.filter((it: any) => {
+        let td = it.date;
+        if (it.completionDate) {
+          td = it.completionDate
+        }
+
+        const taskDate: Date = new Date(td);
+        taskDate.setHours(0, 0, 0, 0);
+
+        return taskDate.getTime() == day.getTime();
+      })
+      tasks.push(...foundTasks)
+
+      foundTasks = calanderTasks.filter((it: any) => {
+        let td = it.date;
+        if (it.completionDate) {
+          td = it.completionDate
+        }
+
+        const taskDate: Date = new Date(td);
+        taskDate.setHours(0, 0, 0, 0);
+
+        return taskDate.getTime() == day.getTime();
+      })
+      tasks.push(...foundTasks)
+
+      const alternate = ((Math.floor((index) / 7) % 2) === 0) ? true : false;
+
+      return {
+        day,
+        tasks,
+        alternate
+      }
+    })
+
+    const data = result.filter(it => it.day.getTime() >= currentDate.getTime())
+
     res.json({
-      days,
-      data: [...calanderTasks, ...userTodos, ...plannerTodos]
+      data
     })
   } catch (error) {
     next(error)

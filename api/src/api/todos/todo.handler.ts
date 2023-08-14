@@ -15,7 +15,8 @@ export const getAll = async (
     const accountCreationData = req.user!.createdAt
     let week = getCurrentWeek(currentStage, accountCreationData);
     if (req.user!.consiveDate) {
-      week = getCurrentWeekFromConsiveDate(req.user!.consiveDate, accountCreationData)
+      const cw = getCurrentWeekFromConsiveDate(req.user!.consiveDate, accountCreationData)
+      week = cw.week
     }
 
     const [adminTodos, userTodos] = await Promise.all([

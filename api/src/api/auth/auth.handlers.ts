@@ -88,7 +88,8 @@ export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunc
     // if consive date
     let week = getCurrentWeek(req.user!.stage, req.user!.createdAt)
     if (req.user?.consiveDate) {
-      week = getCurrentWeekFromConsiveDate(req.user!.consiveDate, req.user!.createdAt)
+      const cw  = getCurrentWeekFromConsiveDate(req.user!.consiveDate, req.user!.createdAt)
+      week = cw.week
     }
     res.status(200)
     res.json({ ...req.user!, week: week.toString() })

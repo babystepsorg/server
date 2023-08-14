@@ -43,23 +43,35 @@ export const getCurrentWeekFromConsiveDate = (consiveDate: string, createdAt: st
     weeks += 1;
   }
 
-  return 40 - weeks;
+  return {week: 40 - weeks, date: givenDate};
 }
 
 
-export const getDaysOfWeekForWeek = (weekNumber: number, startDate: Date) => {
+export const getDaysOfWeekForWeek = ({weekNumber, createdAt, consiveDate}: {weekNumber: number, createdAt?: Date, consiveDate?: Date}) => {
   const daysInWeek = 7;
   const daysOfWeek = [];
+  
+  if (createdAt) {
+    // Calculate the start date of the specified week
+    const targetWeekStart = new Date(createdAt);
+    targetWeekStart.setHours(0, 0, 0, 0)
+    targetWeekStart.setDate(createdAt.getDate() + (weekNumber - 1) * daysInWeek);
 
-  // Calculate the start date of the specified week
-  const targetWeekStart = new Date(startDate);
-  targetWeekStart.setDate(startDate.getDate() + (weekNumber - 1) * daysInWeek);
+    for (let i = 0; i < daysInWeek * 4; i++) {
+      const currentDate = new Date(targetWeekStart);
+      daysOfWeek.push(currentDate);
+      currentDate.setDate(targetWeekStart.getDate() + i);
+    }
+  } else if (consiveDate) {
+    // Calculate the start date of the specified week
+    const targetWeekStart = new Date(consiveDate);
+    targetWeekStart.setHours(0, 0, 0, 0)
 
-  // Loop through each day of the week (0: Sunday, 1: Monday, ..., 6: Saturday)
-  for (let i = 0; i < daysInWeek; i++) {
-    const currentDate = new Date(targetWeekStart);
-    currentDate.setDate(targetWeekStart.getDate() + i);
-    daysOfWeek.push(currentDate);
+    for (let i = 0; i < daysInWeek * 4; i++) {
+      const currentDate = new Date(targetWeekStart);
+      daysOfWeek.push(currentDate);
+      currentDate.setDate(targetWeekStart.getDate() + i);
+    }
   }
 
   return daysOfWeek;
