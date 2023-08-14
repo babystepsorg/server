@@ -151,7 +151,6 @@ export const getAll = async (
 
     const currentDate = new Date()
     currentDate.setHours(0, 0, 0, 0)
-    currentDate.setDate(currentDate.getDate() + 1)
 
     // Map the tasks to their respective days
     const result = days.map((day, index) => {
