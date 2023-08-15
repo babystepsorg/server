@@ -6,7 +6,7 @@ import { Todos } from './todo.model'
 import { getCurrentWeek, getCurrentWeekFromConsiveDate, getWeekNumber } from '../../utils/week'
 
 export const getAll = async (
-  req: Request<any>,
+  req: Request<{}, {}, {}, { week?: string }>,
   res: Response<any>,
   next: NextFunction
 ) => {
@@ -18,6 +18,10 @@ export const getAll = async (
       const cw = getCurrentWeekFromConsiveDate(req.user!.consiveDate, accountCreationData)
       week = cw.week
     }
+    if (req.query.week) {
+      week = parseInt(req.query.week)
+    }
+
 
     const [adminTodos, userTodos] = await Promise.all([
       Todos.aggregate([

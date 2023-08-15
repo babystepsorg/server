@@ -3,11 +3,11 @@ import { Calander, CalanderWithId, Calanders } from '../../models/calander'
 import { UserTodos } from '../../models/userTodo'
 import { ParamsWithId } from '../../interfaces/ParamsWithId'
 import { ObjectId } from 'mongodb'
-import { getCurrentWeek, getCurrentWeekFromConsiveDate, getDaysOfWeekForWeek } from '../../utils/week'
+import { getCurrentWeek, getCurrentWeekFromConsiveDate, getDaysOfWeekForWeek, getDaysOfWeekFromWeekAndConsiveDate } from '../../utils/week'
 import { Planners } from '../../models/planner'
 
 export const getAll = async (
-  req: Request<{}, any>,
+  req: Request<{}, {}, {}, { week?: string }>,
   res: Response<any>,
   next: NextFunction
 ) => {
@@ -20,6 +20,14 @@ export const getAll = async (
     const cw  = getCurrentWeekFromConsiveDate(userConsiveDate, userCreationDate)
     week = cw.week
     days = getDaysOfWeekForWeek({ weekNumber: week, consiveDate: cw.date })
+  }
+  if (req.query.week) {
+    week = parseInt(req.query.week)
+    if (userConsiveDate) {
+      days = getDaysOfWeekFromWeekAndConsiveDate({weekNumber: parseInt(req.query.week), consiveDate: userConsiveDate})
+    } else {
+      days = getDaysOfWeekFromWeekAndConsiveDate({weekNumber: parseInt(req.query.week), createdAt: userCreationDate})
+    }
   }
 
   try {
@@ -187,6 +195,8 @@ export const getAll = async (
 
       const alternate = ((Math.floor((index) / 7) % 2) === 0) ? true : false;
 
+      day.setHours(0, 0, 0, 0)
+
       return {
         day,
         tasks,
@@ -194,7 +204,10 @@ export const getAll = async (
       }
     })
 
-    const data = result.filter(it => it.day.getTime() >= currentDate.getTime())
+    let data = result.filter(it => it.day.getTime() > currentDate.getTime())
+    if (req.query.week) {
+      data = result
+    }
 
     res.json({
       data
@@ -250,11 +263,42 @@ export const deleteOne = async (
   next: NextFunction
 ) => {
   try {
-    await Calanders.findOneAndDelete({
-      _id: new ObjectId(req.params.id),
-    })
-    res.status(204)
-    res.json({})
+    const calanderItem = await Calanders.findOne({ _id: new ObjectId(req.params.id )})
+    if (calanderItem) {
+      const deletedItem = await Calanders.deleteOne({
+        _id: new ObjectId(req.params.id),
+      })
+  
+      console.log({ deletedItem })
+  
+      if (deletedItem.acknowledged) {
+        res.status(200)
+        return res.json({ success: true })
+      }
+    }
+
+    const todoItem = await UserTodos.findOne({ _id: new ObjectId(req.params.id )})
+    if (todoItem) {
+
+      const updatedItem = await UserTodos.findOneAndUpdate({
+        _id: new ObjectId(req.params.id)
+      }, {
+        $unset: {
+          completionDate: 1
+        }
+      })
+  
+      console.log({ updatedItem })
+  
+      if (updatedItem.ok) {
+        res.status(200)
+        return res.json({ success: true })
+      }
+    }
+
+    res.status(400)
+    return res.json({ message: "Something went wrong"})
+
   } catch (error) {
     next(error)
   }

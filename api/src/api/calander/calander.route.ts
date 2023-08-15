@@ -6,7 +6,16 @@ import { z } from 'zod'
 
 const router = Router()
 
-router.get('/', validateAuthentication, CalanderHandler.getAll)
+router.get(
+  '/', 
+  validateAuthentication, 
+  validateRequest({
+    query: z.object({
+      week: z.string().optional()
+    }),
+  }),
+  CalanderHandler.getAll
+)
 router.post(
   '/',
   validateAuthentication,
