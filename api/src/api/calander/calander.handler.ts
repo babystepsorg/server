@@ -80,6 +80,13 @@ export const getAll = async (
       ]).toArray(),
       Calanders.aggregate([
         {
+          $set: {
+            gentleReminderId: {
+              $toObjectId: "$gentleReminderId"
+            }
+          }
+        },
+        {
           $match: {
             $or: [
               {
@@ -204,7 +211,7 @@ export const getAll = async (
       }
     })
 
-    let data = result.filter(it => it.day.getTime() > currentDate.getTime())
+    let data = result.filter(it => it.day.getTime() >= currentDate.getTime())
     if (req.query.week) {
       data = result
     }
