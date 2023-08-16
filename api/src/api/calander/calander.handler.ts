@@ -201,9 +201,12 @@ export const getAll = async (
       tasks.push(...foundTasks)
 
       const currentDay = day.toLocaleDateString('en-IN', { weekday: 'long' })
-      foundTasks = calanderTasks.filter((it:any) => it.gentleReminderId).filter((it: any) => {
-        const repeat = it.gentlereminder[0].repeat
-        if (repeat && repeat === currentDay.toLowerCase()) return true;
+      foundTasks = calanderTasks.filter((it:any) => {
+        if (it.gentleReminderId) {
+          const repeat = it.gentlereminder[0].repeat
+          if (repeat && repeat === currentDay.toLowerCase()) return true;
+        }
+        return false;
       })
       tasks.push(...foundTasks)
 
