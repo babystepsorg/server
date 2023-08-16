@@ -166,6 +166,7 @@ export const getAll = async (
 
     const currentDate = new Date()
     currentDate.setHours(0, 0, 0, 0)
+    const currentDay = currentDate.toLocaleDateString('en-IN', { weekday: 'long' })
 
     // Map the tasks to their respective days
     const result = days.map((day, index) => {
@@ -197,6 +198,12 @@ export const getAll = async (
         taskDate.setHours(0, 0, 0, 0);
 
         return taskDate.getTime() == day.getTime();
+      })
+      tasks.push(...foundTasks)
+
+      foundTasks = calanderTasks.filter((it:any) => it.gentleReminderId).filter((it: any) => {
+        const repeat = it.gentlereminder[0].repeat
+        if (repeat && repeat === currentDay.toLowerCase()) return true;
       })
       tasks.push(...foundTasks)
 
