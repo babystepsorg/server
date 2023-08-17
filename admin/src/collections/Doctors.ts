@@ -56,6 +56,14 @@ const Doctors: CollectionConfig = {
             {
               label: 'WhatsApp',
               value: 'whatsapp'
+            },
+            {
+              label: 'Website',
+              value: 'web'
+            },
+            {
+              label: 'Instagram',
+              value: 'instagram'
             }
           ],
         },
