@@ -7,7 +7,8 @@ export const Planner = z.object({
   priority: z.string().optional(),
   day: z.string().optional(),
   weeks: z.array(z.custom<ObjectId>()),
-  roles: z.array(z.string())
+  roles: z.array(z.string()),
+  color: z.string().optional()
 })
 
 export type Planner = z.infer<typeof Planner>

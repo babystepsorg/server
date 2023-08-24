@@ -75,6 +75,7 @@ export const getAll = async (
             createdAt: 1,
             updatedAt: 1,
             admin: 1,
+            color: 1
           }
         }
       ]).toArray(),
