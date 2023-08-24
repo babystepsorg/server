@@ -76,15 +76,15 @@ const Planner: CollectionConfig = {
           options: [
             {
               label: 'Blue',
-              value: 'bg-[#6259CE]'
+              value: '6259CE'
             },
             {
               label: 'Green',
-              value: 'bg-[#28C66F]'
+              value: '28C66F'
             },
             {
               label: 'Yellow',
-              value: 'bg=[#FFAB00]'
+              value: 'FFAB00'
             },
           ]
         },
