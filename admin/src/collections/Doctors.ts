@@ -64,6 +64,10 @@ const Doctors: CollectionConfig = {
             {
               label: 'Instagram',
               value: 'instagram'
+            },
+            {
+              label: "YouTube",
+              value: 'youtube'
             }
           ],
         },
