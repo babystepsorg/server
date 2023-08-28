@@ -2,14 +2,17 @@ import { NextFunction, Request, Response } from 'express'
 import { UserTodo, UserTodoWithId, UserTodos } from '../../models/userTodo'
 import { ParamsWithId } from '../../interfaces/ParamsWithId'
 import { ObjectId } from 'mongodb'
-import { Todos } from './todo.model'
+import { Todo, Todos } from './todo.model'
 import { getCurrentWeek, getCurrentWeekFromConsiveDate, getWeekNumber } from '../../utils/week'
 
+
+// Todo need to show todos from previous weeks if they are not completed
 export const getAll = async (
   req: Request<{}, {}, {}, { week?: string }>,
   res: Response<any>,
   next: NextFunction
 ) => {
+  
   try {
     const currentStage = req.user!.stage
     const accountCreationData = req.user!.createdAt
@@ -23,7 +26,7 @@ export const getAll = async (
     }
 
 
-    const [adminTodos, userTodos] = await Promise.all([
+    const [adminTodos, userTodos, adminIncompletedTodos] = await Promise.all([
       Todos.aggregate([
         {
           $addFields: {
@@ -72,6 +75,53 @@ export const getAll = async (
         $or: [{ userId: req.user!._id }, { userId: req.user!.partnerId }],
         // completed: false,
       }).toArray(),
+      Todos.aggregate([
+        {
+          $addFields: {
+            weeks: {
+              $map: {
+                input: "$week",
+                as: "id",
+                in: {
+                  $toObjectId: "$$id"
+                }
+              }
+            },
+          }
+        },
+        {
+          $lookup: {
+            from: 'weeks',
+            localField: 'weeks',
+            foreignField: '_id',
+            as: 'week',
+          },
+        },
+        {
+          $lookup: {
+            from: 'userTodos',
+            localField: '_id',
+            foreignField: 'adminTodo',
+            as: 'adminTodo',
+          },
+        },
+        {
+          $addFields: {
+            completed: {
+              $cond: {
+                if: { $eq: [{ $size: '$adminTodo' }, 0] },
+                then: false,
+                else: { $arrayElemAt: ['$adminTodo.completed', 0] },
+              },
+            },
+          },
+        },
+        {
+          $match: {
+            priority: { $in: ['2', '3'] }
+          }
+        }
+      ]).toArray()
     ])
 
     const userTodosWithoutAdmin = userTodos.filter((todo) => todo.adminTodo === undefined)
@@ -91,7 +141,28 @@ export const getAll = async (
         adminTodos[adminTodoIndex] = updatedTodo
       }
     }
-    res.json([...adminTodos, ...userTodosWithoutAdmin] as any)
+
+    const adminUserInCompletedTodos = adminIncompletedTodos.map((todo) => {
+      let weeksLessThanCurrentWeek = todo.week.filter((w: Todo) => parseInt(w.title) < week) 
+      if (week <= 4) {
+        weeksLessThanCurrentWeek = todo.week.filter((w: Todo) => parseInt(w.title) >= 1 && parseInt(w.title) <= 4)
+      }
+
+      if (weeksLessThanCurrentWeek.length && todo.completed === false) {
+        console.log('Here inside of if ')
+        return {
+          _id: todo._id,
+          title: todo.title,
+          description: todo.description,
+          completed: todo.completed,
+        }
+      }
+
+      return null;
+    }).filter((todo) => todo !== null)
+    console.log({ adminUserInCompletedTodos })
+
+    res.json([...adminTodos, ...userTodosWithoutAdmin, ...adminUserInCompletedTodos] as any)
   } catch (err) {
     next(err)
   }

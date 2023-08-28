@@ -204,7 +204,7 @@ export const getAll = async (
       const currentDay = day.toLocaleDateString('en-IN', { weekday: 'long' })
       foundTasks = calanderTasks.filter((it:any) => {
         if (it.gentleReminderId) {
-          const repeat = it.gentlereminder[0].repeat
+          const repeat = it.repeat
           if (repeat && repeat === currentDay.toLowerCase()) return true;
         }
         return false;
