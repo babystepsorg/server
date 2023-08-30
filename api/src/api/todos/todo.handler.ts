@@ -160,9 +160,12 @@ export const getAll = async (
 
       return null;
     }).filter((todo) => todo !== null)
-    console.log({ adminUserInCompletedTodos })
 
-    res.json([...adminTodos, ...userTodosWithoutAdmin, ...adminUserInCompletedTodos] as any)
+    const combinedTodos = [...adminTodos, ...userTodosWithoutAdmin, ...adminUserInCompletedTodos];
+    const uniqueTodos = combinedTodos.reduce((unique: any, todo: any) => {
+      return unique.some((t: any) => t.title === todo.title) ? unique : [...unique, todo];
+    }, [] as any[]);
+    res.json(uniqueTodos as any);
   } catch (err) {
     next(err)
   }
