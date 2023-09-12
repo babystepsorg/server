@@ -4,6 +4,7 @@ import { User, UserWithId } from '../../models/user'
 import { generateToken, verifyToken } from '../../utils/jwt'
 import { ObjectId } from 'mongodb'
 import { getCurrentWeek, getCurrentWeekFromConsiveDate } from '../../utils/week'
+import { allowedEmails } from '../../constants'
 
 type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
   tokens: {
@@ -20,6 +21,10 @@ export async function signUp(
   next: NextFunction
 ) {
   try {
+    if (!allowedEmails.includes(req.body.email)) {
+      res.status(402)
+      throw new Error('Email not allowed');
+    }
     // check if user with this email already exists
     const isMatch = await findUserByEmail(req.body.email)
     if (isMatch) {
