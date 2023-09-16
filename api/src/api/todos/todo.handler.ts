@@ -120,7 +120,12 @@ export const getAll = async (
           $match: {
             priority: { $in: ['2', '3'] }
           }
-        }
+        },
+        {
+          $addFields: {
+            admin: true,
+          },
+        },
       ]).toArray()
     ])
 
