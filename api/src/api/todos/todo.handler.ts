@@ -121,11 +121,6 @@ export const getAll = async (
             priority: { $in: ['2', '3'] }
           }
         },
-        {
-          $addFields: {
-            admin: true,
-          },
-        },
       ]).toArray()
     ])
 
@@ -160,6 +155,7 @@ export const getAll = async (
           title: todo.title,
           description: todo.description,
           completed: todo.completed,
+          admin: true,
         }
       }
 
