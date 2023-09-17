@@ -3,6 +3,7 @@ import { validateAuthentication, validateRequest } from '../../middlewares'
 import { User } from '../../models/user'
 import * as AuthHandler from './auth.handlers'
 import { z } from 'zod'
+import passport from 'passport'
 
 const router = Router()
 
@@ -35,6 +36,16 @@ router.post(
     }),
   }),
   AuthHandler.refreshToken
+)
+
+router.get(
+  '/google',
+  AuthHandler.googleAuth
+)
+
+router.get(
+  '/google/callback',
+  AuthHandler.googleAuthCallback
 )
 
 router.get('/me', validateAuthentication, AuthHandler.me)

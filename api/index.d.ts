@@ -3,8 +3,9 @@ import { UserWithId } from './src/models/user'
 
 declare global {
   namespace Express {
+    interface User extends Omit<UserWithId, 'password' | 'salt'> {};
     export interface Request {
-      user: Omit<UserWithId, 'password' | 'salt'> | null
+      user: User | null
     }
   }
 }

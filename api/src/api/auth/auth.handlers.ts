@@ -5,6 +5,7 @@ import { generateToken, verifyToken } from '../../utils/jwt'
 import { ObjectId } from 'mongodb'
 import { getCurrentWeek, getCurrentWeekFromConsiveDate } from '../../utils/week'
 import { allowedEmails } from '../../constants'
+import passport from 'passport'
 
 type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
   tokens: {
@@ -56,6 +57,8 @@ export async function signUp(
   }
 }
 
+
+
 export async function logIn(
   req: Request<{}, AuthUser, Omit<User, 'salt' | 'stage' | 'role' | 'name'>>,
   res: Response<AuthUser>,
@@ -86,6 +89,29 @@ export async function logIn(
   } catch (err) {
     next(err)
   }
+}
+
+export function googleAuth(req: Request, res: Response) {
+  passport.authenticate('google', { scope: ['profile', 'email'] })(req, res)
+}
+
+export function googleAuthCallback(req: Request, res: Response, next: NextFunction) {
+  passport.authenticate('google', { failureRedirect: '/api/v1/auth/google' }, (error, user, info) => {
+    if (user) {
+      const accessToken = generateToken({ userId: user._id, type: 'ACCESS' })
+      const refreshToken = generateToken({ userId: user._id, type: 'REFRESH' }, { expiresIn: '30d' })
+      return res.redirect(`https://www.babysteps.world/login?access_token=${accessToken}&refresh_token=${refreshToken}`)
+    }
+    if (error) {
+      return res.redirect(`https://www.babysteps.world/login?error=${error}`)
+    }
+
+    if (info) {
+      return res.redirect(`https://www.babysteps.world/login?info=${info}`)
+    }
+
+    return res.redirect('/api/v1/auth/google')
+  })(req, res, next)
 }
 
 export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunction) {
