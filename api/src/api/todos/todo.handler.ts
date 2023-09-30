@@ -98,10 +98,34 @@ export const getAll = async (
           },
         },
         {
+          $match: {
+            week: {
+              $all: [
+                {
+                  $elemMatch: {
+                    title: { $lt: week.toString() }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
           $lookup: {
             from: 'userTodos',
-            localField: '_id',
-            foreignField: 'adminTodo',
+            let: { todoId: '$_id' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ['$adminTodo', '$$todoId'] },
+                      { $eq: ['$userId', req.user!._id] }
+                    ]
+                  }
+                }
+              }
+            ],
             as: 'adminTodo',
           },
         },
@@ -131,6 +155,7 @@ export const getAll = async (
       const adminTodo = adminTodos.find(
         (todo) => todo._id.toString() === userAdminTodo.adminTodo!.toString()
       )
+
       if (adminTodo) {
         const { _id, ...rest } = userAdminTodo
         const adminTodoIndex = adminTodos.indexOf((adminTodo as any))
@@ -138,6 +163,7 @@ export const getAll = async (
           ...adminTodo,
           ...rest,
         }
+
         adminTodos[adminTodoIndex] = updatedTodo
       }
     }
@@ -149,7 +175,6 @@ export const getAll = async (
       }
 
       if (weeksLessThanCurrentWeek.length && todo.completed === false) {
-        console.log('Here inside of if ')
         return {
           _id: todo._id,
           title: todo.title,
@@ -273,7 +298,10 @@ export async function completeOne(
 ) {
   try {
     if (req.body.admin) {
-      const adminTodo = await UserTodos.findOne({ adminTodo: new ObjectId(req.params.id) })
+      const adminTodo = await UserTodos.findOne({ 
+        adminTodo: new ObjectId(req.params.id),
+        $or: [{ userId: req.user!._id }, { userId: req.user!.partnerId }]  
+      })
       if (adminTodo) {
         await UserTodos.findOneAndUpdate(
           {
@@ -291,7 +319,7 @@ export async function completeOne(
         return res.json({ message: 'Task completed sucessfully' })
       }
 
-      await UserTodos.insertOne({
+      const rs = await UserTodos.insertOne({
         adminTodo: new ObjectId(req.params.id),
         completed: true,
         completedOn: new Date().toISOString(),

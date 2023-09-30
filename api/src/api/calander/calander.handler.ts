@@ -57,8 +57,19 @@ export const getAll = async (
         },
         {
           $match: {
-            'week.title': week.toString(),
-          },
+            week: {
+              $all: [
+                {
+                  $elemMatch: {
+                    $and: [
+                      { title: { $lt: (week + 4).toString() } },
+                      { title: { $gt: week.toString() } }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
         },
         {
           $addFields: {
@@ -75,7 +86,8 @@ export const getAll = async (
             createdAt: 1,
             updatedAt: 1,
             admin: 1,
-            color: 1
+            color: 1,
+            week: 1
           }
         }
       ]).toArray(),
@@ -173,7 +185,23 @@ export const getAll = async (
       const tasks = []
 
       day.setHours(0, 0, 0, 0);
-      tasks.push(...plannerTodos.filter(todo => todo.day === (index + 1).toString()))
+      let currentWeek = Math.floor(index / 7);
+      currentWeek += week;
+      
+      const todosForCurrentWeek = plannerTodos.filter(todo => todo.week.some((w: any) => w.title === currentWeek.toString()))
+      
+      if (currentWeek === week) {
+        tasks.push(...todosForCurrentWeek.filter(todo => todo.day === (index + 1).toString()))
+      } else {
+        const weekMoreThanCurrent = currentWeek - week;
+        const dayForWeek = (index + 1) - (weekMoreThanCurrent * 7);
+        tasks.push(
+          ...todosForCurrentWeek.filter(todo => {
+            const day = todo.day;
+            return day === dayForWeek.toString();
+          })
+        )
+      }
 
       let foundTasks = userTodos.filter((it: any) => {
         let td = it.date;
@@ -286,9 +314,7 @@ export const deleteOne = async (
       const deletedItem = await Calanders.deleteOne({
         _id: new ObjectId(req.params.id),
       })
-  
-      console.log({ deletedItem })
-  
+    
       if (deletedItem.acknowledged) {
         res.status(200)
         return res.json({ success: true })
@@ -305,9 +331,7 @@ export const deleteOne = async (
           completionDate: 1
         }
       })
-  
-      console.log({ updatedItem })
-  
+    
       if (updatedItem.ok) {
         res.status(200)
         return res.json({ success: true })
