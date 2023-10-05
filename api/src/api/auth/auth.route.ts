@@ -14,6 +14,7 @@ router.post(
   }),
   AuthHandler.signUp
 )
+
 router.post(
   '/login',
   validateRequest({
@@ -46,6 +47,16 @@ router.get(
 router.get(
   '/google/callback',
   AuthHandler.googleAuthCallback
+)
+
+router.get(
+  '/google/signup',
+  AuthHandler.googleAuthSignup
+)
+
+router.get(
+  '/google/signup/callback',
+  AuthHandler.googleAuthSignupCallback
 )
 
 router.get('/me', validateAuthentication, AuthHandler.me)

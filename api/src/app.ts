@@ -25,9 +25,9 @@ const GoogleStrategy = strategy.Strategy;
 
 passport.use(
   new GoogleStrategy({
-    clientID: '1097238989540-mfdmko312ppv6h7jlj9e7fsgnos11lbs.apps.googleusercontent.com',
-    clientSecret: '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',
-    callbackURL: 'http://localhost:4000/api/v1/auth/google/callback',
+    clientID: "868417869848-v336g58n4rkrfkotsk85meq74ggs5flp.apps.googleusercontent.com",
+    clientSecret: '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',
+    callbackURL: 'http://localhost:5000/api/v1/auth/google/callback',
     passReqToCallback: true,
   },
   async (req, accessToken, refreshToken, profile, done) => {
