@@ -104,18 +104,18 @@ export function googleAuthCallback(req: Request, res: Response, next: NextFuncti
       const accessToken = generateToken({ userId: user._id, type: 'ACCESS' })
       const refreshToken = generateToken({ userId: user._id, type: 'REFRESH' }, { expiresIn: '30d' })
       if (newAccount) {
-        return res.redirect(`http://localhost:3000/login?access_token=${accessToken}&refresh_token=${refreshToken}&new=${newAccount}&user_id=${user._id}`)
+        return res.redirect(`https://www.babysteps.world/login?access_token=${accessToken}&refresh_token=${refreshToken}&new=${newAccount}&user_id=${user._id}`)
       } else {
-        return res.redirect(`http://localhost:3000/login?access_token=${accessToken}&refresh_token=${refreshToken}`)
+        return res.redirect(`https://www.babysteps.world/login?access_token=${accessToken}&refresh_token=${refreshToken}`)
       }
     }
 
     if (error) {
-      return res.redirect(`http://localhost:3000/login?error=${error}`)
+      return res.redirect(`https://www.babysteps.world/login?error=${error}`)
     }
 
     if (info) {
-      return res.redirect(`http://localhost:3000/login?info=${info}`)
+      return res.redirect(`https://www.babysteps.world/login?info=${info}`)
     }
 
     return res.redirect('/api/v1/auth/google')
