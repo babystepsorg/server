@@ -27,7 +27,7 @@ passport.use(
   new GoogleStrategy({
     clientID: "868417869848-v336g58n4rkrfkotsk85meq74ggs5flp.apps.googleusercontent.com",
     clientSecret: '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',
-    callbackURL: 'http://api.babysteps.world/api/v1/auth/google/callback',
+    callbackURL: 'https://api.babysteps.world/api/v1/auth/google/callback',
     passReqToCallback: true,
   },
   async (req, accessToken, refreshToken, profile, done) => {
