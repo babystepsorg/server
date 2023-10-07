@@ -9,4 +9,6 @@ export const allowedEmails = [
     'maegan.sundlie@gmail.com',
     'dhawanishita05@gmail.com',
     'mallikadhawan97@gmail.com',
+    'dakshitacounselling@gmail.com',
+    'medha.agarwal247@gmail.com' 
 ]
