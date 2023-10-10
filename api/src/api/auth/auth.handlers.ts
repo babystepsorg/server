@@ -22,10 +22,6 @@ export async function signUp(
   next: NextFunction
 ) {
   try {
-    if (!allowedEmails.includes(req.body.email)) {
-      res.status(402)
-      throw new Error('Email not allowed');
-    }
     // check if user with this email already exists
     const isMatch = await findUserByEmail(req.body.email)
     if (isMatch) {

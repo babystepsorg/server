@@ -6,6 +6,7 @@ import auth from './auth/auth.route'
 import todos from './todos/todo.route'
 import users from './users/user.route'
 import calander from './calander/calander.route'
+import content from './content/content.route'
 
 const router = express.Router()
 
@@ -20,5 +21,6 @@ router.use('/auth', auth)
 router.use('/todos', todos)
 router.use('/users', users)
 router.use('/calander', calander)
+router.use('/content', content)
 
 export default router

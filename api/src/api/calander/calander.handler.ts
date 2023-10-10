@@ -233,7 +233,7 @@ export const getAll = async (
       foundTasks = calanderTasks.filter((it:any) => {
         if (it.gentleReminderId) {
           const repeat = it.repeat
-          if (repeat && repeat === currentDay.toLowerCase()) return true;
+          if (repeat && repeat.includes(currentDay.toLowerCase())) return true;
         }
         return false;
       })
@@ -341,6 +341,47 @@ export const deleteOne = async (
     res.status(400)
     return res.json({ message: "Something went wrong"})
 
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const createOrUpdateGR = async (
+  req: Request<{}, CalanderWithId, Calander>,
+  res: Response<CalanderWithId>,
+  next: NextFunction
+) => {
+  try {
+    const gr = await Calanders.findOneAndUpdate(
+      { gentleReminderId: new ObjectId(req.body.gentleReminderId), userId: req.user!._id },
+      { $set: { ...req.body } },
+      { upsert: true }
+    );
+    if (!gr.ok || !gr.value) {
+      throw new Error('Something went wrong.')
+    }
+    res.status(200)
+    return res.json({
+      ...req.body,
+      _id: gr.value._id
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getGentleReminderDoc = async (
+  req: Request<ParamsWithId, CalanderWithId, Calander>,
+  res: Response<CalanderWithId>,
+  next: NextFunction
+) => {
+  try {
+    const gentleReminder = await Calanders.findOne({ gentleReminderId: new ObjectId(req.params.id), userId: req.user!._id });
+    if (!gentleReminder) {
+      throw new Error('Error while getting Gentle Reminder')
+    }
+    res.status(200)
+    res.json(gentleReminder)
   } catch (error) {
     next(error)
   }

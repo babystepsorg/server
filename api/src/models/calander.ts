@@ -9,7 +9,7 @@ export const Calander = z.object({
   date: z.string().datetime().nonempty(),
   createdAt: z.string().datetime().default(new Date().toISOString()).optional(),
   userId: z.custom<ObjectId>(),
-  repeat: z.enum(['sunday','monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'])
+  repeat: z.array(z.enum(['sunday','monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']))
 })
 
 export type Calander = z.infer<typeof Calander>

@@ -26,6 +26,21 @@ router.post(
   }),
   CalanderHandler.createOne
 )
+router.post(
+  '/gr',
+  validateAuthentication,
+  validateRequest({
+    body: Calander.omit({
+      userId: true
+    }),
+  }),
+  CalanderHandler.createOrUpdateGR
+)
+router.get(
+  '/gr/:id',
+  validateAuthentication,
+  CalanderHandler.getGentleReminderDoc
+)
 router.patch(
   '/:id',
   validateAuthentication,
