@@ -41,7 +41,7 @@ export const getSymptoms = async (
 			week = parseInt(req.query.week)
 		}
 
-		const [symptoms, usersymptoms] = await Promise.all([
+		let [symptoms, usersymptoms] = await Promise.all([
 			Symptoms.aggregate([
 				{
 					$addFields: {
@@ -57,11 +57,11 @@ export const getSymptoms = async (
 						}
 					},
 					{
-					$lookup: {
-						from: 'weeks',
-						localField: 'weeks',
-						foreignField: '_id',
-						as: 'week',
+						$lookup: {
+							from: 'weeks',
+							localField: 'weeks',
+							foreignField: '_id',
+							as: 'week',
 						},
 					},
 					{
@@ -78,6 +78,19 @@ export const getSymptoms = async (
 						// roles: {
 						// 	$in: [req.query.role]
 						// }
+					}
+				},
+				{
+					$lookup: {
+						from: "media",
+						localField: 'image',
+						foreignField: '_id',
+						pipeline: [
+							{
+									$limit: 1
+							}
+					],
+						as: 'image',
 					}
 				},
 				{
@@ -114,16 +127,49 @@ export const getSymptoms = async (
 						symptomId: 1,
 						name: '$symptom.name',
 						description: '$symptom.description',
-						image: '$symptom.image'
+						image: { $arrayElemAt: ['$symptom.image', 0] },
 					}
 				},
 				{
 					$addFields: {
 						highlight: true
 					}
-				}
+				},
+				{
+					$lookup: {
+						from: "media",
+						localField: 'image',
+						foreignField: '_id',
+						pipeline: [
+							{
+									$limit: 1
+							}
+					],
+						as: 'image',
+					}
+				},
 			]).toArray()
 		])
+
+		symptoms = symptoms.map((symptom) => {
+			return {
+				...symptom,
+				image: {
+					...symptom.image,
+					url: `https://api.babysteps.world/media/${symptom.image.filename}`
+				}
+			}
+		})
+
+		usersymptoms = usersymptoms.map((symptom) => {
+			return {
+				...symptom,
+				image: {
+					...symptom.image,
+					url: `https://api.babysteps.world/media/${symptom.image.filename}`
+				}
+			}
+		})
 
 		const adminSymptoms = symptoms.map(symp => {
 			const foundUserSymptom = usersymptoms.find(it => it.symptomId === symp._id);
