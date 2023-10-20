@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { SymptomWithId, Symptoms } from "../../models/symptoms";
-import { getCurrentWeek, getCurrentWeekFromConsiveDate } from "../../utils/week";
+import { getCurrentWeek, getCurrentWeekFromConsiveDate, getDaysOfWeekForWeek } from "../../utils/week";
 import { UserSymptoms } from "../../models/usersymptoms";
 import { ObjectId } from "mongodb";
 
@@ -10,7 +10,16 @@ export const addSymptom = async (
 	next: NextFunction
 ) => {
 	try {
-		const symptom = await UserSymptoms.insertOne({ symptomId: new ObjectId(req.body.symptomId), userId: req.user!._id })
+		const userCreationDate = req.user!.createdAt
+		const userConsiveDate = req.user!.consiveDate
+
+		let week = getCurrentWeek(req.user!.stage, userCreationDate)
+		if (userConsiveDate) {
+			const cw  = getCurrentWeekFromConsiveDate(userConsiveDate, userCreationDate)
+			week = cw.week
+		}
+
+		const symptom = await UserSymptoms.insertOne({ symptomId: new ObjectId(req.body.symptomId), userId: req.user!._id, week })
 		if (!symptom.acknowledged) {
 			throw new Error('Error while add the symptom')
 		}
@@ -47,12 +56,12 @@ export const getSymptoms = async (
 					$addFields: {
 						weeks: {
 							$map: {
-											input: "$weeks",
-											as: "id",
-											in: {
-											$toObjectId: "$$id"
-											}
+									input: "$weeks",
+									as: "id",
+									in: {
+										$toObjectId: "$$id"
 									}
+								}
 							}
 						}
 					},
@@ -81,6 +90,11 @@ export const getSymptoms = async (
 					}
 				},
 				{
+					$addFields: {
+						image: { $toObjectId: '$image' }
+					}
+				},
+				{
 					$lookup: {
 						from: "media",
 						localField: 'image',
@@ -97,6 +111,15 @@ export const getSymptoms = async (
 					$addFields: {
 						highlight: false
 					}
+				},
+				{
+					$project: {
+						_id: 1,
+						name: 1,
+						descriptions: 1,
+						image: { $arrayElemAt: ['$image', 0] },
+						highlight: 1
+					}
 				}
 			]).toArray(),
 			UserSymptoms.aggregate([
@@ -105,7 +128,8 @@ export const getSymptoms = async (
 						$or: [
 							{ userId: req.user?._id },
 							{ userId: req.user?.partnerId }
-						]
+						],
+						week
 					}
 				},
 				{
@@ -125,14 +149,19 @@ export const getSymptoms = async (
 					$project: {
 						_id: 1,
 						symptomId: 1,
-						name: '$symptom.name',
-						description: '$symptom.description',
+						name: { $arrayElemAt: ['$symptom.name', 0] },
+						descriptions: { $arrayElemAt: ['$symptom.descriptions', 0] },
 						image: { $arrayElemAt: ['$symptom.image', 0] },
 					}
 				},
 				{
 					$addFields: {
 						highlight: true
+					}
+				},
+				{
+					$addFields: {
+						image: { $toObjectId: '$image' }
 					}
 				},
 				{
@@ -148,6 +177,16 @@ export const getSymptoms = async (
 						as: 'image',
 					}
 				},
+				{
+					$project: {
+						_id: 1,
+						symptomId: 1,
+						name: 1,
+						descriptions: 1,
+						image: { $arrayElemAt: ['$image', 0] },
+						highlight: 1
+					}
+				}
 			]).toArray()
 		])
 
@@ -172,7 +211,7 @@ export const getSymptoms = async (
 		})
 
 		const adminSymptoms = symptoms.map(symp => {
-			const foundUserSymptom = usersymptoms.find(it => it.symptomId === symp._id);
+			const foundUserSymptom = usersymptoms.find(it => symp.name === it.name);
 			if (foundUserSymptom) {
 				return null;
 			}

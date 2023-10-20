@@ -5,6 +5,7 @@ import { db } from '../db'
 export const UserSymptom = z.object({
   symptomId: z.custom<ObjectId>(),
   userId: z.custom<ObjectId>(),
+  week: z.number(),
   createdAt: z.string().datetime().default(new Date().toISOString()).optional(),
 })
 
