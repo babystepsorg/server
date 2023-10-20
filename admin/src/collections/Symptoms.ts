@@ -27,7 +27,7 @@ const Symptoms: CollectionConfig = {
       relationTo: 'media',
     },
     {
-      type: 'row',
+      type: "row",
       fields: [
         {
           name: 'weeks',
@@ -37,14 +37,14 @@ const Symptoms: CollectionConfig = {
           hasMany: true,
         },
         {
-          label: 'Red Flag',
-          name: 'red_flag',
+          label: 'Red Flag Weeks',
+          name: 'red_flag_weeks',
           type: 'relationship',
-          relationTo: 'symptoms',
+          relationTo: 'weeks',
           hasMany: true
         }
       ]
-    },
+    }
   ],
 }
 

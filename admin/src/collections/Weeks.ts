@@ -32,6 +32,13 @@ const Weeks: CollectionConfig = {
     {
       name: 'message',
       type: 'text',
+    },
+    {
+      label: 'Red Flag Symptoms',
+      name: 'red_flag_symptoms',
+      type: 'relationship',
+      relationTo: 'symptoms',
+      hasMany: true
     }
   ],
 }
