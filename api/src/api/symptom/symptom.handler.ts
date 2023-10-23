@@ -56,24 +56,24 @@ export const getSymptoms = async (
 					$addFields: {
 						weeks: {
 							$map: {
-									input: "$weeks",
-									as: "id",
-									in: {
-										$toObjectId: "$$id"
-									}
+								input: "$weeks",
+								as: "id",
+								in: {
+									$toObjectId: "$$id"
 								}
 							}
 						}
+					}
+				},
+				{
+					$lookup: {
+						from: 'weeks',
+						localField: 'weeks',
+						foreignField: '_id',
+						as: 'week',
 					},
-					{
-						$lookup: {
-							from: 'weeks',
-							localField: 'weeks',
-							foreignField: '_id',
-							as: 'week',
-						},
-					},
-					{
+				},
+				{
 					$match: {
 						week: {
 							$all: [
@@ -133,16 +133,29 @@ export const getSymptoms = async (
 					}
 				},
 				{
+					$addFields: {
+						'week': { $toString: '$week' }
+					}
+				},
+				{
 					$lookup: {
-							from: 'symptoms',
-							localField: 'symptomId',
-							foreignField: '_id',
-							pipeline: [
-									{
-											$limit: 1
-									}
-							],
-							as: 'symptom'
+						from: 'weeks',
+						localField: 'week',
+						foreignField: 'title',
+						as: 'week',
+					},	
+				},
+				{
+					$lookup: {
+						from: 'symptoms',
+						localField: 'symptomId',
+						foreignField: '_id',
+						pipeline: [
+							{
+								$limit: 1
+							}
+						],
+						as: 'symptom'
 					}
 				},
 				{
@@ -152,6 +165,8 @@ export const getSymptoms = async (
 						name: { $arrayElemAt: ['$symptom.name', 0] },
 						descriptions: { $arrayElemAt: ['$symptom.descriptions', 0] },
 						image: { $arrayElemAt: ['$symptom.image', 0] },
+						week: 1,
+						red_flag_weeks: { $arrayElemAt: ['$symptom.red_flag_weeks' , 0]}
 					}
 				},
 				{
@@ -178,13 +193,43 @@ export const getSymptoms = async (
 					}
 				},
 				{
+					$addFields: {
+						red_flag_weeks: {
+							$map: {
+								input: "$red_flag_weeks",
+								as: "id",
+								in: {
+									$toObjectId: "$$id"
+								}
+							}
+						}
+					}
+				},
+				{
+					$lookup: {
+						from: 'weeks',
+						localField: 'red_flag_weeks',
+						foreignField: '_id',
+						as: 'red_flag_weeks',
+						pipeline: [
+							{
+								$project: {
+									title: 1
+								}
+							}
+						]
+					},
+				},
+				{
 					$project: {
 						_id: 1,
 						symptomId: 1,
 						name: 1,
 						descriptions: 1,
 						image: { $arrayElemAt: ['$image', 0] },
-						highlight: 1
+						highlight: 1,
+						week: 1,
+						red_flag_weeks: 1
 					}
 				}
 			]).toArray()
@@ -193,6 +238,7 @@ export const getSymptoms = async (
 		symptoms = symptoms.map((symptom) => {
 			return {
 				...symptom,
+				red_flag: false,
 				image: {
 					...symptom.image,
 					url: `https://api.babysteps.world/media/${symptom.image.filename}`
@@ -201,11 +247,23 @@ export const getSymptoms = async (
 		})
 
 		usersymptoms = usersymptoms.map((symptom) => {
+			const red_flag_symptoms: Array<any> = symptom.week?.length ? (symptom.week[0]?.red_flag_symptoms ?? []) : []
+	
+			let red_flag = false;
+			if (symptom.red_flag_weeks) {
+				red_flag = !!symptom.red_flag_weeks.find((it: any) => it.title === week.toString())
+			} else if (red_flag_symptoms.length) {
+				red_flag = !!red_flag_symptoms.find((id: string) => id === symptom.symptomId.toString())
+			}
+
+			const { week: symptomWeek, red_flag_weeks, ...rest } = symptom;
+
 			return {
-				...symptom,
+				...rest,
+				red_flag,
 				image: {
 					...symptom.image,
-					url: `https://api.babysteps.world/media/${symptom.image.filename}`
+					url: `https://api.babysteps.world/media/${symptom?.image?.filename}`
 				}
 			}
 		})

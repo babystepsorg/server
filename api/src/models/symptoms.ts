@@ -7,6 +7,7 @@ export const Symptom = z.object({
   description: z.string().optional(),
   image: z.any(),
   weeks: z.array(z.custom<ObjectId>()),
+  red_flag_weeks: z.array(z.custom<ObjectId>()),
   createdAt: z.string().datetime().default(new Date().toISOString()).optional(),
 })
 
