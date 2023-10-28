@@ -123,7 +123,10 @@ export const getAll = async (
                   $expr: {
                     $and: [
                       { $eq: ['$adminTodo', '$$todoId'] },
-                      { $eq: ['$userId', req.user!._id] }
+                      { $or: [
+                        { $eq: ['$userId', req.user!._id] },
+                        { $eq: ['$userId', req.user!.partnerId] }
+                      ]}
                     ]
                   }
                 }
