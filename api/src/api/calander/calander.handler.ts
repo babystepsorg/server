@@ -3,7 +3,7 @@ import { Calander, CalanderWithId, Calanders } from '../../models/calander'
 import { UserTodos } from '../../models/userTodo'
 import { ParamsWithId } from '../../interfaces/ParamsWithId'
 import { ObjectId } from 'mongodb'
-import { getCurrentWeek, getCurrentWeekFromConsiveDate, getDaysOfWeekForWeek, getDaysOfWeekFromWeekAndConsiveDate } from '../../utils/week'
+import { getCurrentWeek, getCurrentWeekFromConsiveDate, getDaysOfWeekForWeek, getDaysOfWeekFromWeekAndConsiveDate, getWeekFromUser } from '../../utils/week'
 import { Planners } from '../../models/planner'
 
 export const getAll = async (
@@ -11,24 +11,25 @@ export const getAll = async (
   res: Response<any>,
   next: NextFunction
 ) => {
-  const userCreationDate = req.user!.createdAt
-  const userConsiveDate = req.user!.consiveDate
+  // const userCreationDate = req.user!.createdAt
+  // const userConsiveDate = req.user!.consiveDate
 
-  let week = getCurrentWeek(req.user!.stage, userCreationDate)
-  let days = getDaysOfWeekForWeek({weekNumber: week, createdAt: new Date(userCreationDate)})
-  if (userConsiveDate) {
-    const cw  = getCurrentWeekFromConsiveDate(userConsiveDate, userCreationDate)
-    week = cw.week
-    days = getDaysOfWeekForWeek({ weekNumber: week, consiveDate: cw.date })
-  }
-  if (req.query.week) {
-    week = parseInt(req.query.week)
-    if (userConsiveDate) {
-      days = getDaysOfWeekFromWeekAndConsiveDate({weekNumber: parseInt(req.query.week), consiveDate: userConsiveDate})
-    } else {
-      days = getDaysOfWeekFromWeekAndConsiveDate({weekNumber: parseInt(req.query.week), createdAt: userCreationDate})
-    }
-  }
+  const reqWeek = req.query.week ? parseInt(req.query.week) : undefined
+  let { week, days } = await getWeekFromUser(req.user!, reqWeek, true)
+  // let days = getDaysOfWeekForWeek({weekNumber: week, createdAt: new Date(userCreationDate)})
+  // if (userConsiveDate) {
+  //   const cw  = getCurrentWeekFromConsiveDate(userConsiveDate, userCreationDate)
+  //   week = cw.week
+  //   days = getDaysOfWeekForWeek({ weekNumber: week, consiveDate: cw.date })
+  // }
+  // if (req.query.week) {
+  //   week = parseInt(req.query.week)
+  //   if (userConsiveDate) {
+  //     days = getDaysOfWeekFromWeekAndConsiveDate({weekNumber: parseInt(req.query.week), consiveDate: userConsiveDate})
+  //   } else {
+  //     days = getDaysOfWeekFromWeekAndConsiveDate({weekNumber: parseInt(req.query.week), createdAt: userCreationDate})
+  //   }
+  // }
 
   try {
     // add the date directly from here

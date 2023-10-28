@@ -1,3 +1,5 @@
+import { User, UserWithId, Users } from "../models/user"
+
 export const getWeekNumber = (date: Date): number => {
   const startOfYear = new Date(date.getFullYear(), 0, 1)
   const startOfWeek = new Date(
@@ -124,4 +126,60 @@ export const getDaysOfWeekFromWeekAndConsiveDate = ({ weekNumber, consiveDate, c
   }
 
   return []
+}
+
+export const getWeekFromUser = async (user: Omit<UserWithId, 'password' | 'salt'>, reqWeek?: number, calander?: boolean) => {
+  try {
+    let week = getCurrentWeek(user.stage, user.createdAt)
+    let date;
+    let days: Array<Date> = [];
+    if (user?.partnerId) {
+      const partneredUser = await Users.findOne({ _id: user.partnerId });
+      if (partneredUser) {
+        week = getCurrentWeek(partneredUser.stage, partneredUser.createdAt)
+        date = partneredUser.createdAt
+        week = reqWeek ? reqWeek : week
+
+        if (calander) {
+          days = getDaysOfWeekFromWeekAndConsiveDate({ weekNumber: week, createdAt: date?.toLocaleString()})
+        }
+      }
+
+      if (partneredUser?.consiveDate) {
+        const cw = getCurrentWeekFromConsiveDate(partneredUser.consiveDate, partneredUser.createdAt)
+        week = cw.week
+        date = cw.date
+
+        week = reqWeek ? reqWeek : week
+
+        if (calander) {
+          days = getDaysOfWeekFromWeekAndConsiveDate({ weekNumber: week, consiveDate: date?.toLocaleString()})
+        }
+      }
+    } else {
+      week = getCurrentWeek(user.stage, user.createdAt)
+      date = user.createdAt
+
+      week = reqWeek ? reqWeek : week
+
+      if (calander) {
+        days = getDaysOfWeekFromWeekAndConsiveDate({ weekNumber: week, createdAt: date?.toLocaleString()})
+      }
+      
+      if (user?.consiveDate) {
+        const cw  = getCurrentWeekFromConsiveDate(user!.consiveDate, user!.createdAt)
+        week = cw.week
+        date = cw.date
+
+        week = reqWeek ? reqWeek : week
+
+        if (calander) {
+          days = getDaysOfWeekFromWeekAndConsiveDate({ weekNumber: week, consiveDate: date?.toLocaleString()})
+        }
+      }
+    }
+    return { week, days }
+  } catch (err) {
+    throw (err);
+  }
 }

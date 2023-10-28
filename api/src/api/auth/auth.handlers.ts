@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
 import { comparePassword, createUser, findUserByEmail } from '../../services/user'
-import { User, UserWithId } from '../../models/user'
+import { User, UserWithId, Users } from '../../models/user'
 import { generateToken, verifyToken } from '../../utils/jwt'
 import { ObjectId } from 'mongodb'
-import { getCurrentWeek, getCurrentWeekFromConsiveDate } from '../../utils/week'
+import { getCurrentWeek, getCurrentWeekFromConsiveDate, getWeekFromUser } from '../../utils/week'
 import { allowedEmails } from '../../constants'
 import passport from 'passport'
 
@@ -143,12 +143,7 @@ export function googleAuthSignupCallback(req: Request, res: Response, next: Next
 
 export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunction) {
   try {
-    // if consive date
-    let week = getCurrentWeek(req.user!.stage, req.user!.createdAt)
-    if (req.user?.consiveDate) {
-      const cw  = getCurrentWeekFromConsiveDate(req.user!.consiveDate, req.user!.createdAt)
-      week = cw.week
-    }
+    const { week } = await getWeekFromUser(req.user!);
     res.status(200)
     res.json({ ...req.user!, week: week.toString() })
   } catch (err) {

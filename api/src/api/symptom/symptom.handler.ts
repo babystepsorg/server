@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { SymptomWithId, Symptoms } from "../../models/symptoms";
-import { getCurrentWeek, getCurrentWeekFromConsiveDate, getDaysOfWeekForWeek } from "../../utils/week";
+import { getCurrentWeek, getCurrentWeekFromConsiveDate, getDaysOfWeekForWeek, getWeekFromUser } from "../../utils/week";
 import { UserSymptoms } from "../../models/usersymptoms";
 import { ObjectId } from "mongodb";
 
@@ -10,14 +10,16 @@ export const addSymptom = async (
 	next: NextFunction
 ) => {
 	try {
-		const userCreationDate = req.user!.createdAt
-		const userConsiveDate = req.user!.consiveDate
+		// const userCreationDate = req.user!.createdAt
+		// const userConsiveDate = req.user!.consiveDate
 
-		let week = getCurrentWeek(req.user!.stage, userCreationDate)
-		if (userConsiveDate) {
-			const cw  = getCurrentWeekFromConsiveDate(userConsiveDate, userCreationDate)
-			week = cw.week
-		}
+		// let week = getCurrentWeek(req.user!.stage, userCreationDate)
+		// if (userConsiveDate) {
+		// 	const cw  = getCurrentWeekFromConsiveDate(userConsiveDate, userCreationDate)
+		// 	week = cw.week
+		// }
+
+		const { week } = await getWeekFromUser(req.user!)
 
 		const symptom = await UserSymptoms.insertOne({ symptomId: new ObjectId(req.body.symptomId), userId: req.user!._id, week })
 		if (!symptom.acknowledged) {
@@ -38,17 +40,20 @@ export const getSymptoms = async (
 	next: NextFunction
 ) => {
 	try {
-		const userCreationDate = req.user!.createdAt
-		const userConsiveDate = req.user!.consiveDate
+		// const userCreationDate = req.user!.createdAt
+		// const userConsiveDate = req.user!.consiveDate
 
-		let week = getCurrentWeek(req.user!.stage, userCreationDate)
-		if (userConsiveDate) {
-			const cw  = getCurrentWeekFromConsiveDate(userConsiveDate, userCreationDate)
-			week = cw.week
-		}
-		if (req.query.week) {
-			week = parseInt(req.query.week)
-		}
+		// let week = getCurrentWeek(req.user!.stage, userCreationDate)
+		// if (userConsiveDate) {
+		// 	const cw  = getCurrentWeekFromConsiveDate(userConsiveDate, userCreationDate)
+		// 	week = cw.week
+		// }
+		// if (req.query.week) {
+		// 	week = parseInt(req.query.week)
+		// }
+
+		const reqWeek = req.query.week ? parseInt(req.query.week) : undefined
+		let { week } = await getWeekFromUser(req.user!, reqWeek)
 
 		let [symptoms, usersymptoms] = await Promise.all([
 			Symptoms.aggregate([

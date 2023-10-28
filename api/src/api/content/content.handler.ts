@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ContentHistories, ContentHistoryWithId } from "../../models/contenthistory";
 import { ObjectId } from "mongodb";
-import { getCurrentWeek, getCurrentWeekFromConsiveDate } from "../../utils/week";
+import { getCurrentWeek, getCurrentWeekFromConsiveDate, getWeekFromUser } from "../../utils/week";
 import { Content, ContentWithId, Contents } from "../../models/content";
 
 export const setVideoHistory = async (
@@ -34,17 +34,20 @@ export const getContent = async (
   next: NextFunction
 ) => {
     try {
-      const userCreationDate = req.user!.createdAt
-      const userConsiveDate = req.user!.consiveDate
+      // const userCreationDate = req.user!.createdAt
+      // const userConsiveDate = req.user!.consiveDate
   
-      let week = getCurrentWeek(req.user!.stage, userCreationDate)
-      if (userConsiveDate) {
-        const cw  = getCurrentWeekFromConsiveDate(userConsiveDate, userCreationDate)
-        week = cw.week
-      }
-      if (req.query.week) {
-        week = parseInt(req.query.week)
-      }
+      // let week = getCurrentWeek(req.user!.stage, userCreationDate)
+      // if (userConsiveDate) {
+      //   const cw  = getCurrentWeekFromConsiveDate(userConsiveDate, userCreationDate)
+      //   week = cw.week
+      // }
+      // if (req.query.week) {
+      //   week = parseInt(req.query.week)
+      // }
+
+      const reqWeek = req.query.week ? parseInt(req.query.week) : undefined
+      const { week } = await getWeekFromUser(req.user!, reqWeek)
 
       const contents = await Contents.aggregate([
         {

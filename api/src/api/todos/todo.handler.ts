@@ -3,7 +3,7 @@ import { UserTodo, UserTodoWithId, UserTodos } from '../../models/userTodo'
 import { ParamsWithId } from '../../interfaces/ParamsWithId'
 import { ObjectId } from 'mongodb'
 import { Todo, Todos } from './todo.model'
-import { getCurrentWeek, getCurrentWeekFromConsiveDate, getWeekNumber } from '../../utils/week'
+import { getCurrentWeek, getCurrentWeekFromConsiveDate, getWeekFromUser, getWeekNumber } from '../../utils/week'
 
 
 // Todo need to show todos from previous weeks if they are not completed
@@ -14,16 +14,19 @@ export const getAll = async (
 ) => {
   
   try {
-    const currentStage = req.user!.stage
-    const accountCreationData = req.user!.createdAt
-    let week = getCurrentWeek(currentStage, accountCreationData);
-    if (req.user!.consiveDate) {
-      const cw = getCurrentWeekFromConsiveDate(req.user!.consiveDate, accountCreationData)
-      week = cw.week
-    }
-    if (req.query.week) {
-      week = parseInt(req.query.week)
-    }
+    // const currentStage = req.user!.stage
+    // const accountCreationData = req.user!.createdAt
+    // let week = getCurrentWeek(currentStage, accountCreationData);
+    // if (req.user!.consiveDate) {
+    //   const cw = getCurrentWeekFromConsiveDate(req.user!.consiveDate, accountCreationData)
+    //   week = cw.week
+    // }
+    // if (req.query.week) {
+    //   week = parseInt(req.query.week)
+    // }
+
+    const reqWeek = req.query.week ? parseInt(req.query.week) : undefined
+    let { week } = await getWeekFromUser(req.user!, reqWeek)
 
 
     const [adminTodos, userTodos, adminIncompletedTodos] = await Promise.all([
