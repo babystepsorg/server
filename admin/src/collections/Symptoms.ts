@@ -44,6 +44,16 @@ const Symptoms: CollectionConfig = {
           hasMany: true
         }
       ]
+    },
+    {
+      label: 'Tags',
+      name: 'tags',
+      type: 'relationship',
+      relationTo: 'tags',
+      hasMany: true,
+      admin: {
+        position: 'sidebar'
+      }
     }
   ],
 }

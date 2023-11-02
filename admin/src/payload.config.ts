@@ -16,6 +16,7 @@ import { cloudStorage } from '@payloadcms/plugin-cloud-storage'
 import { s3Adapter } from '@payloadcms/plugin-cloud-storage/s3'
 import Careers from './collections/Careers'
 import Subheadings from './globals/Subheading'
+import Tags from './collections/Tag'
 
 const adapter = s3Adapter({
   config: {
@@ -45,6 +46,7 @@ export default buildConfig({
     Doctors,
     TodoLists,
     Careers,
+    Tags,
     Media,
     Users,
   ],

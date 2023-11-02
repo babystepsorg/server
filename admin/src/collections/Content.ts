@@ -135,6 +135,16 @@ const Content: CollectionConfig = {
       ],
     },
     slugField(),
+    {
+      label: 'Tags',
+      name: 'tags',
+      type: 'relationship',
+      relationTo: 'tags',
+      hasMany: true,
+      admin: {
+        position: 'sidebar'
+      }
+    }
     // {
     //   name: 'author',
     //   type: 'relationship',
