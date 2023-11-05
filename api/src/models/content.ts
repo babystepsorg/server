@@ -11,6 +11,7 @@ export const Content = z.object({
   weeks: z.array(z.string()),
   roles: z.array(z.enum(['Father', 'Mother'])),
   body: z.any(),
+  tags: z.array(z.custom<ObjectId>()),
   createdAt: z.string().datetime().default(new Date().toISOString()),
   updatedAt: z.string().datetime().default(new Date().toISOString()),
 })

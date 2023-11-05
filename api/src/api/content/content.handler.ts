@@ -3,6 +3,7 @@ import { ContentHistories, ContentHistoryWithId } from "../../models/contenthist
 import { ObjectId } from "mongodb";
 import { getCurrentWeek, getCurrentWeekFromConsiveDate, getWeekFromUser } from "../../utils/week";
 import { Content, ContentWithId, Contents } from "../../models/content";
+import { UserSymptoms } from "../../models/usersymptoms";
 
 export const setVideoHistory = async (
   req: Request<{}, ContentHistoryWithId | null, { contentId: string }>,
@@ -49,6 +50,47 @@ export const getContent = async (
       const reqWeek = req.query.week ? parseInt(req.query.week) : undefined
       const { week } = await getWeekFromUser(req.user!, reqWeek)
 
+      const userSymptoms = await UserSymptoms.aggregate([
+				{
+					$match: {
+						$or: [
+							{ userId: req.user?._id },
+							{ userId: req.user?.partnerId }
+						],
+						week
+					}
+				},
+				{
+					$lookup: {
+						from: 'symptoms',
+						localField: 'symptomId',
+						foreignField: '_id',
+						pipeline: [
+							{
+								$limit: 1
+							}
+						],
+						as: 'symptom'
+					}
+				},
+				{
+					$project: {
+						_id: 1,
+						symptomId: 1,
+						name: { $arrayElemAt: ['$symptom.name', 0] },
+						descriptions: { $arrayElemAt: ['$symptom.descriptions', 0] },
+						image: { $arrayElemAt: ['$symptom.image', 0] },
+						week: 1,
+            tags: { $arrayElemAt: ['$symptom.tags', 0] },
+					}
+				},
+			]).toArray()
+
+      let allTags: Array<string> = [];
+      for (let i = 0; i < userSymptoms.length; i++) {
+        allTags = [...new Set([...allTags, ...userSymptoms[i].tags])];
+      }
+
       const contents = await Contents.aggregate([
         {
             $addFields: {
@@ -73,18 +115,27 @@ export const getContent = async (
           },
           {
             $match: {
-              week: {
-                $all: [
-                  {
-                    $elemMatch: {
-                      title: { $eq: week.toString() }
-                    }
+              $or: [
+                {
+                  week: {
+                    $all: [
+                      {
+                        $elemMatch: {
+                          title: { $eq: week.toString() }
+                        }
+                      }
+                    ]
+                  },
+                },
+                {
+                  tags: {
+                    $in: allTags
                   }
-                ]
-              },
+                }
+              ],
               roles: {
                 $in: [req.query.role]
-              }
+              },
             }
           }
       ]).toArray() as Array<ContentWithId>;

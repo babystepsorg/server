@@ -82,11 +82,11 @@ export const getSymptoms = async (
 					$match: {
 						week: {
 							$all: [
-									{
-										$elemMatch: {
-												title: { $eq: week.toString() }
-										}
+								{
+									$elemMatch: {
+											title: { $eq: week.toString() }
 									}
+								}
 							]
 						},
 						// roles: {
