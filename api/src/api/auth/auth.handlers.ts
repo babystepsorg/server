@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Request, Response, response } from 'express'
 import { comparePassword, createUser, findUserByEmail } from '../../services/user'
 import { User, UserWithId, Users } from '../../models/user'
 import { generateToken, verifyToken } from '../../utils/jwt'
@@ -6,6 +6,8 @@ import { ObjectId } from 'mongodb'
 import { getCurrentWeek, getCurrentWeekFromConsiveDate, getWeekFromUser } from '../../utils/week'
 import { allowedEmails } from '../../constants'
 import passport from 'passport'
+import { Strategy } from 'passport-google-oauth20'
+import { google } from 'googleapis'
 
 type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
   tokens: {
@@ -102,7 +104,7 @@ export function googleAuthCallback(req: Request, res: Response, next: NextFuncti
       if (newAccount) {
         return res.redirect(`https://www.babysteps.world/login?access_token=${accessToken}&refresh_token=${refreshToken}&new=${newAccount}&user_id=${user._id}`)
       } else {
-        return res.redirect(`https://www.babysteps.world/login?access_token=${accessToken}&refresh_token=${refreshToken}`)
+        return res.redirect(`https://www.babysteps.world/login?access_token=${accessToken}&refresh_token=${refreshToken}&new=${newAccount}`)
       }
     }
 
@@ -118,28 +120,70 @@ export function googleAuthCallback(req: Request, res: Response, next: NextFuncti
   })(req, res, next)
 }
 
-export function googleAuthSignup(req: Request, res: Response) {
-  passport.authenticate('google', { scope: ['profile', 'email'] })(req, res)
+export function googleCalandarAuthMiddleware(req: Request, res: Response, next: NextFunction) {
+  const GoogleStrategy = Strategy;
+
+  passport.use(
+    new GoogleStrategy({
+      clientID: "868417869848-v336g58n4rkrfkotsk85meq74ggs5flp.apps.googleusercontent.com",
+      clientSecret: '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',
+      callbackURL: 'http://localhost:5000/api/v1/auth/google/calendar/callback',
+      passReqToCallback: true,
+    }, 
+    async (req, accessToken, refreshToken, profile, done) => {
+      const user = await Users.findOneAndUpdate({ email: profile._json.email! }, { $set: { googleId: profile.id, googleAccessToken: accessToken, googleRefreshToken: refreshToken } });
+      if (user.ok) {
+        return done(null, user.value as Omit<UserWithId, 'salt' | 'password'>)
+      }
+
+      return done('No user found with this email...')
+    }));
+  
+  next();
 }
 
-export function googleAuthSignupCallback(req: Request, res: Response, next: NextFunction) {
-  passport.authenticate('google', { failureRedirect: '/api/v1/auth/google' }, (error, user, info) => {
-    if (user) {
-      const accessToken = generateToken({ userId: user._id, type: 'ACCESS' })
-      const refreshToken = generateToken({ userId: user._id, type: 'REFRESH' }, { expiresIn: '30d' })
-      return res.redirect(`https://www.babysteps.world/signup?access_token=${accessToken}&refresh_token=${refreshToken}`)
-    }
-    if (error) {
-      return res.redirect(`https://www.babysteps.world/signup?error=${error}`)
-    }
-
-    if (info) {
-      return res.redirect(`https://www.babysteps.world/signup?info=${info}`)
-    }
-
-    return res.redirect('/api/v1/auth/google')
-  })(req, res, next)
+export function googleCalandarAuth(req: Request, res: Response) {
+  passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/calendar.events'] })(req, res)
 }
+
+export function googleCalanderAuthCallback(req: Request, res: Response) {
+  passport.authenticate('google', { failureRedirect: '/api/v1/auth/google/calendar' }, (err, user, info) => {
+    if (!err && !info) {
+      res.send(user);
+    }
+  })
+  // const calendar = google.calendar('v3').events.insert({
+  //   auth: '',
+  //   calendarId: 'default',
+  //   oauth_token: '',
+  //   requestBody: {
+  //     summary: '',
+  //   }
+  // })
+}
+
+// export function googleAuthSignup(req: Request, res: Response) {
+//   passport.authenticate('google', { scope: ['profile', 'email'] })(req, res)
+// }
+
+// export function googleAuthSignupCallback(req: Request, res: Response, next: NextFunction) {
+//   passport.authenticate('google', { failureRedirect: '/api/v1/auth/google' }, (error, user, info) => {
+//     if (user) {
+//       const accessToken = generateToken({ userId: user._id, type: 'ACCESS' })
+//       const refreshToken = generateToken({ userId: user._id, type: 'REFRESH' }, { expiresIn: '30d' })
+//       return res.redirect(`https://www.babysteps.world/signup?access_token=${accessToken}&refresh_token=${refreshToken}`)
+//     }
+//     if (error) {
+//       return res.redirect(`https://www.babysteps.world/signup?error=${error}`)
+//     }
+
+//     if (info) {
+//       return res.redirect(`https://www.babysteps.world/signup?info=${info}`)
+//     }
+
+//     return res.redirect('/api/v1/auth/google')
+//   })(req, res, next)
+// }
 
 export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunction) {
   try {

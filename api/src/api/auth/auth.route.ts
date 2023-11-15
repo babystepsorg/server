@@ -50,14 +50,25 @@ router.get(
 )
 
 router.get(
-  '/google/signup',
-  AuthHandler.googleAuthSignup
+  '/google/calendar',
+  AuthHandler.googleCalandarAuthMiddleware,
+  AuthHandler.googleCalandarAuth
 )
 
 router.get(
-  '/google/signup/callback',
-  AuthHandler.googleAuthSignupCallback
+  '/google/calendar/callback',
+  AuthHandler.googleCalanderAuthCallback
 )
+
+// router.get(
+//   '/google/signup',
+//   AuthHandler.googleAuthSignup
+// )
+
+// router.get(
+//   '/google/signup/callback',
+//   AuthHandler.googleAuthSignupCallback
+// )
 
 router.get('/me', validateAuthentication, AuthHandler.me)
 

@@ -17,6 +17,9 @@ export const User = z.object({
   country: z.string().optional(),
   partnerId: z.custom<ObjectId>().optional(),
   consiveDate: z.string().datetime().optional(),
+  googleId: z.string().optional(),
+  googleAccessToken: z.string().optional(),
+  googleRefreshToken: z.string().optional(),
   createdAt: z.string().datetime().default(new Date().toISOString()),
   updatedAt: z.string().datetime().default(new Date().toISOString()),
 })

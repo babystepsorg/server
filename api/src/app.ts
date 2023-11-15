@@ -52,7 +52,10 @@ passport.use(
       stage: 'postpartum' as 'pre-conception' | 'pregnancy' | 'postpartum',
       salt: null,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
+      googleId: profile.id,
+      googleAccessToken: accessToken,
+      googleRefreshToken: refreshToken
     }
     const newUser = await Users.insertOne(userObj)
 
