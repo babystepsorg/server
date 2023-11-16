@@ -127,7 +127,7 @@ export function googleCalandarAuthMiddleware(req: Request, res: Response, next: 
     new GoogleStrategy({
       clientID: "868417869848-v336g58n4rkrfkotsk85meq74ggs5flp.apps.googleusercontent.com",
       clientSecret: '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',
-      callbackURL: 'http://localhost:5000/api/v1/auth/google/calendar/callback',
+      callbackURL: 'htts://api.babysteps.world/api/v1/auth/google/calendar/callback',
       passReqToCallback: true,
     }, 
     async (req, accessToken, refreshToken, profile, done) => {
@@ -149,8 +149,10 @@ export function googleCalandarAuth(req: Request, res: Response) {
 export function googleCalanderAuthCallback(req: Request, res: Response) {
   passport.authenticate('google', { failureRedirect: '/api/v1/auth/google/calendar' }, (err, user, info) => {
     if (!err && !info) {
-      res.send(user);
+      return res.send(user);
     }
+
+    return res.send({ err, info })
   })
   // const calendar = google.calendar('v3').events.insert({
   //   auth: '',
