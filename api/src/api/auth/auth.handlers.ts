@@ -16,7 +16,7 @@ type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
   }
 }
 
-type Me = Omit<UserWithId, 'password' | 'salt'> & { week: string }
+type Me = Omit<UserWithId, 'password' | 'salt'> & { week: string, partner: boolean }
 
 export async function signUp(
   req: Request<{}, AuthUser, Omit<User, 'salt'> & { token?: string }>,
@@ -127,7 +127,7 @@ export function googleCalandarAuthMiddleware(req: Request, res: Response, next: 
     new GoogleStrategy({
       clientID: "868417869848-v336g58n4rkrfkotsk85meq74ggs5flp.apps.googleusercontent.com",
       clientSecret: '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',
-      callbackURL: 'htts://api.babysteps.world/api/v1/auth/google/calendar/callback',
+      callbackURL: 'https://api.babysteps.world/api/v1/auth/google/calendar/callback',
       passReqToCallback: true,
     }, 
     async (req, accessToken, refreshToken, profile, done) => {
@@ -190,8 +190,17 @@ export function googleCalanderAuthCallback(req: Request, res: Response) {
 export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunction) {
   try {
     const { week } = await getWeekFromUser(req.user!);
+    let partner = !!req.user?.partnerId
+    if (!partner) {
+      const foundUser = await Users.findOne({ partnerId: req.user!._id })
+      if (foundUser) {
+        partner = true
+      } else {
+        partner = false
+      }
+    }
     res.status(200)
-    res.json({ ...req.user!, week: week.toString() })
+    res.json({ ...req.user!, week: week.toString(), partner })
   } catch (err) {
     next(err)
   }

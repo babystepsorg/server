@@ -235,7 +235,10 @@ export const getAll = async (
       foundTasks = calanderTasks.filter((it:any) => {
         if (it.gentleReminderId) {
           const repeat = it.repeat
-          if (repeat && repeat.includes(currentDay.toLowerCase())) return true;
+          if (repeat && repeat.includes(currentDay.toLowerCase())) {
+            return true
+          };
+          return false;
         }
         return false;
       })
@@ -354,18 +357,20 @@ export const createOrUpdateGR = async (
   next: NextFunction
 ) => {
   try {
+    const gentleReminderId = new ObjectId(req.body.gentleReminderId)
+    req.body.gentleReminderId = gentleReminderId
     const gr = await Calanders.findOneAndUpdate(
-      { gentleReminderId: new ObjectId(req.body.gentleReminderId), userId: req.user!._id },
+      { gentleReminderId, userId: req.user!._id },
       { $set: { ...req.body } },
       { upsert: true }
     );
-    if (!gr.ok || !gr.value) {
+    if (!gr.ok) {
       throw new Error('Something went wrong.')
     }
     res.status(200)
     return res.json({
       ...req.body,
-      _id: gr.value._id
+      _id: gr!.value!._id
     })
   } catch (error) {
     next(error)
