@@ -10,6 +10,7 @@ import api from './api'
 import MessageResponse from './interfaces/MessageResponse'
 import { UserWithId, Users } from './models/user'
 import { ObjectId } from 'mongodb'
+import config from './config'
 
 require('dotenv').config()
 
@@ -27,7 +28,7 @@ passport.use(
   new GoogleStrategy({
     clientID: "868417869848-v336g58n4rkrfkotsk85meq74ggs5flp.apps.googleusercontent.com",
     clientSecret: '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',
-    callbackURL: 'https://api.babysteps.world/api/v1/auth/google/callback',
+    callbackURL: `${config.SERVER_URL}/api/v1/auth/google/callback`,
     passReqToCallback: true,
   },
   async (req, accessToken, refreshToken, profile, done) => {
@@ -40,14 +41,14 @@ passport.use(
 
     const foundUser = await Users.findOne({ email })
     if (foundUser) {
-      if (!foundUser.avatarUrl || !foundUser.googleAccessToken || !foundUser.googleRefreshToken) {
+      if (!foundUser.avatarUrl || !foundUser.googleAccessToken) {
         const updatedUser = await Users.findOneAndUpdate({
           _id: foundUser._id
         }, {
           $set: {
             googleAccessToken: accessToken,
             googleRefreshToken: refreshToken,
-            avatarUrl: profile._json.profile
+            avatarUrl: profile._json.picture
           }
         })
 

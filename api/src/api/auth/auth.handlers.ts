@@ -9,6 +9,7 @@ import passport from 'passport'
 import { Strategy } from 'passport-google-oauth20'
 import { google } from 'googleapis'
 import { getUserCalendarEvent } from '../../utils/calendar'
+import config from '../../config'
 
 type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
   tokens: {
@@ -17,7 +18,7 @@ type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
   }
 }
 
-type Me = Omit<UserWithId, 'password' | 'salt'> & { week: string, partner: boolean }
+type Me = Omit<UserWithId, 'password' | 'salt' | 'googleAccessToken' | 'googleRefreshToken'> & { week: string, partner: boolean, partnerAvatarUrl?: (string | null) }
 
 export async function signUp(
   req: Request<{}, AuthUser, Omit<User, 'salt'> & { token?: string }>,
@@ -90,8 +91,8 @@ export async function logIn(
   }
 }
 
-export function googleAuth(req: Request, res: Response) {
-  passport.authenticate('google', { scope: ['profile', 'email'] })(req, res)
+export function googleAuth(req: Request, res: Response, next: NextFunction) {
+  passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next)
 }
 
 export function googleAuthCallback(req: Request, res: Response, next: NextFunction) {
@@ -103,18 +104,18 @@ export function googleAuthCallback(req: Request, res: Response, next: NextFuncti
       const accessToken = generateToken({ userId: user._id, type: 'ACCESS' })
       const refreshToken = generateToken({ userId: user._id, type: 'REFRESH' }, { expiresIn: '30d' })
       if (newAccount) {
-        return res.redirect(`https://www.babysteps.world/login?access_token=${accessToken}&refresh_token=${refreshToken}&new=${newAccount}&user_id=${user._id}`)
+        return res.redirect(`${config.FRONTEND_URL}/login?access_token=${accessToken}&refresh_token=${refreshToken}&new=${newAccount}&user_id=${user._id}`)
       } else {
-        return res.redirect(`https://www.babysteps.world/login?access_token=${accessToken}&refresh_token=${refreshToken}&new=${newAccount}`)
+        return res.redirect(`${config.FRONTEND_URL}/login?access_token=${accessToken}&refresh_token=${refreshToken}&new=${newAccount}`)
       }
     }
 
     if (error) {
-      return res.redirect(`https://www.babysteps.world/login?error=${error}`)
+      return res.redirect(`${config.FRONTEND_URL}/login?error=${error}`)
     }
 
     if (info) {
-      return res.redirect(`https://www.babysteps.world/login?info=${info}`)
+      return res.redirect(`${config.FRONTEND_URL}/login?info=${info}`)
     }
 
     return res.redirect('/api/v1/auth/google')
@@ -125,7 +126,7 @@ export function googleAuthCallback(req: Request, res: Response, next: NextFuncti
 const oauth2Client = new google.auth.OAuth2(
   "868417869848-v336g58n4rkrfkotsk85meq74ggs5flp.apps.googleusercontent.com",
   "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",
-  "http://localhost:5000/api/v1/auth/google/calendar/callback"
+  `${config.SERVER_URL}/api/v1/auth/google/calendar/callback`
 )
 
 export function googleCalandarAuth(req: Request, res: Response, next: NextFunction) {
@@ -330,16 +331,18 @@ export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunc
   try {
     const { week } = await getWeekFromUser(req.user!);
     let partner = !!req.user?.partnerId
+    let partnerAvatarUrl = null
     if (!partner) {
       const foundUser = await Users.findOne({ partnerId: req.user!._id })
       if (foundUser) {
         partner = true
+        partnerAvatarUrl = foundUser.avatarUrl
       } else {
         partner = false
       }
     }
     res.status(200)
-    res.json({ ...req.user!, week: week.toString(), partner })
+    res.json({ ...req.user!, week: week.toString(), partner, partnerAvatarUrl })
   } catch (err) {
     next(err)
   }
