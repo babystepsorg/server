@@ -51,7 +51,7 @@ router.get(
 
 router.get(
   '/google/calendar',
-  AuthHandler.googleCalandarAuthMiddleware,
+  // AuthHandler.googleCalandarAuthMiddleware,
   AuthHandler.googleCalandarAuth
 )
 

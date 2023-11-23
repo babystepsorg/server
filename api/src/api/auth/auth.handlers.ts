@@ -8,6 +8,7 @@ import { allowedEmails } from '../../constants'
 import passport from 'passport'
 import { Strategy } from 'passport-google-oauth20'
 import { google } from 'googleapis'
+import { getUserCalendarEvent } from '../../utils/calendar'
 
 type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
   tokens: {
@@ -120,40 +121,178 @@ export function googleAuthCallback(req: Request, res: Response, next: NextFuncti
   })(req, res, next)
 }
 
-export function googleCalandarAuthMiddleware(req: Request, res: Response, next: NextFunction) {
-  const GoogleStrategy = Strategy;
+// google oauth2Client
+const oauth2Client = new google.auth.OAuth2(
+  "868417869848-v336g58n4rkrfkotsk85meq74ggs5flp.apps.googleusercontent.com",
+  "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",
+  "http://localhost:5000/api/v1/auth/google/calendar/callback"
+)
 
-  passport.use(
-    new GoogleStrategy({
-      clientID: "868417869848-v336g58n4rkrfkotsk85meq74ggs5flp.apps.googleusercontent.com",
-      clientSecret: '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',
-      callbackURL: 'https://api.babysteps.world/api/v1/auth/google/calendar/callback',
-      passReqToCallback: true,
-    }, 
-    async (req, accessToken, refreshToken, profile, done) => {
-      const user = await Users.findOneAndUpdate({ email: profile._json.email! }, { $set: { googleId: profile.id, googleAccessToken: accessToken, googleRefreshToken: refreshToken } });
-      if (user.ok) {
-        return done(null, user.value as Omit<UserWithId, 'salt' | 'password'>)
-      }
+export function googleCalandarAuth(req: Request, res: Response, next: NextFunction) {
+  // const oauth2Client = new google.auth.OAuth2(
+  //   "868417869848-v336g58n4rkrfkotsk85meq74ggs5flp.apps.googleusercontent.com",
+  //   "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",
+  //   "http://localhost:5000/api/v1/auth/google/calendar/callback"
+  // )
 
-      return done('No user found with this email...')
-    }));
+  const scopes = [
+    "https://www.googleapis.com/auth/calendar.events",
+    "https://www.googleapis.com/auth/calendar"
+  ]
+
+  const authorizationUrl = oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: scopes,
+    include_granted_scopes: true
+  })
+
+  res.status(301)
+  res.redirect(authorizationUrl)
+
+  // res.writeHead(301, { "Location": authorizationUrl })
+
+  // const GoogleStrategy = Strategy;
+
+  // passport.use(
+  //   new GoogleStrategy({
+  //     clientID: "868417869848-v336g58n4rkrfkotsk85meq74ggs5flp.apps.googleusercontent.com",
+  //     clientSecret: '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',
+  //     callbackURL: 'http://localhost:5000/api/v1/auth/google/calendar/callback',
+  //     passReqToCallback: true,
+  //   }, 
+  //   async (req, accessToken, refreshToken, profile, done) => {
+  //     const user = await Users.findOneAndUpdate({ email: profile._json.email! }, { $set: { googleId: profile.id, googleAccessToken: accessToken, googleRefreshToken: refreshToken } });
+  //     if (user.ok) {
+  //       return done(null, user.value as Omit<UserWithId, 'salt' | 'password'>)
+  //     }
+
+  //     return done('No user found with this email...')
+  //   }));
   
-  next();
+  // next();
 }
 
-export function googleCalandarAuth(req: Request, res: Response) {
-  passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/calendar.events'] })(req, res)
-}
+// export function googleCalandarAuth(req: Request, res: Response) {
+//   passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/calendar.events', 'profile', 'email'], accessType: 'offline' })(req, res)
+// }
 
-export function googleCalanderAuthCallback(req: Request, res: Response) {
-  passport.authenticate('google', { failureRedirect: '/api/v1/auth/google/calendar' }, (err, user, info) => {
-    if (!err && !info) {
-      return res.send(user);
+export async function googleCalanderAuthCallback(req: Request<{}, {}, {}, { code: string }>, res: Response) {
+  oauth2Client.getToken(req.query.code, async (err, tokens) => {
+    if (err) {
+      res.status(500)
+      return res.send(err.message)
     }
 
-    return res.send({ err, info })
+    if (!tokens) {
+      res.status(500);
+      return res.send({ message: 'something went wrong...' })
+    }
+
+    const info = await oauth2Client.getTokenInfo(tokens.access_token!)
+
+    if (info.email) {
+      const user = await Users.findOneAndUpdate({
+        "email": info.email
+      }, {
+        $set: {
+          googleAccessToken: tokens.access_token as string,
+          googleRefreshToken: tokens.refresh_token as string
+        }
+      })
+
+      if (user.ok) {
+        oauth2Client.setCredentials(tokens)
+
+        // oauth2Client.getAccessToken()
+  
+        // Get all calendar event from the admin
+        const userCalendarEvents = await getUserCalendarEvent(user.value!)
+
+
+        type DateTime = {
+          dateTime: string,
+          timeZone: string
+        }
+
+        type Event = {
+          summary: string;
+          start: DateTime;
+          end: DateTime;
+        }
+
+        const events: Array<Event> = [];
+        userCalendarEvents.forEach(ev => {
+          const start = {
+            dateTime: ev.day.toISOString(),
+            timeZone: 'Asia/Kolkata'
+          }
+
+          const end = {
+            dateTime: ev.endDay.toISOString(),
+            timeZone: 'Asia/Kolkata'
+          }
+
+          ev.tasks.forEach(task => {
+            const event: Event = {
+              start,
+              end,
+              summary: task.title
+            }
+            event.summary = task.title
+            events.push(event)
+          })
+        })
+  
+        // const event = {
+        //   summary: 'TEsting an event from the google calander',
+        //   start: {
+        //     dateTime: `${new Date().toISOString()}`,
+        //     timeZone: 'Asia/Kolkata'
+        //   },
+        //   end: {
+        //     dateTime: `${new Date(Date.now() + 30 * 60 * 1000).toISOString()}`,
+        //     timeZone: 'Asia/Kolkata'
+        //   },
+        // }
+
+        const result = await Promise.all(events.map(async (event) => {
+          try {
+            const insertedEvent = await google.calendar('v3').events.insert({
+              auth: oauth2Client,
+              calendarId: 'primary',
+              requestBody: {
+                summary: event.summary,
+                start: event.start,
+                end: event.end
+              }
+            });
+            return insertedEvent;
+          } catch (error) {
+            console.error('Error inserting event:', error);
+            throw error;
+          }
+        }));
+  
+  
+        res.status(200)
+        return res.send(result)
+      } 
+    }
+
+    res.status(200)
+    return res.send({ message: "Email not found..."})
   })
+
+  // oauth2Client.getTokenInfo(tokens.access_token)
+  // res.status(200)
+  // res.send(tokens)
+  // passport.authenticate('google', { failureRedirect: '/api/v1/auth/google/calendar'  }, (err, user, info) => {
+  //   if (!err && !info) {
+  //     return res.send(user);
+  //   }
+
+  //   return res.send({ err, info })
+  // })
   // const calendar = google.calendar('v3').events.insert({
   //   auth: '',
   //   calendarId: 'default',
