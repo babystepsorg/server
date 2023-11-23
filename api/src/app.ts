@@ -40,6 +40,21 @@ passport.use(
 
     const foundUser = await Users.findOne({ email })
     if (foundUser) {
+      if (!foundUser.avatarUrl || !foundUser.googleAccessToken || !foundUser.googleRefreshToken) {
+        const updatedUser = await Users.findOneAndUpdate({
+          _id: foundUser._id
+        }, {
+          $set: {
+            googleAccessToken: accessToken,
+            googleRefreshToken: refreshToken,
+            avatarUrl: profile._json.profile
+          }
+        })
+
+        if (updatedUser.ok) {
+          return done(null, updatedUser.value!)
+        }
+      }
       return done(null, foundUser)
     }
 
@@ -55,7 +70,8 @@ passport.use(
       updatedAt: new Date().toISOString(),
       googleId: profile.id,
       googleAccessToken: accessToken,
-      googleRefreshToken: refreshToken
+      googleRefreshToken: refreshToken,
+      avatarUrl: profile._json.picture
     }
     const newUser = await Users.insertOne(userObj)
 

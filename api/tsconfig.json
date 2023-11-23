@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "dist",
+    "rootDir": "src",
     "sourceMap": true,
     "target": "esnext",
     "module": "commonjs",
@@ -11,5 +12,5 @@
     "skipLibCheck": true,
     "typeRoots": ["./node_modules/@types", "index.d.ts"]
   },
-  "include": ["./*.js", "src/**/*.ts", "test/**/*.ts", "index.d.ts"]
+  "include": ["./*.js", "src/**/*.ts", "index.d.ts"]
 }

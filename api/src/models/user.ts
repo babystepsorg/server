@@ -20,6 +20,7 @@ export const User = z.object({
   googleId: z.string().optional(),
   googleAccessToken: z.string().optional(),
   googleRefreshToken: z.string().optional(),
+  avatarUrl: z.string().optional(),
   createdAt: z.string().datetime().default(new Date().toISOString()),
   updatedAt: z.string().datetime().default(new Date().toISOString()),
 })
