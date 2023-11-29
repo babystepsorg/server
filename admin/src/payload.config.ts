@@ -17,6 +17,8 @@ import { s3Adapter } from '@payloadcms/plugin-cloud-storage/s3'
 import Careers from './collections/Careers'
 import Subheadings from './globals/Subheading'
 import Tags from './collections/Tag'
+import RecommendedProducts from './collections/RecommendedProducts'
+import RecommendedSpecialists from './collections/RecommendedSpecialists'
 
 const adapter = s3Adapter({
   config: {
@@ -49,6 +51,8 @@ export default buildConfig({
     Tags,
     Media,
     Users,
+    RecommendedProducts,
+    RecommendedSpecialists
   ],
   globals: [
     Subheadings
