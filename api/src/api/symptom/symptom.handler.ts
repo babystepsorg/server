@@ -246,7 +246,7 @@ export const getSymptoms = async (
 				red_flag: false,
 				image: {
 					...symptom.image,
-					url: `https://api.babysteps.world/media/${symptom.image.filename}`
+					url: symptom?.image?.filename ? `https://api.babysteps.world/media/${symptom.image.filename}` : ""
 				}
 			}
 		})

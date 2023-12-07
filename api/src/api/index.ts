@@ -8,6 +8,7 @@ import users from './users/user.route'
 import calander from './calander/calander.route'
 import content from './content/content.route'
 import symptom from './symptom/symptom.route'
+import assistant from './assistant/assistant.route'
 
 const router = express.Router()
 
@@ -24,5 +25,6 @@ router.use('/users', users)
 router.use('/calander', calander)
 router.use('/content', content)
 router.use('/symptoms', symptom)
+router.use('/assistant', assistant)
 
 export default router
