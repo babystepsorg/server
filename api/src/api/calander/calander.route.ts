@@ -3,6 +3,7 @@ import { validateAuthentication, validateRequest } from '../../middlewares'
 import * as CalanderHandler from './calander.handler'
 import { Calander } from '../../models/calander'
 import { z } from 'zod'
+import { Ovulation } from '../../models/ovulation'
 
 const router = Router()
 
@@ -26,6 +27,18 @@ router.post(
   }),
   CalanderHandler.createOne
 )
+
+router.post(
+  '/ovulation',
+  validateAuthentication,
+  validateRequest({
+    body: Ovulation.omit({
+      userId: true,
+    }),
+  }),
+  CalanderHandler.createOrUpdateOvulation
+)
+
 router.post(
   '/gr',
   validateAuthentication,

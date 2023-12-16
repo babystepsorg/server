@@ -5,6 +5,7 @@ import { ParamsWithId } from '../../interfaces/ParamsWithId'
 import { ObjectId } from 'mongodb'
 import { getCurrentWeek, getCurrentWeekFromConsiveDate, getDaysOfWeekForWeek, getDaysOfWeekFromWeekAndConsiveDate, getWeekFromUser } from '../../utils/week'
 import { Planners } from '../../models/planner'
+import { Ovulation, OvulationWithId, Ovulations } from '../../models/ovulation'
 
 export const getAll = async (
   req: Request<{}, {}, {}, { week?: string }>,
@@ -391,5 +392,28 @@ export const getGentleReminderDoc = async (
     res.json(gentleReminder)
   } catch (error) {
     next(error)
+  }
+}
+
+export const createOrUpdateOvulation = async (
+  req: Request<{}, OvulationWithId, Ovulation>,
+  res: Response<OvulationWithId>,
+  next: NextFunction
+) => {
+  try {
+    const ovulation = await Ovulations.findOneAndUpdate(
+      { userId: req.user!._id }, 
+      { $set: { ...req.body, } }, 
+      { upsert: true }
+    )
+
+    if (!ovulation.ok) {
+      throw new Error('Error while updating ovulation.')
+    }
+
+    res.status(200)
+    res.send(ovulation.value!)
+  } catch (err) {
+    next(err)
   }
 }
