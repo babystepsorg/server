@@ -177,8 +177,10 @@ export const getAll = async (
             adminTodo: 0
           }
         }
-      ]).toArray()
+      ]).toArray(),
     ])
+
+    const ovulation = await Ovulations.findOne({ userId: req.user!._id })
 
     const currentDate = new Date()
     currentDate.setHours(0, 0, 0, 0)
@@ -249,10 +251,31 @@ export const getAll = async (
 
       day.setHours(0, 0, 0, 0)
 
+      let _ovulation = false;
+      let _ovulationMain = false;
+      if (ovulation) {
+        const ov = new Date(ovulation.ovultaionDate)
+        ov.setHours(0, 0, 0, 0)
+        const fws = new Date(ovulation.fertileWindowStart)
+        fws.setHours(0, 0, 0, 0)
+        const fwe = new Date(ovulation.fertileWindowEnd)
+        fwe.setHours(0, 0, 0, 0)
+
+        if (day >= fws && day <= fwe) {
+          _ovulation = true
+        }
+
+        if (day.getTime() === ov.getTime()) {
+          _ovulationMain = true
+        }
+      }
+
       return {
         day,
         tasks,
-        alternate
+        alternate,
+        _ovulation,
+        _ovulationMain
       }
     })
 
