@@ -88,7 +88,7 @@ export const getContent = async (
 
       let allTags: Array<string> = [];
       for (let i = 0; i < userSymptoms.length; i++) {
-        allTags = [...new Set([...allTags, ...userSymptoms[i].tags])];
+        allTags = [...new Set([...allTags, ...(userSymptoms[i]?.tags ?? [])])];
       }
 
       const contents = await Contents.aggregate([

@@ -394,7 +394,7 @@ export const createOrUpdateGR = async (
     res.status(200)
     return res.json({
       ...req.body,
-      _id: gr!.value!._id
+      _id: gentleReminderId
     })
   } catch (error) {
     next(error)
