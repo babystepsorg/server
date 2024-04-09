@@ -33,6 +33,23 @@ const Doctors: CollectionConfig = {
       required: true,
     },
     {
+      name: 'location',
+      type: 'text',
+    },
+    {
+      name: 'tags',
+      type: 'relationship',
+      relationTo: 'tags',
+      hasMany: true,
+      admin: {
+        position: 'sidebar'
+      }
+    },
+    {
+      name: 'phone',
+      type: 'text',
+    },
+    {
       name: 'social_links',
       label: 'Social Links',
       type: 'array',

@@ -24,6 +24,10 @@ const Tags: CollectionConfig = {
       name: 'description',
       type: 'text',
     },
+    {
+      name: 'category',
+      type: 'checkbox'
+    }
   ],
 }
 
