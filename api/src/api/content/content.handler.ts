@@ -123,6 +123,11 @@ export const getContent = async (
                         $elemMatch: {
                           title: { $eq: week.toString() }
                         }
+                      },
+                      {
+                        $elemMatch: {
+                          title: { $eq: '-10' }
+                        }
                       }
                     ]
                   },
@@ -144,9 +149,9 @@ export const getContent = async (
       const watchedContentIds = history.map(h => h.contentId.toString());
       const unwatchedContents = contents.filter(c => !watchedContentIds.includes(c._id.toString()));
       const unwatchedVideos = unwatchedContents.filter(c => c.layout === 'video');
-      const unwatchedPosts = unwatchedContents.filter(c => c.layout === 'post');
+      // const unwatchedPosts = unwatchedContents.filter(c => c.layout === 'post');
       const watchedContent = contents.filter(c => watchedContentIds.includes(c._id.toString()));
-      const sortedContents = [...unwatchedVideos, ...unwatchedPosts, ...watchedContent];
+      const sortedContents = [...unwatchedVideos, ...watchedContent];
       res.status(200);
       res.json(sortedContents);
     } catch (error) {

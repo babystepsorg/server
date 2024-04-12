@@ -10,6 +10,7 @@ import { Strategy } from 'passport-google-oauth20'
 import { google } from 'googleapis'
 import { getUserCalendarEvent } from '../../utils/calendar'
 import config from '../../config'
+import { ActiveUsers } from '../../models/activeUser'
 
 type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
   tokens: {
@@ -341,6 +342,24 @@ export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunc
         partner = false
       }
     }
+    // Add the user to the active users
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const exists = await ActiveUsers.findOne({
+      userId: req.user!._id,
+      activityTimestamp: {
+        $gte: todayStart.toISOString(),
+        $lte: todayEnd.toISOString()
+      }
+    });
+    if (!exists) {
+      await ActiveUsers.insertOne({ userId: req.user!._id, activityTimestamp: new Date().toISOString() });
+    }
+
     res.status(200)
     res.json({ ...req.user!, week: week.toString(), partner, partnerAvatarUrl })
   } catch (err) {
