@@ -171,7 +171,8 @@ export const getSymptoms = async (
 						descriptions: { $arrayElemAt: ['$symptom.descriptions', 0] },
 						image: { $arrayElemAt: ['$symptom.image', 0] },
 						week: 1,
-						red_flag_weeks: { $arrayElemAt: ['$symptom.red_flag_weeks' , 0]}
+						red_flag_weeks: { $arrayElemAt: ['$symptom.red_flag_weeks' , 0]},
+						tags: { $arrayElemAt: ['$symptom.tags', 0 ]}
 					}
 				},
 				{
@@ -234,7 +235,8 @@ export const getSymptoms = async (
 						image: { $arrayElemAt: ['$image', 0] },
 						highlight: 1,
 						week: 1,
-						red_flag_weeks: 1
+						red_flag_weeks: 1,
+						tags: 1
 					}
 				}
 			]).toArray()

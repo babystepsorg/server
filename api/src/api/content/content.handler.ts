@@ -4,6 +4,7 @@ import { ObjectId } from "mongodb";
 import { getCurrentWeek, getCurrentWeekFromConsiveDate, getWeekFromUser } from "../../utils/week";
 import { Content, ContentWithId, Contents } from "../../models/content";
 import { UserSymptoms } from "../../models/usersymptoms";
+import { Symptoms } from "../../models/symptoms";
 
 export const setVideoHistory = async (
   req: Request<{}, ContentHistoryWithId | null, { contentId: string }>,
@@ -159,3 +160,40 @@ export const getContent = async (
     }
 }
 
+export const getContentForSymptom = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { symptom } = req.params;
+    const symptomTags = (await Symptoms.findOne({ _id: new ObjectId(symptom) }))?.tags || [];
+    const contents = await Contents.aggregate([
+      {
+        $match: {
+          tags: { $in: symptomTags }
+        }
+      },
+      // {
+      //   $lookup: {
+      //     from: 'contenthistories',
+      //     localField: '_id',
+      //     foreignField: 'contentId',
+      //     as: 'history'
+      //   }
+      // },
+      // {
+      //   $addFields: {
+      //     watched: {
+      //       $in: [req.user!._id, '$history.userId']
+      //     }
+      //   }
+      // },
+      // {
+      //   $match: {
+      //     watched: false
+      //   }
+      // }
+    ]).toArray();
+
+    res.status(200).json(contents);
+  } catch (error) {
+    next(error);
+  }
+};

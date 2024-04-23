@@ -70,8 +70,44 @@ export const getAllSpecialists = async(
             {
                 $lookup: {
                     from: "doctors",
-                    localField: "specialists",
-                    foreignField: "_id",
+                    let: { specialistIds: "$specialists" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: ["$_id", "$$specialistIds"]
+                                }
+                            }
+                        },
+                        {
+                            $addFields: {
+                                imageObjectId: { $toObjectId: "$image" }
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: "media",
+                                localField: "imageObjectId",
+                                foreignField: "_id",
+                                as: "imageArray"
+                            }
+                        },
+                        {
+                            $addFields: {
+                                image: { $arrayElemAt: ["$imageArray", 0] }
+                            }
+                        },
+                        {
+                            $addFields: {
+                                "image.url": {
+                                    $concat: [
+                                        "https://api.babysteps.world/media/",
+                                        { $ifNull: ["$image.filename", ""] }
+                                    ]
+                                }
+                            }
+                        },
+                    ],
                     as: "specialists"
                 }
             }

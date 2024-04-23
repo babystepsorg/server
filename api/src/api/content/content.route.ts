@@ -22,4 +22,11 @@ router.get(
     ContentHandler.getContent
 )
 
+router.get(
+  '/symptom/:symptom',
+  validateAuthentication,
+  ContentHandler.getContentForSymptom
+)
+
+
 export default router
