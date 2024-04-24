@@ -54,6 +54,16 @@ const Symptoms: CollectionConfig = {
       admin: {
         position: 'sidebar'
       }
+    },
+    {
+      label: 'Category',
+      name: 'category',
+      type: 'relationship',
+      relationTo: 'tags',
+      hasMany: true,
+      admin: {
+        position: 'sidebar'
+      }
     }
   ],
 }

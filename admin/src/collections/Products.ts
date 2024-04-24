@@ -29,6 +29,10 @@ const Products: CollectionConfig = {
       ],
     },
     {
+      name: 'description',
+      type: 'richText'
+    },
+    {
       name: 'link',
       type: 'text',
     },
