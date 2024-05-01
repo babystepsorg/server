@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { ContentHistories, ContentHistoryWithId } from "../../models/contenthistory";
 import { ObjectId } from "mongodb";
-import { getCurrentWeek, getCurrentWeekFromConsiveDate, getWeekFromUser } from "../../utils/week";
-import { Content, ContentWithId, Contents } from "../../models/content";
+import { getWeekFromUser } from "../../utils/week";
+import { ContentWithId, Contents } from "../../models/content";
 import { UserSymptoms } from "../../models/usersymptoms";
 import { Symptoms } from "../../models/symptoms";
 
@@ -50,6 +50,8 @@ export const getContent = async (
 
       const reqWeek = req.query.week ? parseInt(req.query.week) : undefined
       const { week } = await getWeekFromUser(req.user!, reqWeek)
+
+      console.log({ week })
 
       const userSymptoms = await UserSymptoms.aggregate([
 				{

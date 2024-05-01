@@ -7,6 +7,11 @@ import { generateToken } from '../../utils/jwt'
 
 import config from '../../config'
 import NotificationService from '../../services/notification'
+import { ContentHistories } from '../../models/contenthistory'
+import { SelectedSpecialists } from '../../models/selectedSpecialit'
+import { Calanders } from '../../models/calander'
+import { UserTodos } from '../../models/userTodo'
+import { UserSymptoms } from '../../models/usersymptoms'
 
 export async function createOne(
   req: Request<{}, Omit<UserWithId, 'password' | 'salt'>, User>,
@@ -103,3 +108,36 @@ export async function invitePartner(
 // There are only some items that are going to be different for both user
 // (means that both user can see there things)
 // But most of the things will be same, what one user adds will be seen by the other
+
+export async function deleteUserByEmail(
+  req: Request<{}, {}, { email: string }>,
+  res: Response<{}>,
+  next: NextFunction
+) {
+  try {
+    const { email } = req.body;
+    const user = await Users.findOne({ email });
+    if (!user) {
+      res.status(404);
+      throw new Error(`User with email "${email}" not found.`);
+    }
+
+    // Delete associated content, specialists, symptoms, and calendar entries
+    await Promise.all([
+      ContentHistories.deleteMany({ userId: user._id }),
+      Calanders.deleteMany({ userId: user._id }),
+      SelectedSpecialists.deleteMany({ userId: user._id }),
+      UserSymptoms.deleteMany({ userId: user._id }),
+      UserTodos.deleteMany({ userId: user._id })
+    ]);
+
+    // Finally, delete the user
+    await Users.deleteOne({ _id: user._id });
+
+    res.status(200).json({
+      message: 'User and all related data deleted successfully.'
+    });
+  } catch (error) {
+    next(error);
+  }
+}
