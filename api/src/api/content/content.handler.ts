@@ -124,14 +124,9 @@ export const getContent = async (
                     $all: [
                       {
                         $elemMatch: {
-                          title: { $eq: week.toString() }
+                          title: { $in: [week.toString(), '-10'] }
                         }
                       },
-                      {
-                        $elemMatch: {
-                          title: { $eq: '-10' }
-                        }
-                      }
                     ]
                   },
                 },
@@ -144,6 +139,15 @@ export const getContent = async (
               roles: {
                 $in: [req.query.role]
               },
+            }
+          },
+          {
+            $project: {
+              _id: 1,
+              title: 1,
+              layout: 1,
+              type: 1,
+              video_url: 1
             }
           }
       ]).toArray() as Array<ContentWithId>;

@@ -84,7 +84,7 @@ export const getSymptoms = async (
 							$all: [
 								{
 									$elemMatch: {
-											title: { $eq: week.toString() }
+										title: { $eq: week.toString() }
 									}
 								}
 							]
