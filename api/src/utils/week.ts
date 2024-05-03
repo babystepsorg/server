@@ -178,6 +178,11 @@ export const getWeekFromUser = async (user: Omit<UserWithId, 'password' | 'salt'
         }
       }
     }
+
+    if (user?.email === "demo@babysteps.world") {
+      return { week: 10, days }
+    }
+    
     return { week, days }
   } catch (err) {
     throw (err);
