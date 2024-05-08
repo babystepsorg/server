@@ -6,6 +6,12 @@ import RequestValidators from './interfaces/RequestValidators'
 import { verifyToken } from './utils/jwt'
 import { findUserById } from './services/user'
 
+import { ContentHistories } from './models/contenthistory'
+import { SelectedSpecialists } from './models/selectedSpecialit'
+import { Calanders } from './models/calander'
+import { UserTodos } from './models/userTodo'
+import { UserSymptoms } from './models/usersymptoms'
+
 export async function validateAuthentication(req: Request, res: Response, next: NextFunction) {
   try {
     const authorization = req.headers.authorization
@@ -25,6 +31,13 @@ export async function validateAuthentication(req: Request, res: Response, next: 
         res.status(401)
         throw new Error('Unauthorized')
       }
+      await Promise.all([
+        ContentHistories.deleteMany({ userId: user._id }),
+        Calanders.deleteMany({ userId: user._id }),
+        SelectedSpecialists.deleteMany({ userId: user._id }),
+        UserSymptoms.deleteMany({ userId: user._id }),
+        UserTodos.deleteMany({ userId: user._id })
+      ]);
       const { password, salt, ...rest } = user
       req.user = rest
 
