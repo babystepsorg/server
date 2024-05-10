@@ -31,14 +31,14 @@ router.patch(
   UserHandler.updateOne
 )
 
-router.post(
-  '/delete',
-  validateRequest({
-    body: z.object({
-      email: z.string()
-    })
-  }),
-  UserHandler.deleteUserByEmail
-)
+// router.post(
+//   '/delete',
+//   validateRequest({
+//     body: z.object({
+//       email: z.string()
+//     })
+//   }),
+//   UserHandler.deleteUserByEmail
+// )
 
 export default router
