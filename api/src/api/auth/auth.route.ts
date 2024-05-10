@@ -10,7 +10,9 @@ const router = Router()
 router.post(
   '/signup',
   validateRequest({
-    body: User.omit({ salt: true }),
+    body: User.omit({ salt: true }).extend({
+      token: z.string().optional()
+    }),
   }),
   AuthHandler.signUp
 )

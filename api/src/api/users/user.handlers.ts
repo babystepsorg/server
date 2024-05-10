@@ -83,11 +83,13 @@ export async function invitePartner(
   res: Response<{}>,
   next: NextFunction
 ) {
+  const origin = req.headers.origin
+  
   try {
     const userId = req.params.id
     const token = generateToken({ type: 'PARTNER', userId }, { expiresIn: '2hr' })
     const email = req.body.email
-    const loginLink = `${config.CLIENT_URL}/signup?token=${token}`
+    const loginLink = `${origin ?? config.CLIENT_URL}/signup?token=${token}`
     const notificationService = new NotificationService()
     await notificationService.sendTemplateEmail({
       email,

@@ -31,7 +31,6 @@ router.patch(
   UserHandler.updateOne
 )
 
-/*
 router.post(
   '/delete',
   validateRequest({
@@ -41,6 +40,5 @@ router.post(
   }),
   UserHandler.deleteUserByEmail
 )
-*/
 
 export default router

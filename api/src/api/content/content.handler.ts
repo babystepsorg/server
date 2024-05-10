@@ -121,13 +121,30 @@ export const getContent = async (
               $or: [
                 {
                   week: {
-                    $all: [
-                      {
-                        $elemMatch: {
-                          title: { $in: [week.toString(), '-10'] }
+                    // $all: [
+                    //   {
+                    //     $elemMatch: {
+                    //       $or: [
+                    //         {
+                    //             title: week.toString()
+                    //         },
+                    //         {
+                    //             title: "-10"
+                    //         }
+                    //       ]
+                    //     },
+                    //   },
+                    // ]
+                    $elemMatch: {
+                      $or: [
+                        {
+                          title: week.toString()
+                        },
+                        {
+                          title: "-10"
                         }
-                      },
-                    ]
+                      ]
+                    }
                   },
                 },
                 {

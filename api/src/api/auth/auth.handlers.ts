@@ -34,12 +34,15 @@ export async function signUp(
       throw new Error('User with this email already exists')
     }
     // get the token from the body
+    console.log("Token:: ", req.body.token)
+    console.log(req.body)
     const { token, ...rest } = req.body
     let partnerId = undefined
     if (token) {
       const decoded = verifyToken(token) as {
         userId: string
       }
+      console.log({ decoded })
       partnerId = new ObjectId(decoded.userId)
     }
     const user = await createUser({ ...rest, partnerId })
