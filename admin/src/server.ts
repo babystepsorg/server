@@ -84,20 +84,63 @@ app.post('/api/careers', upload.single('resume'), async (req, res) => {
   res.status(200).send({})
 })
 
-const start = async () => {
+const start = async (): Promise<void> => {
   // Initialize Payload
   await payload.init({
     secret: process.env.PAYLOAD_SECRET,
-    mongoURL: process.env.MONGODB_URI!,
     express: app,
     onInit: async () => {
       payload.logger.info(`Payload Admin URL: ${payload.getAdminURL()}`)
     },
   })
 
-  // Add your own express routes here
+  app.get("/week-info/:id", async (req, res) => {
+    try {
+      const [symptoms, products, content, todos] = await Promise.all([
+        payload.find({
+          collection: 'symptoms',
+          where: {
+            weeks: {
+              in: [req.params.id]
+            }
+          }
+        }),
+        payload.find({
+          collection: 'products',
+          where: {
+            weeks: {
+              in: [req.params.id]
+            }
+          }
+        }),
+        payload.find({
+          collection: 'content',
+          where: {
+            weeks: {
+              in: [req.params.id]
+            }
+          }
+        }),
+        payload.find({
+          collection: 'todos',
+          where: {
+            week: {
+              in: [req.params.id]
+            }
+          }
+        })
+      ])
 
-  app.listen(3000)
+      const data = { symptoms, products, content, todos }
+      res.status(200).json(data)
+    } catch (err) {
+      res.status(500).json({ error: err.message })
+    }
+  })
+
+  app.listen(process.env.PORT || 3000, async () => {
+    payload.logger.info(`Server listening on port ${process.env.PORT || 3000}`)
+  })
 }
 
 start()

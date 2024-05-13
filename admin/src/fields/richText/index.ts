@@ -1,4 +1,6 @@
-import type { RichTextElement, RichTextField, RichTextLeaf } from 'payload/dist/fields/config/types'
+import type { RichTextElement, RichTextLeaf } from '@payloadcms/richtext-slate'
+import type { RichTextField } from 'payload/dist/fields/config/types'
+import { slateEditor } from '@payloadcms/richtext-slate'
 
 import deepMerge from '../../utils/deepMerge'
 import link from '../link'
@@ -25,32 +27,34 @@ const richText: RichText = (
       name: 'richText',
       type: 'richText',
       required: true,
-      admin: {
-        upload: {
-          collections: {
-            media: {
-              fields: [
-                {
-                  name: 'enableLink',
-                  type: 'checkbox',
-                  label: 'Enable Link',
-                },
-                link({
-                  appearances: false,
-                  disableLabel: true,
-                  overrides: {
-                    admin: {
-                      condition: (_, data) => Boolean(data?.enableLink),
-                    },
+      editor: slateEditor({
+        admin: {
+          upload: {
+            collections: {
+              media: {
+                fields: [
+                  {
+                    name: 'enableLink',
+                    type: 'checkbox',
+                    label: 'Enable Link',
                   },
-                }),
-              ],
+                  link({
+                    appearances: false,
+                    disableLabel: true,
+                    overrides: {
+                      admin: {
+                        condition: (_, data) => Boolean(data?.enableLink),
+                      },
+                    },
+                  }),
+                ],
+              },
             },
           },
+          elements: [...elements, ...(additions.elements || [])],
+          leaves: [...leaves, ...(additions.leaves || [])],
         },
-        elements: [...elements, ...(additions.elements || [])],
-        leaves: [...leaves, ...(additions.leaves || [])],
-      },
+      })
     },
     overrides
   )

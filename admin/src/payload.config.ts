@@ -1,5 +1,9 @@
 import { buildConfig } from 'payload/config'
 import path from 'path'
+import { slateEditor } from '@payloadcms/richtext-slate'
+import { mongooseAdapter } from '@payloadcms/db-mongodb'
+import { webpackBundler } from '@payloadcms/bundler-webpack'
+
 import TodoLists from './collections/TodoLists'
 import Users from './collections/Users'
 import GentleReminder from './collections/GentleReminder'
@@ -32,10 +36,6 @@ const adapter = s3Adapter({
 })
 
 export default buildConfig({
-  serverURL: process.env.SERVER_URL,
-  admin: {
-    user: Users.slug,
-  },
   collections: [
     Weeks,
     Slider,
@@ -54,6 +54,10 @@ export default buildConfig({
     RecommendedProducts,
     RecommendedSpecialists
   ],
+  db: mongooseAdapter({
+    url: process.env.MONGODB_URI
+  }),
+  editor: slateEditor({}),
   globals: [
     Subheadings
   ],
@@ -65,7 +69,7 @@ export default buildConfig({
   },
   upload: {
     limits: {
-      fileSize: 10000000, // 10 MB, written in bytes
+      fileSize: 100000000, // 10 MB, written in bytes
     }
   },
   plugins: [
@@ -77,4 +81,20 @@ export default buildConfig({
       },
     }),
   ],
+  admin: {
+    bundler: webpackBundler(),
+    user: Users.slug,
+    webpack: config => ({
+      ...config,
+      resolve: {
+        ...config.resolve,
+        alias: {
+          ...config?.resolve?.alias,
+          react: path.resolve(__dirname, '../node_modules/react'),
+          'react-dom': path.resolve(__dirname, '../node_modules/react-dom'),
+          'react-router-dom': path.resolve(__dirname, '../node_modules/react-router-dom'),
+        }
+      }
+    })
+  },
 })

@@ -1,4 +1,4 @@
-import type { RichTextElement } from 'payload/dist/fields/config/types'
+import type { RichTextElement } from '@payloadcms/richtext-slate'
 
 import video from './video'
 

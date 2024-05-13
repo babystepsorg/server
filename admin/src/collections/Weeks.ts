@@ -1,17 +1,37 @@
 import { CollectionConfig } from 'payload/types'
+import InfoComponent from '../components/InfoComponent'
 
 const Weeks: CollectionConfig = {
   slug: 'weeks',
-  admin: {
-    defaultColumns: ['title', 'stage', 'createdAt'],
-    useAsTitle: 'title',
-    hideAPIURL: true,
-  },
   access: {
     create: () => true,
     read: () => true,
     update: () => true,
     delete: () => true,
+  },
+  admin: {
+    defaultColumns: ['title', 'stage', 'createdAt'],
+    useAsTitle: 'title',
+    hideAPIURL: true,
+    components: {
+      views: {
+        Edit: {
+          Default: {
+            Tab: {
+              label: "Edit"
+            }
+          },
+          Testing: {
+            Component: InfoComponent,
+            path: '/info',
+            Tab: {
+              label: "Info",
+              href: '/info'
+            }
+          }
+        }
+      }
+    }
   },
   fields: [
     {

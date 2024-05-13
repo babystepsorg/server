@@ -64,6 +64,15 @@ const Products: CollectionConfig = {
         position: 'sidebar'
       }
     },
+    {
+      name: 'category',
+      type: 'relationship',
+      relationTo: 'tags',
+      hasMany: true,
+      admin: {
+        position: 'sidebar'
+      }
+    },
   ],
 }
 
