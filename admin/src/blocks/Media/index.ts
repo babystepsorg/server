@@ -31,10 +31,7 @@ export const MediaBlock: Block = {
         },
         {
           name: 'caption',
-          type: 'richText',
-          admin: {
-            elements: ['link'],
-          },
+          type: 'richText'
         },
       ],
     }),
