@@ -25,9 +25,31 @@ const Tags: CollectionConfig = {
       type: 'text',
     },
     {
-      name: 'category',
-      type: 'checkbox'
-    }
+      name: 'type',
+      type: 'select',
+      options: [
+        {
+          label: "Category",
+          value: "category"
+        },
+        {
+          label: "Symptom Category",
+          value: "symptom"
+        },
+        {
+          label: "Specialist Category",
+          value: "specialist"
+        },
+        {
+          label: "Products Category",
+          value: "product"
+        },
+        {
+          label: "Content Category",
+          value: "content"
+        }
+      ]
+    },
   ],
 }
 

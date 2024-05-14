@@ -65,7 +65,8 @@ const Products: CollectionConfig = {
       }
     },
     {
-      name: 'category',
+      label: 'Symptom Tags',
+      name: 'symptom_tags',
       type: 'relationship',
       relationTo: 'tags',
       hasMany: true,
@@ -73,6 +74,26 @@ const Products: CollectionConfig = {
         position: 'sidebar'
       }
     },
+    {
+      label: 'Content Tags',
+      name: 'content_tags',
+      type: 'relationship',
+      relationTo: 'tags',
+      hasMany: true,
+      admin: {
+        position: 'sidebar'
+      }
+    },
+    {
+      label: 'Specialist Tags',
+      name: 'specialist_tags',
+      type: 'relationship',
+      relationTo: 'tags',
+      hasMany: true,
+      admin: {
+        position: 'sidebar'
+      }
+    }
   ],
 }
 

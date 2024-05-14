@@ -46,6 +46,36 @@ const Doctors: CollectionConfig = {
       }
     },
     {
+      label: 'Symptom Tags',
+      name: 'symptom_tags',
+      type: 'relationship',
+      relationTo: 'tags',
+      hasMany: true,
+      admin: {
+        position: 'sidebar'
+      }
+    },
+    {
+      label: 'Product Tags',
+      name: 'product_tags',
+      type: 'relationship',
+      relationTo: 'tags',
+      hasMany: true,
+      admin: {
+        position: 'sidebar'
+      }
+    },
+    {
+      label: 'Content Tags',
+      name: 'content_tags',
+      type: 'relationship',
+      relationTo: 'tags',
+      hasMany: true,
+      admin: {
+        position: 'sidebar'
+      }
+    },
+    {
       name: 'phone',
       type: 'text',
     },

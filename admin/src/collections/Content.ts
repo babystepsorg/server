@@ -144,6 +144,36 @@ const Content: CollectionConfig = {
       admin: {
         position: 'sidebar'
       }
+    },
+    {
+      label: 'Symptom Tags',
+      name: 'symptom_tags',
+      type: 'relationship',
+      relationTo: 'tags',
+      hasMany: true,
+      admin: {
+        position: 'sidebar'
+      }
+    },
+    {
+      label: 'Product Tags',
+      name: 'product_tags',
+      type: 'relationship',
+      relationTo: 'tags',
+      hasMany: true,
+      admin: {
+        position: 'sidebar'
+      }
+    },
+    {
+      label: 'Specialist Tags',
+      name: 'specialist_tags',
+      type: 'relationship',
+      relationTo: 'tags',
+      hasMany: true,
+      admin: {
+        position: 'sidebar'
+      }
     }
     // {
     //   name: 'author',

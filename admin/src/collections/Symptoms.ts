@@ -56,8 +56,28 @@ const Symptoms: CollectionConfig = {
       }
     },
     {
-      label: 'Category',
-      name: 'category',
+      label: 'Content Tags',
+      name: 'content_tags',
+      type: 'relationship',
+      relationTo: 'tags',
+      hasMany: true,
+      admin: {
+        position: 'sidebar'
+      }
+    },
+    {
+      label: 'Product Tags',
+      name: 'product_tags',
+      type: 'relationship',
+      relationTo: 'tags',
+      hasMany: true,
+      admin: {
+        position: 'sidebar'
+      }
+    },
+    {
+      label: 'Specialist Tags',
+      name: 'specialist_tags',
       type: 'relationship',
       relationTo: 'tags',
       hasMany: true,
