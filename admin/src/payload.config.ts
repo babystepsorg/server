@@ -55,7 +55,8 @@ export default buildConfig({
     RecommendedSpecialists
   ],
   db: mongooseAdapter({
-    url: process.env.MONGODB_URI
+    url: process.env.MONGODB_URI,
+    autoPluralization: false
   }),
   editor: slateEditor({}),
   globals: [
