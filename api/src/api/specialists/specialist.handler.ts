@@ -63,9 +63,14 @@ export const getAllSpecialists = async(
         const userId = req.user!._id;
         const specialists = await SelectedSpecialists.aggregate([
             {
-                $match: {
-                    userId
-                }
+               $or: [
+              {
+                userId: userId,
+              },
+              {
+                userId: req.user!.partnerId,
+              },
+            ], 
             },
             {
                 $lookup: {
