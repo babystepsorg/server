@@ -6,14 +6,23 @@ import { ObjectId } from 'mongodb'
 import { getCurrentWeek, getCurrentWeekFromConsiveDate, getDaysOfWeekForWeek, getDaysOfWeekFromWeekAndConsiveDate, getWeekFromUser } from '../../utils/week'
 import { Planners } from '../../models/planner'
 import { Ovulation, OvulationWithId, Ovulations } from '../../models/ovulation'
+import { Users } from '../../models/user'
 
 export const getAll = async (
   req: Request<{}, {}, {}, { week?: string }>,
   res: Response<any>,
   next: NextFunction
 ) => {
-  const userCreationDate = req.user!.createdAt
-  const userConsiveDate = req.user!.consiveDate
+  let userCreationDate = req.user!.createdAt
+  let userConsiveDate = req.user!.consiveDate
+
+  if (req.user!.partnerId) {
+    const partnerUser = await Users.findOne({ _id: req.user!.partnerId })
+    if (partnerUser) {
+      userCreationDate = partnerUser.createdAt
+      userConsiveDate = partnerUser.consiveDate
+    }
+  }
 
   // const reqWeek = req.query.week ? parseInt(req.query.week) : undefined
   // let { week } = await getWeekFromUser(req.user!, reqWeek, true)
