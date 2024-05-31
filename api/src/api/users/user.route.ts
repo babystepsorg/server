@@ -31,6 +31,22 @@ router.patch(
   UserHandler.updateOne
 )
 
+router.post(
+  '/:id/subscribe',
+  validateAuthentication,
+  validateRequest({
+    body: z.object({
+      subscriptionStatus: z.enum(['active', 'inactive', 'cancelled']),
+      subscriptionStartDate: z.string().datetime(),
+      subscriptionEndDate: z.string().datetime(),
+      razorpaySubscriptionId: z.string(),
+      razorpayPlanId: z.string(),
+    }),
+  }),
+  UserHandler.subscribeUser
+)
+
+
 // router.post(
 //   '/delete',
 //   validateRequest({

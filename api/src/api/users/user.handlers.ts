@@ -12,6 +12,7 @@ import { SelectedSpecialists } from '../../models/selectedSpecialit'
 import { Calanders } from '../../models/calander'
 import { UserTodos } from '../../models/userTodo'
 import { UserSymptoms } from '../../models/usersymptoms'
+import { z } from 'zod'
 
 export async function createOne(
   req: Request<{}, Omit<UserWithId, 'password' | 'salt'>, User>,
@@ -105,6 +106,45 @@ export async function invitePartner(
     next(err)
   }
 }
+
+export async function subscribeUser(
+  req: Request<ParamsWithId, {}, { subscriptionStatus: "active" | "inactive" | "cancelled", subscriptionStartDate: string, subscriptionEndDate: string, razorpaySubscriptionId: string, razorpayPlanId: string }>,
+  res: Response<{}>,
+  next: NextFunction
+) {
+  try {
+    const userId = req.params.id;
+    const { subscriptionStatus, subscriptionStartDate, subscriptionEndDate, razorpayPlanId, razorpaySubscriptionId } = req.body;
+
+    const result = await Users.findOneAndUpdate(
+      { _id: new ObjectId(userId) },
+      {
+        $set: {
+          subscriptionStartDate,
+          subscriptionEndDate,
+          subscriptionStatus,
+          razorpaySubscriptionId,
+          razorpayPlanId,
+          updatedAt: new Date().toISOString()
+        }
+      },
+      { returnDocument: 'after' }
+    );
+
+    if (!result.value) {
+      res.status(404);
+      throw new Error(`User with id "${userId}" not found.`);
+    }
+
+    res.status(200).json({
+      message: 'Subscription details updated successfully.',
+      user: result.value
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 
 // Add partner to a user
 // There are only some items that are going to be different for both user
