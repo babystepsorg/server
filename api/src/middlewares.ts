@@ -12,6 +12,20 @@ import { Calanders } from './models/calander'
 import { UserTodos } from './models/userTodo'
 import { UserSymptoms } from './models/usersymptoms'
 
+export async function validateApiKey(req: Request, res: Response, next: NextFunction) {
+  try {
+    const apiKey = req.headers['x-api-key'];
+    if (!apiKey || apiKey !== 'bs_pymnt_MM5lHlgWVrweJ8') {
+      res.status(403);
+      throw new Error('Forbidden');
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
+
+
 export async function validateAuthentication(req: Request, res: Response, next: NextFunction) {
   try {
     const authorization = req.headers.authorization
@@ -97,6 +111,7 @@ export function errorHandler(
   res: Response<ErrorResponse>,
   next: NextFunction
 ) {
+  console.log("Error:: ", err)
   const statusCode = res.statusCode !== 200 ? res.statusCode : 500
   res.status(statusCode)
   res.json({

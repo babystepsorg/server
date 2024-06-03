@@ -21,6 +21,13 @@ export const User = z.object({
   googleAccessToken: z.string().optional(),
   googleRefreshToken: z.string().optional(),
   avatarUrl: z.string().optional(),
+  subscriptionStatus: z.enum(['active', 'inactive', 'cancelled']).optional(),
+  subscriptionStartDate: z.string().datetime().optional(),
+  subscriptionEndDate: z.string().datetime().optional(),
+  // subscriptionPlan: z.string().optional(),
+  // razorpayCustomerId: z.string().optional(),
+  razorpaySubscriptionId: z.string().optional(),
+  razorpayPlanId: z.string().optional(),
   createdAt: z.string().datetime().default(new Date().toISOString()),
   updatedAt: z.string().datetime().default(new Date().toISOString()),
 })

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { validateAuthentication, validateRequest } from '../../middlewares'
+import { validateApiKey, validateAuthentication, validateRequest } from '../../middlewares'
 import * as UserHandler from './user.handlers'
 import { User } from '../../models/user'
 import { z } from 'zod'
@@ -31,14 +31,15 @@ router.patch(
   UserHandler.updateOne
 )
 
+// Todo: Need to fix the typings...
 router.post(
   '/:id/subscribe',
-  validateAuthentication,
+  validateApiKey,
   validateRequest({
     body: z.object({
-      subscriptionStatus: z.enum(['active', 'inactive', 'cancelled']),
-      subscriptionStartDate: z.string().datetime(),
-      subscriptionEndDate: z.string().datetime(),
+      subscriptionStatus: z.any(),
+      subscriptionStartDate: z.any(),
+      subscriptionEndDate: z.any(),
       razorpaySubscriptionId: z.string(),
       razorpayPlanId: z.string(),
     }),
