@@ -5,10 +5,12 @@ import richText from '../fields/richText'
 import { slugField } from '../fields/slug'
 
 const Content: CollectionConfig = {
-  slug: 'content',
+  slug: 'contents',
+  dbName: "contents",
   admin: {
     useAsTitle: 'title',
     hideAPIURL: true,
+    
   },
   versions: {
     drafts: true,
