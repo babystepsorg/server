@@ -138,6 +138,15 @@ const start = async (): Promise<void> => {
     }
   })
 
+  app.get("/change-collection", async (req, res) => {
+    try {
+      const result = await payload.db.connection.db.renameCollection('_content_versions', '_contents_versions')
+      res.send(result)
+    } catch (err) {
+      res.send(err)
+    }
+  })
+
   app.listen(process.env.PORT || 3000, async () => {
     payload.logger.info(`Server listening on port ${process.env.PORT || 3000}`)
   })

@@ -10,7 +10,6 @@ const Content: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     hideAPIURL: true,
-    
   },
   versions: {
     drafts: true,
