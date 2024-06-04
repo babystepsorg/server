@@ -336,11 +336,21 @@ export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunc
     const { week } = await getWeekFromUser(req.user!);
     let partner = !!req.user?.partnerId
     let partnerAvatarUrl = null
+    let subscriptionStatus = undefined
+    let subscriptionStartDate = undefined
+    let subscriptionEndDate = undefined
+    let razorpaySubscriptionId = undefined
+    let razorpayPlanId = undefined
     if (!partner) {
       const foundUser = await Users.findOne({ partnerId: req.user!._id })
       if (foundUser) {
         partner = true
         partnerAvatarUrl = foundUser.avatarUrl
+        subscriptionStatus = foundUser.subscriptionStatus
+        subscriptionStartDate = foundUser.subscriptionStartDate
+        subscriptionEndDate = foundUser.subscriptionEndDate
+        razorpaySubscriptionId = foundUser.razorpaySubscriptionId
+        razorpayPlanId = foundUser.razorpayPlanId
       } else {
         partner = false
       }
@@ -364,7 +374,17 @@ export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunc
     }
 
     res.status(200)
-    res.json({ ...req.user!, week: week.toString(), partner, partnerAvatarUrl })
+    res.json({ 
+      ...req.user!, 
+      week: week.toString(), 
+      partner, 
+      partnerAvatarUrl, 
+      subscriptionStatus, 
+      subscriptionStartDate,
+      subscriptionEndDate, 
+      razorpaySubscriptionId, 
+      razorpayPlanId 
+    })
   } catch (err) {
     next(err)
   }
