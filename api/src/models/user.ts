@@ -21,7 +21,7 @@ export const User = z.object({
   googleAccessToken: z.string().optional(),
   googleRefreshToken: z.string().optional(),
   avatarUrl: z.string().optional(),
-  subscriptionStatus: z.enum(['active', 'inactive', 'cancelled']).optional(),
+  subscriptionStatus: z.enum(['active', 'inactive', 'cancelled', 'trail']).optional(),
   subscriptionStartDate: z.string().datetime().optional(),
   subscriptionEndDate: z.string().datetime().optional(),
   // subscriptionPlan: z.string().optional(),
