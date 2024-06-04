@@ -8,7 +8,6 @@ const Content: CollectionConfig = {
   slug: 'content',
   admin: {
     useAsTitle: 'title',
-    // preview: (doc) => 'https://babysteps.world/testing/things',
     hideAPIURL: true,
   },
   versions: {
