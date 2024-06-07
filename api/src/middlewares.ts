@@ -54,7 +54,7 @@ export async function validateAuthentication(req: Request, res: Response, next: 
         UserTodos.deleteMany({ userId: user._id })
       ]);
       const { password, salt, ...rest } = user
-      req.user = rest
+      req.user = { ...rest, root: true }
 
       return next()
     }
@@ -72,10 +72,12 @@ export async function validateAuthentication(req: Request, res: Response, next: 
     const { password, salt, ...rest } = user
 
     let partner = !!rest.partnerId
+    let root = false;
     if (!partner) {
       const foundUser = await Users.findOne({ partnerId: rest!._id })
       if (foundUser) {
         rest.partnerId = foundUser._id
+        root = true
       }
     } else {
       const foundUser = await Users.findOne({ _id: rest.partnerId })
@@ -85,10 +87,11 @@ export async function validateAuthentication(req: Request, res: Response, next: 
         rest.subscriptionStatus = foundUser.subscriptionStatus
         rest.razorpayPlanId = foundUser.razorpayPlanId
         rest.razorpaySubscriptionId = foundUser.razorpaySubscriptionId
+        root = false
       }
     }
 
-    req.user = rest
+    req.user = { ...rest, root }
     next()
   } catch (err) {
     next(err)

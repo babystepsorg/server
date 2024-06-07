@@ -53,10 +53,10 @@ passport.use(
         })
 
         if (updatedUser.ok) {
-          return done(null, updatedUser.value!)
+          return done(null, {...updatedUser.value!, root: true})
         }
       }
-      return done(null, foundUser)
+      return done(null, {...foundUser, root: true })
     }
 
     // else create the user
@@ -79,9 +79,10 @@ passport.use(
     if (newUser.acknowledged) {
       const user = {
         _id: newUser.insertedId,
-        ...userObj
+        ...userObj,
+        root: true
       }
-      return done(null, user as Omit<UserWithId, "password" | "salt">)
+      return done(null, user as Omit<UserWithId, "password" | "salt"> & { root: boolean })
     }
   }
   )

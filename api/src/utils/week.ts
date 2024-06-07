@@ -128,12 +128,12 @@ export const getDaysOfWeekFromWeekAndConsiveDate = ({ weekNumber, consiveDate, c
   return []
 }
 
-export const getWeekFromUser = async (user: Omit<UserWithId, 'password' | 'salt'>, reqWeek?: number, calander?: boolean) => {
+export const getWeekFromUser = async (user: Omit<UserWithId, 'password' | 'salt'> & { root: boolean }, reqWeek?: number, calander?: boolean) => {
   try {
     let week = getCurrentWeek(user.stage, user.createdAt)
     let date;
     let days: Array<Date> = [];
-    if (user?.partnerId) {
+    if (user?.partnerId && user.root === false) {
       const partneredUser = await Users.findOne({ _id: user.partnerId });
       if (partneredUser) {
         week = getCurrentWeek(partneredUser.stage, partneredUser.createdAt)
