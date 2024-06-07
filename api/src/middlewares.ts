@@ -76,6 +76,10 @@ export async function validateAuthentication(req: Request, res: Response, next: 
       const foundUser = await Users.findOne({ partnerId: rest!._id })
       if (foundUser) {
         rest.partnerId = foundUser._id
+      }
+    } else {
+      const foundUser = await Users.findOne({ _id: rest.partnerId })
+      if (foundUser) {
         rest.subscriptionEndDate = foundUser.subscriptionEndDate
         rest.subscriptionStartDate = foundUser.subscriptionStartDate
         rest.subscriptionStatus = foundUser.subscriptionStatus
