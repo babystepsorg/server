@@ -10,15 +10,6 @@ export const addSymptom = async (
 	next: NextFunction
 ) => {
 	try {
-		// const userCreationDate = req.user!.createdAt
-		// const userConsiveDate = req.user!.consiveDate
-
-		// let week = getCurrentWeek(req.user!.stage, userCreationDate)
-		// if (userConsiveDate) {
-		// 	const cw  = getCurrentWeekFromConsiveDate(userConsiveDate, userCreationDate)
-		// 	week = cw.week
-		// }
-
 		const { week } = await getWeekFromUser(req.user!)
 
 		const symptom = await UserSymptoms.insertOne({ symptomId: new ObjectId(req.body.symptomId), userId: req.user!._id, week })
@@ -28,6 +19,28 @@ export const addSymptom = async (
 		res.status(201)
 		res.send({
 			_id: symptom.insertedId
+		})
+	} catch (err) {
+		next(err)
+	}
+}
+
+
+export const deleteSymptom = async (
+	req: Request<{}, {}, { symptomId: string }>,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		const { week } = await getWeekFromUser(req.user!)
+
+		const symptom = await UserSymptoms.deleteOne({ symptomId: new ObjectId(req.body.symptomId), userId: req.user!._id, week })
+		if (!symptom.acknowledged) {
+			throw new Error('Error while deleting symptom the symptom')
+		}
+		res.status(200)
+		res.send({
+			_id: req.body.symptomId
 		})
 	} catch (err) {
 		next(err)

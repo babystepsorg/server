@@ -379,11 +379,13 @@ export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunc
       week: week.toString(), 
       partner, 
       partnerAvatarUrl, 
-      subscriptionStatus, 
-      subscriptionStartDate,
-      subscriptionEndDate, 
-      razorpaySubscriptionId, 
-      razorpayPlanId 
+      ...(partner ? {
+        subscriptionStatus, 
+        subscriptionStartDate,
+        subscriptionEndDate, 
+        razorpaySubscriptionId, 
+        razorpayPlanId 
+      } : {})
     })
   } catch (err) {
     next(err)

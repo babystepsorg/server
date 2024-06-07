@@ -28,4 +28,14 @@ router.post(
     SymptomHandler.addSymptom
 )
 
+router.delete(
+    '/',
+    validateAuthentication,
+    validateRequest({
+        body: z.object({
+            symptomId: z.string()
+        })
+    }),
+    SymptomHandler.deleteSymptom
+)
 export default router

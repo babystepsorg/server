@@ -11,6 +11,7 @@ import { SelectedSpecialists } from './models/selectedSpecialit'
 import { Calanders } from './models/calander'
 import { UserTodos } from './models/userTodo'
 import { UserSymptoms } from './models/usersymptoms'
+import { Users } from './models/user'
 
 export async function validateApiKey(req: Request, res: Response, next: NextFunction) {
   try {
@@ -69,6 +70,15 @@ export async function validateAuthentication(req: Request, res: Response, next: 
       throw new Error('Unauthorized')
     }
     const { password, salt, ...rest } = user
+
+    let partner = !!rest.partnerId
+    if (!partner) {
+      const foundUser = await Users.findOne({ partnerId: req.user!._id })
+      if (foundUser) {
+        rest.partnerId = foundUser._id
+      }
+    }
+
     req.user = rest
     next()
   } catch (err) {
