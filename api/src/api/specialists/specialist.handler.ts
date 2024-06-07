@@ -10,11 +10,17 @@ export const addSpecialist = async(
     try {
         const { specialistId } = req.body;
         const userId = req.user!._id;
-        const existingEntry = await SelectedSpecialists.findOne({ userId });
+        const partnerId = req.user!.partnerId
+        const existingEntry = await SelectedSpecialists.findOne({ 
+            $or: [
+                { userId },
+                { userId: partnerId }
+            ]
+         });
 
         if (existingEntry) {
             await SelectedSpecialists.updateOne(
-                { userId },
+                { userId: existingEntry.userId },
                 { $push: { specialists: new ObjectId(specialistId) } }
             );
         } else {
@@ -38,11 +44,17 @@ export const deleteSpecialist = async(
     try {
         const { specialistId } = req.body;
         const userId = req.user!._id;
-        const existingEntry = await SelectedSpecialists.findOne({ userId });
+        const partnerId = req.user!.partnerId
+        const existingEntry = await SelectedSpecialists.findOne({ 
+            $or: [
+                { userId },
+                { userId: partnerId }
+            ]
+         });
 
         if (existingEntry) {
             await SelectedSpecialists.updateOne(
-                { userId },
+                { userId: existingEntry.userId },
                 { $pull: { specialists: new ObjectId(specialistId) } }
             );
             res.status(200).send({ message: "Specialist removed successfully." });

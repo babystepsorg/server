@@ -34,7 +34,13 @@ export const deleteSymptom = async (
 	try {
 		const { week } = await getWeekFromUser(req.user!)
 
-		const symptom = await UserSymptoms.deleteOne({ symptomId: new ObjectId(req.body.symptomId), userId: req.user!._id, week })
+		const userId = req.user!._id
+		const partnerId = req.user!.partnerId
+
+		const symptom = await UserSymptoms.deleteOne({ symptomId: new ObjectId(req.body.symptomId), $or: [
+			{ userId },
+			{ userId: partnerId }
+		], week })
 		if (!symptom.acknowledged) {
 			throw new Error('Error while deleting symptom the symptom')
 		}
@@ -53,18 +59,6 @@ export const getSymptoms = async (
 	next: NextFunction
 ) => {
 	try {
-		// const userCreationDate = req.user!.createdAt
-		// const userConsiveDate = req.user!.consiveDate
-
-		// let week = getCurrentWeek(req.user!.stage, userCreationDate)
-		// if (userConsiveDate) {
-		// 	const cw  = getCurrentWeekFromConsiveDate(userConsiveDate, userCreationDate)
-		// 	week = cw.week
-		// }
-		// if (req.query.week) {
-		// 	week = parseInt(req.query.week)
-		// }
-
 		const reqWeek = req.query.week ? parseInt(req.query.week) : undefined
 		let { week } = await getWeekFromUser(req.user!, reqWeek)
 

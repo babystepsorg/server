@@ -336,25 +336,25 @@ export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunc
     const { week } = await getWeekFromUser(req.user!);
     let partner = !!req.user?.partnerId
     let partnerAvatarUrl = null
-    let subscriptionStatus = undefined
-    let subscriptionStartDate = undefined
-    let subscriptionEndDate = undefined
-    let razorpaySubscriptionId = undefined
-    let razorpayPlanId = undefined
-    if (!partner) {
-      const foundUser = await Users.findOne({ partnerId: req.user!._id })
-      if (foundUser) {
-        partner = true
-        partnerAvatarUrl = foundUser.avatarUrl
-        subscriptionStatus = foundUser.subscriptionStatus
-        subscriptionStartDate = foundUser.subscriptionStartDate
-        subscriptionEndDate = foundUser.subscriptionEndDate
-        razorpaySubscriptionId = foundUser.razorpaySubscriptionId
-        razorpayPlanId = foundUser.razorpayPlanId
-      } else {
-        partner = false
-      }
-    }
+    // let subscriptionStatus = undefined
+    // let subscriptionStartDate = undefined
+    // let subscriptionEndDate = undefined
+    // let razorpaySubscriptionId = undefined
+    // let razorpayPlanId = undefined
+    // if (!partner) {
+    //   const foundUser = await Users.findOne({ partnerId: req.user!._id })
+    //   if (foundUser) {
+    //     partner = true
+    //     partnerAvatarUrl = foundUser.avatarUrl
+    //     subscriptionStatus = foundUser.subscriptionStatus
+    //     subscriptionStartDate = foundUser.subscriptionStartDate
+    //     subscriptionEndDate = foundUser.subscriptionEndDate
+    //     razorpaySubscriptionId = foundUser.razorpaySubscriptionId
+    //     razorpayPlanId = foundUser.razorpayPlanId
+    //   } else {
+    //     partner = false
+    //   }
+    // }
     // Add the user to the active users
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -378,14 +378,7 @@ export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunc
       ...req.user!, 
       week: week.toString(), 
       partner, 
-      partnerAvatarUrl, 
-      ...(partner ? {
-        subscriptionStatus, 
-        subscriptionStartDate,
-        subscriptionEndDate, 
-        razorpaySubscriptionId, 
-        razorpayPlanId 
-      } : {})
+      partnerAvatarUrl
     })
   } catch (err) {
     next(err)
