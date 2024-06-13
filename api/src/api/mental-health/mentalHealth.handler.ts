@@ -14,7 +14,7 @@ export const saveMentalhealth = async (
         const mentalHealth: Mentalhealth = {
             emotion,
             description,
-            useId: new ObjectId(userId),
+            userId: new ObjectId(userId),
             createdAt: new Date().toISOString()
         }
         const result = await Mentalhealths.insertOne(mentalHealth)
@@ -40,8 +40,7 @@ export const getPartnerInfo = async (
 
         if (partnerId) {
             const mentalHealth = await Mentalhealths.findOne({
-                userId: partnerId,
-                sort: { createdAt: -1 }
+                userId: new ObjectId(partnerId),
             })
 
             if (!mentalHealth) {

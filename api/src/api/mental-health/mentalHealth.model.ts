@@ -6,7 +6,7 @@ import { db } from '../../db'
 export const Mentalhealth = z.object({
   emotion: z.string(),
   description: z.string(),
-  useId: z.custom<ObjectId>(),
+  userId: z.custom<ObjectId>(),
   createdAt: z.string().datetime().default(new Date().toISOString())
 })
 

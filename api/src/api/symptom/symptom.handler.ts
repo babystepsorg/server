@@ -16,9 +16,25 @@ export const addSymptom = async (
 		if (!symptom.acknowledged) {
 			throw new Error('Error while add the symptom')
 		}
+
+		// Get the Admin Symptom
+		const adminSymptom = await Symptoms.findOne({ _id: new ObjectId(req.body.symptomId )})
+		let red_flag = false;
+		if (adminSymptom) {
+			// const red_flag_symptoms: Array<any> = adminSymptom?.week?.length ? (adminSymptom?.week[0]?.red_flag_symptoms ?? []) : []
+		
+			if (adminSymptom.red_flag_weeks) {
+				red_flag = !!adminSymptom.red_flag_weeks.find((it: any) => it.title === week.toString())
+			} // else if (red_flag_symptoms.length) {
+				// red_flag = !!red_flag_symptoms.find((id: string) => id === symptom.symptomId.toString())
+			// }
+		}
+
 		res.status(201)
+		// Todo: Send the full symptom along with the red_flag
 		res.send({
-			_id: symptom.insertedId
+			_id: symptom.insertedId,
+			red_flag
 		})
 	} catch (err) {
 		next(err)
