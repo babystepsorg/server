@@ -25,33 +25,61 @@ export const addSymptom = async (
 				}
 			},
 			{
-					$addFields: {
-						red_flag_weeks: {
-							$map: {
-								input: "$red_flag_weeks",
-								as: "id",
-								in: {
-									$toObjectId: "$$id"
-								}
+				$addFields: {
+					red_flag_weeks: {
+						$map: {
+							input: "$red_flag_weeks",
+							as: "id",
+							in: {
+								$toObjectId: "$$id"
 							}
 						}
 					}
-				},
-				{
-					$lookup: {
-						from: 'weeks',
-						localField: 'red_flag_weeks',
-						foreignField: '_id',
-						as: 'red_flag_weeks',
-						pipeline: [
-							{
-								$project: {
-									title: 1
-								}
+				}
+			},
+			{
+				$lookup: {
+					from: 'weeks',
+					localField: 'red_flag_weeks',
+					foreignField: '_id',
+					as: 'red_flag_weeks',
+					pipeline: [
+						{
+							$project: {
+								title: 1
 							}
-						]
-					},
+						}
+					]
 				},
+			},
+			{
+				$addFields: {
+					weeks: {
+						$map: {
+							input: "$weeks",
+							as: "id",
+							in: {
+								$toObjectId: "$$id"
+							}
+						}
+					}
+				}
+			},
+			{
+				$lookup: {
+					from: 'weeks',
+					localField: 'weeks',
+					foreignField: '_id',
+					as: 'weeks',
+					pipeline: [
+						{
+							$project: {
+								title: 1
+							}
+						}
+					]
+				},
+			},
 		]).toArray()
 		let red_flag = false;
 		if (adminSymptom.length) {
@@ -59,9 +87,9 @@ export const addSymptom = async (
 		
 			if (adminSymptom[0].red_flag_weeks) {
 				red_flag = !!adminSymptom[0].red_flag_weeks.find((it: any) => it.title === week.toString())
-			} // else if (red_flag_symptoms.length) {
-				// red_flag = !!red_flag_symptoms.find((id: string) => id === symptom.symptomId.toString())
-			// }
+			} else if (adminSymptom[0].weeks) {
+				red_flag = !!adminSymptom[0].weeks((it: any) => it.title === "-10")
+			}
 		}
 
 		res.status(201)
