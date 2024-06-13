@@ -18,13 +18,47 @@ export const addSymptom = async (
 		}
 
 		// Get the Admin Symptom
-		const adminSymptom = await Symptoms.findOne({ _id: new ObjectId(req.body.symptomId )})
+		const adminSymptom = await Symptoms.aggregate([
+			{
+				$match: {
+					_id: new ObjectId(req.body.symptomId)
+				}
+			},
+			{
+					$addFields: {
+						red_flag_weeks: {
+							$map: {
+								input: "$red_flag_weeks",
+								as: "id",
+								in: {
+									$toObjectId: "$$id"
+								}
+							}
+						}
+					}
+				},
+				{
+					$lookup: {
+						from: 'weeks',
+						localField: 'red_flag_weeks',
+						foreignField: '_id',
+						as: 'red_flag_weeks',
+						pipeline: [
+							{
+								$project: {
+									title: 1
+								}
+							}
+						]
+					},
+				},
+		]).toArray()
 		let red_flag = false;
-		if (adminSymptom) {
+		if (adminSymptom.length) {
 			// const red_flag_symptoms: Array<any> = adminSymptom?.week?.length ? (adminSymptom?.week[0]?.red_flag_symptoms ?? []) : []
 		
-			if (adminSymptom.red_flag_weeks) {
-				red_flag = !!adminSymptom.red_flag_weeks.find((it: any) => it.title === week.toString())
+			if (adminSymptom[0].red_flag_weeks) {
+				red_flag = !!adminSymptom[0].red_flag_weeks.find((it: any) => it.title === week.toString())
 			} // else if (red_flag_symptoms.length) {
 				// red_flag = !!red_flag_symptoms.find((id: string) => id === symptom.symptomId.toString())
 			// }
