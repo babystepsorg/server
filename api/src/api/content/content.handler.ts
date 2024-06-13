@@ -159,12 +159,34 @@ export const getContent = async (
             }
           },
           {
+            $addFields: {
+              tags: {
+                $map: {
+                  input: "$tags",
+                  as: "id",
+                  in: {
+                    $toObjectId: "$$id"
+                  }
+                }
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: "tags",
+              localField: "tags",
+              foreignField: "_id",
+              as: "tags"
+            }
+          },
+          {
             $project: {
               _id: 1,
               title: 1,
               layout: 1,
               type: 1,
-              video_url: 1
+              video_url: 1,
+              tags: 1
             }
           }
       ]).toArray() as Array<ContentWithId>;

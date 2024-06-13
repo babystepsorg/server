@@ -88,7 +88,7 @@ export const addSymptom = async (
 			if (adminSymptom[0].red_flag_weeks) {
 				red_flag = !!adminSymptom[0].red_flag_weeks.find((it: any) => it.title === week.toString())
 			} else if (adminSymptom[0].weeks) {
-				red_flag = !!adminSymptom[0].weeks((it: any) => it.title === "-10")
+				red_flag = !!adminSymptom[0].weeks.find((it: any) => it.title === "-10")
 			}
 		}
 
