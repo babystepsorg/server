@@ -338,8 +338,11 @@ export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunc
     let partnerAvatarUrl = null
 
     if (req.user && !req.user.referralId) {
-      const referralId = `${req.user.name}${req.user.email.split('@')[0].replace(/[._]/g, '')}${Math.floor(Math.random() * 10 ** 6).toString(10).slice(-6)}`;
-      await Users.updateOne({ _id: req.user._id }, { $set: { referralId } });
+      let referralId;
+      do {
+        referralId = `${req.user.name.replace(/\s+/g, '')}${req.user.email.split('@')[0].replace(/[._\s]/g, '')}${Math.floor(Math.random() * 10 ** 6).toString(10).slice(-6)}`;
+      } while (await Users.findOne({ referralId: referralId.slice(0, 6) }));
+      await Users.updateOne({ _id: req.user._id }, { $set: { referralId: referralId.slice(0, 6) } });
       req.user.referralId = referralId;
     }
     
