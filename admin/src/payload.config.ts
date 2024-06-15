@@ -23,6 +23,7 @@ import Subheadings from './globals/Subheading'
 import Tags from './collections/Tag'
 import RecommendedProducts from './collections/RecommendedProducts'
 import RecommendedSpecialists from './collections/RecommendedSpecialists'
+import Feedback from './collections/Feedback'
 
 const adapter = s3Adapter({
   config: {
@@ -52,7 +53,8 @@ export default buildConfig({
     Media,
     Users,
     RecommendedProducts,
-    RecommendedSpecialists
+    RecommendedSpecialists,
+    Feedback
   ],
   db: mongooseAdapter({
     url: process.env.MONGODB_URI,

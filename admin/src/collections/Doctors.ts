@@ -124,6 +124,22 @@ const Doctors: CollectionConfig = {
         },
       ],
     },
+    {
+      name: 'referralId',
+      type: 'text',
+      defaultValue: () => {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let referralId = '';
+        for (let i = 0; i < Math.floor(Math.random() * (8 - 6 + 1)) + 6; i++) {
+          referralId += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return referralId;
+      },
+      required: true,
+      admin: {
+        readOnly: true
+      }
+    },
   ],
 }
 
