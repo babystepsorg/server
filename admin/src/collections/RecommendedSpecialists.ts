@@ -23,6 +23,13 @@ const RecommendedSpecialists: CollectionConfig = {
         },
         {
             type: 'text',
+            name: 'contact',
+            admin: {
+                readOnly: true
+            }
+        },
+        {
+            type: 'text',
             name: 'user_id',
             label: "User ID",
             admin: {

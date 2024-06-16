@@ -1,6 +1,15 @@
-import { CollectionConfig } from 'payload/types'
+import { CollectionConfig, CollectionAfterChangeHook } from 'payload/types'
 import { isAdmin } from '../access/isAdmin'
 import richText from '../fields/richText'
+
+const afterChange: CollectionAfterChangeHook = async ({ doc, req, operation }: { doc: { name: string, referralId: string }; req: any; operation: string }) => {
+      if (operation === 'create' || operation === 'update') {
+        const name = doc.name.replace(/dr/i, "").replace(/\./g, "").replace(/\s/g, "").toUpperCase();
+        const referralId = name;
+        doc.referralId = referralId;
+      }
+      return doc;
+    }
 
 const Doctors: CollectionConfig = {
   slug: 'doctors',
@@ -13,6 +22,9 @@ const Doctors: CollectionConfig = {
     read: () => true,
     update: () => true,
     delete: () => true,
+  },
+  hooks: {
+    afterChange: [afterChange]
   },
   fields: [
     {
@@ -127,15 +139,6 @@ const Doctors: CollectionConfig = {
     {
       name: 'referralId',
       type: 'text',
-      defaultValue: () => {
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let referralId = '';
-        for (let i = 0; i < Math.floor(Math.random() * (8 - 6 + 1)) + 6; i++) {
-          referralId += characters.charAt(Math.floor(Math.random() * characters.length));
-        }
-        return referralId;
-      },
-      required: true,
       admin: {
         readOnly: true
       }
