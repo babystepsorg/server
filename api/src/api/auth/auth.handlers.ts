@@ -338,13 +338,15 @@ export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunc
     let partnerAvatarUrl = null
 
     if (req.user && !req.user.referralId) {
-      let referralId;
+      let referralId: string | null = null;
       do {
-        referralId = `${req.user.name.replace(/\s+/g, '')}${req.user.email.split('@')[0].replace(/[._\s]/g, '')}${Math.floor(Math.random() * 10 ** 6).toString(10).slice(-6)}`;
-      } while (await Users.findOne({ referralId: referralId.slice(0, 6) }));
-      await Users.updateOne({ _id: req.user._id }, { $set: { referralId: referralId.slice(0, 6) } });
-      req.user.referralId = referralId;
+        referralId = Math.floor(Math.random() * 10 ** 6).toString(10).padStart(6, '0');
+      } while (await Users.findOne({ referralId }));
+      await Users.updateOne({ _id: req.user._id }, { $set: { referralId: referralId! } });
+      req.user.referralId = referralId!;
     }
+
+    
     
     // Add the user to the active users
     const todayStart = new Date();

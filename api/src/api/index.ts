@@ -10,8 +10,8 @@ import content from './content/content.route'
 import symptom from './symptom/symptom.route'
 import assistant from './assistant/assistant.route'
 import specialists from './specialists/specialist.route'
-// import webhooks from './webhooks/webhook.route'
 import mentalHealth from './mental-health/mentalHealth.route'
+import payments from './payments/payment.route'
 
 const router = express.Router()
 
@@ -31,5 +31,6 @@ router.use('/symptoms', symptom)
 router.use('/assistant', assistant)
 router.use('/specialists', specialists)
 router.use('/mental-health', mentalHealth)
+router.use('/payments', payments)
 
 export default router
