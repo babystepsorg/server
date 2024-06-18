@@ -1,14 +1,14 @@
-import { CollectionConfig, CollectionAfterChangeHook } from 'payload/types'
+import { CollectionConfig, CollectionBeforeChangeHook } from 'payload/types'
 import { isAdmin } from '../access/isAdmin'
 import richText from '../fields/richText'
 
-const afterChange: CollectionAfterChangeHook = async ({ doc, req, operation }: { doc: { name: string, referralId: string }; req: any; operation: string }) => {
+const addReferralId: CollectionBeforeChangeHook = async ({ data, req, operation }: { data: any; req: any; operation: string }) => {
       if (operation === 'create' || operation === 'update') {
-        const name = doc.name.replace(/dr/i, "").replace(/\./g, "").replace(/\s/g, "").toUpperCase();
+        const name = data.name.replace(/dr/i, "").replace(/\./g, "").replace(/\s/g, "").toUpperCase();
         const referralId = name;
-        doc.referralId = referralId;
+        data.referralId = referralId;
       }
-      return doc;
+      return data;
     }
 
 const Doctors: CollectionConfig = {
@@ -24,7 +24,7 @@ const Doctors: CollectionConfig = {
     delete: () => true,
   },
   hooks: {
-    afterChange: [afterChange]
+    beforeChange: [addReferralId]
   },
   fields: [
     {
