@@ -168,6 +168,7 @@ export const getAll = async (
         const updatedTodo = {
           ...adminTodo,
           ...rest,
+          overdue: false,
         }
 
         adminTodos[adminTodoIndex] = updatedTodo
@@ -187,6 +188,7 @@ export const getAll = async (
           description: todo.description,
           completed: todo.completed,
           admin: true,
+          overdue: true
         }
       }
 

@@ -25,6 +25,8 @@ export const getCurrentWeek = (stage: string, createdAt: string) => {
     if (currentWeek > 4) {
       currentWeek = 4
     }
+  } else if (currentStage === "pregnancy") {
+    currentWeek = 5
   }
 
   return currentWeek

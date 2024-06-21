@@ -11,6 +11,7 @@ import { google } from 'googleapis'
 import { getUserCalendarEvent } from '../../utils/calendar'
 import config from '../../config'
 import { ActiveUsers } from '../../models/activeUser'
+import { Payments } from '../payments/payment.model'
 
 type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
   tokens: {
@@ -33,16 +34,13 @@ export async function signUp(
       res.status(422)
       throw new Error('User with this email already exists')
     }
-    // get the token from the body
-    console.log("Token:: ", req.body.token)
-    console.log(req.body)
+    
     const { token, ...rest } = req.body
     let partnerId = undefined
     if (token) {
       const decoded = verifyToken(token) as {
         userId: string
       }
-      console.log({ decoded })
       partnerId = new ObjectId(decoded.userId)
     }
     const user = await createUser({ ...rest, partnerId })
@@ -340,13 +338,11 @@ export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunc
     if (req.user && !req.user.referralId) {
       let referralId: string | null = null;
       do {
-        referralId = Math.floor(Math.random() * 10 ** 6).toString(10).padStart(6, '0');
+        referralId = Math.floor(100000 + Math.random() * 900000).toString();
       } while (await Users.findOne({ referralId }));
-      await Users.updateOne({ _id: req.user._id }, { $set: { referralId: referralId! } });
-      req.user.referralId = referralId!;
+      await Users.updateOne({ _id: req.user._id }, { $set: { referralId: referralId } });
+      req.user.referralId = referralId;
     }
-
-    
     
     // Add the user to the active users
     const todayStart = new Date();

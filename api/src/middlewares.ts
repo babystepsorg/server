@@ -12,6 +12,8 @@ import { Calanders } from './models/calander'
 import { UserTodos } from './models/userTodo'
 import { UserSymptoms } from './models/usersymptoms'
 import { Users } from './models/user'
+import { Payments } from './api/payments/payment.model'
+import { ObjectId } from 'mongodb'
 
 export async function validateApiKey(req: Request, res: Response, next: NextFunction) {
   try {
@@ -77,16 +79,23 @@ export async function validateAuthentication(req: Request, res: Response, next: 
       const foundUser = await Users.findOne({ partnerId: rest!._id })
       if (foundUser) {
         rest.partnerId = foundUser._id
+        const payment = await Payments.findOne({ user_id: new ObjectId(rest!._id) })
+        rest.subscriptionEndDate = payment?.subscription_end_at?.toString() ?? foundUser.subscriptionEndDate
+        rest.subscriptionStartDate = payment?.subscription_start_at?.toString() ?? foundUser.subscriptionStartDate
+        rest.subscriptionStatus = (payment?.subscription_status as any) ?? foundUser.subscriptionStatus
+        rest.razorpayPlanId = payment?.razorpay_plan_id ?? foundUser.razorpayPlanId
+        rest.razorpaySubscriptionId = payment?.subscription_id ?? foundUser.razorpaySubscriptionId
         root = true
       }
     } else {
       const foundUser = await Users.findOne({ _id: rest.partnerId })
       if (foundUser) {
-        rest.subscriptionEndDate = foundUser.subscriptionEndDate
-        rest.subscriptionStartDate = foundUser.subscriptionStartDate
-        rest.subscriptionStatus = foundUser.subscriptionStatus
-        rest.razorpayPlanId = foundUser.razorpayPlanId
-        rest.razorpaySubscriptionId = foundUser.razorpaySubscriptionId
+        const payment = await Payments.findOne({ user_id: new ObjectId(rest.partnerId) })
+        rest.subscriptionEndDate = payment?.subscription_end_at?.toString() ?? foundUser.subscriptionEndDate
+        rest.subscriptionStartDate = payment?.subscription_start_at?.toString() ?? foundUser.subscriptionStartDate
+        rest.subscriptionStatus = (payment?.subscription_status as any) ?? foundUser.subscriptionStatus
+        rest.razorpayPlanId = payment?.razorpay_plan_id ?? foundUser.razorpayPlanId
+        rest.razorpaySubscriptionId = payment?.subscription_id ?? foundUser.razorpaySubscriptionId
         root = false
       }
     }

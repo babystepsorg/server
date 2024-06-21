@@ -72,7 +72,7 @@ export async function razorpayWebhook(
     res: Response,
     next: NextFunction
 ) {
-    const razorpaySignature = req.headers['X-Razorpay-Signature']?.toString() 
+    const razorpaySignature = req.headers['x-razorpay-signature']?.toString() 
 
     if (!razorpaySignature) {
         res.status(400)
@@ -94,52 +94,55 @@ export async function razorpayWebhook(
     switch(event) {
         case "subscription.authenticated": {
             const payment = insertOrUpdatePayment(subscription)
-            res.status(200).send(payment)
+            return res.status(200).send(payment)
         }
         case "subscription.activated": {
             // Handle subscription activation
             const payment = insertOrUpdatePayment(subscription)
-            res.status(200).send(payment)
+            return res.status(200).send(payment)
         }
         case "subscription.charged": {
             // Handle subscription charge
             const payment = insertOrUpdatePayment(subscription)
-            res.status(200).send(payment)
+            return res.status(200).send(payment)
         }
         case "subscription.completed": {
             // Handle subscription completion
             const payment = insertOrUpdatePayment(subscription)
-            res.status(200).send(payment)
+            return res.status(200).send(payment)
         }
         case "subscription.updated": {
             // Handle subscription update
             const payment = insertOrUpdatePayment(subscription)
-            res.status(200).send(payment)
+            return res.status(200).send(payment)
         }
         case "subscription.pending": {
             // Handle subscription pending
             const payment = insertOrUpdatePayment(subscription)
-            res.status(200).send(payment)
+            return res.status(200).send(payment)
         }
         case "subscription.halted": {
             // Handle subscription halted
             const payment = insertOrUpdatePayment(subscription)
-            res.status(200).send(payment)
+            return res.status(200).send(payment)
         }
         case "subscription.cancelled": {
             // Handle subscription cancellation
             const payment = insertOrUpdatePayment(subscription)
-            res.status(200).send(payment)
+            return res.status(200).send(payment)
         }
         case "subscription.paused": {
             // Handle subscription pause
             const payment = insertOrUpdatePayment(subscription)
-            res.status(200).send(payment)
+            return res.status(200).send(payment)
         }
         case "subscription.resumed": {
             // Handle subscription resume
             const payment = insertOrUpdatePayment(subscription)
-            res.status(200).send(payment)
+            return res.status(200).send(payment)
+        } 
+        default: {
+          throw new Error("Nothing matches")
         }
     }
 }
