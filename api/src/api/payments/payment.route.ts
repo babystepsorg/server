@@ -10,13 +10,13 @@ router.post(
   PaymentHandler.createSubscription
 );
 
-router.post(
+router.get(
   '/subscriptions/pause',
   validateAuthentication,
   PaymentHandler.pauseSubscription
 );
 
-router.post(
+router.get(
   '/subscriptions/cancel',
   validateAuthentication,
   PaymentHandler.cancelSubscription
