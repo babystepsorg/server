@@ -11,6 +11,18 @@ router.post(
 );
 
 router.post(
+  '/subscriptions/pause',
+  validateAuthentication,
+  PaymentHandler.pauseSubscription
+);
+
+router.post(
+  '/subscriptions/cancel',
+  validateAuthentication,
+  PaymentHandler.cancelSubscription
+);
+
+router.post(
   '/discount',
   validateAuthentication,
   PaymentHandler.applyDiscountCode

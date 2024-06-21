@@ -5,6 +5,8 @@ import { Subscriptions } from "razorpay/dist/types/subscriptions";
 import { Specialists } from '../../models/specialist';
 import { verifyWebhook } from './verifyRequest';
 import { insertOrUpdatePayment } from './payment';
+import { ObjectId } from 'mongodb';
+import { Payments } from './payment.model';
 
 const instance = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID!,
@@ -66,6 +68,55 @@ export async function applyDiscountCode(req: Request, res: Response, next: NextF
   }
 }
 
+export async function pauseSubscription(req: Request, res: Response, next: NextFunction) {
+  try {
+    const payment = await Payments.findOne({ user_id: new ObjectId(req.user!._id) })
+
+    if (!payment) {
+      res.status(400)
+      throw new Error("Subscription not found")
+    }
+
+    const subscription = await instance.subscriptions.fetch(payment.subscription_id);
+
+    if (!subscription) {
+      res.status(400);
+      throw new Error('Subscription not found');
+    }
+
+    const pausedSubscription = await instance.subscriptions.pause(payment.subscription_id);
+
+    res.status(200);
+    res.json(pausedSubscription);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function cancelSubscription(req: Request, res: Response, next: NextFunction) {
+  try {
+    const payment = await Payments.findOne({ user_id: new ObjectId(req.user!._id) })
+
+    if (!payment) {
+      res.status(400)
+      throw new Error("Subscription not found")
+    }
+
+    const subscription = await instance.subscriptions.fetch(payment.subscription_id);
+
+    if (!subscription) {
+      res.status(400);
+      throw new Error('Subscription not found');
+    }
+
+    const canceledSubscription = await instance.subscriptions.cancel(payment.subscription_id);
+
+    res.status(200);
+    res.json(canceledSubscription);
+  } catch (err) {
+    next(err);
+  }
+}
 
 export async function razorpayWebhook(
     req: Request,
