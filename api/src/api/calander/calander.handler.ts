@@ -26,12 +26,10 @@ export const getAll = async (
 
   // const reqWeek = req.query.week ? parseInt(req.query.week) : undefined
   // let { week } = await getWeekFromUser(req.user!, reqWeek, true)
-  let week = getCurrentWeek(req.user!.stage, userCreationDate)
-  let days = getDaysOfWeekForWeek({weekNumber: week, createdAt: new Date(userCreationDate)})
+  let { week } = await getWeekFromUser(req.user!, req.query?.week ? + req.query.week : undefined)
+  let days = getDaysOfWeekForWeek({weekNumber: week as number, createdAt: new Date(userCreationDate)})
   if (userConsiveDate) {
-    const cw  = getCurrentWeekFromConsiveDate(userConsiveDate, userCreationDate)
-    week = cw.week
-    days = getDaysOfWeekForWeek({ weekNumber: week, consiveDate: cw.date })
+    days = getDaysOfWeekForWeek({ weekNumber: week, consiveDate: new Date(userConsiveDate) })
   }
   if (req.query.week) {
     week = parseInt(req.query.week)
