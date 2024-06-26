@@ -7,7 +7,7 @@ export const Notification = z.object({
 	userId: z.custom<ObjectId>(),
 	type: z.enum(["email", "popup", "notification"]),
 	status: z.enum(["pending", "sent", "failed"]),
-	read: z.boolean().default(false),
+	read: z.boolean().optional().default(false),
 	readAt: z.string().datetime().optional(),
 	payload: z.object({
 		subject: z.string(),
@@ -16,8 +16,8 @@ export const Notification = z.object({
 		link: z.string().url().optional(),
 		popupContent: z.string().optional(),
 	}),
-	createdAt: z.string().datetime().default(new Date().toISOString()),
-	updatedAt: z.string().datetime().default(new Date().toISOString()),
+	createdAt: z.string().datetime().optional().default(new Date().toISOString()),
+	updatedAt: z.string().datetime().optional().default(new Date().toISOString()),
 });
 
 export type Notification = z.infer<typeof Notification>;
