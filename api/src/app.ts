@@ -12,11 +12,7 @@ import { UserWithId, Users } from './models/user'
 import { ObjectId } from 'mongodb'
 import config from './config'
 import cron from 'node-cron'
-<<<<<<< HEAD
 import { notificationEveryFourHours, notificationDailyMidMorning, notificationDailyEvening, notificationDailyMidday } from './api/notifications/notification.job'
-=======
-import { notificationDailyEvening, notificationDailyMidMorning, notificationDailyMidday, notificationEveryFourHours } from './api/notifications/notification.job'
->>>>>>> 19cc8ac4fb7f127208e850636124e6a558ec0e25
 
 require('dotenv').config()
 
