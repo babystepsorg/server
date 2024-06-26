@@ -59,7 +59,7 @@ export const getDaysOfWeekForWeek = ({weekNumber, createdAt, consiveDate}: {week
   // return 4 weeks from current date
   for (let i = 0; i < daysInWeek * 4; ++i) {
     const currentDate = new Date(startDate)
-    daysOfWeek.push(startDate)
+    daysOfWeek.push(currentDate)
     currentDate.setDate(startDate.getDate() + i)
   }
 
@@ -99,7 +99,7 @@ export const getDaysOfWeekFromWeekAndConsiveDate = ({ weekNumber, consiveDate, c
   // return 4 weeks from current date
   for (let i = 0; i < daysInWeek * 4; ++i) {
     const currentDate = new Date(startDate)
-    daysOfWeek.push(startDate)
+    daysOfWeek.push(currentDate)
     currentDate.setDate(startDate.getDate() + i)
   }
 

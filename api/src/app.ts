@@ -11,6 +11,8 @@ import MessageResponse from './interfaces/MessageResponse'
 import { UserWithId, Users } from './models/user'
 import { ObjectId } from 'mongodb'
 import config from './config'
+import cron from 'node-cron'
+import { notificationEveryFourHours } from './api/notifications/notification.job'
 
 require('dotenv').config()
 
@@ -101,6 +103,8 @@ app.get<{}, MessageResponse>('/', (req, res) => {
     message: '🦄🌈✨👋🌎🌍🌏✨🌈🦄',
   })
 })
+
+cron.schedule("0 */4 * * *", notificationEveryFourHours)
 
 app.use('/api/v1', api)
 // app.use('', api)
