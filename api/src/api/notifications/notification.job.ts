@@ -2,49 +2,114 @@ import { Users } from '../../models/user'
 import { ObjectId } from 'mongodb'
 import { Notifications, type Notification } from './notification.model'
 
-export const testNotification = async () => {
-    console.log("Running cron")
-    try {
-        console.log("Outside client else block")
-        const notification = await Notifications.insertOne({
-            type: "notification",
-            status: "sent",
-            payload: {
-                subject: "Test Notification",
-                message: "This is a test notification",
-                action: "none",
-            },
-            userId: new ObjectId("6676ef6d3330db55f5a97606"),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            read: false,
-        })
-        console.log("Notification:: ", notification.insertedId)
-    } catch (err) {
-        console.log("ERROR:: ", err)
-    }
-
-}
 export const notificationEveryFourHours = async () => {
-    const users = await Users.find({})
+    const users = await Users.find().toArray()
 
     if (!users) {
         console.log("No Users found")
         return;
     }
 
-    // const notifications: Notification = {
-    //     type: "notification",
-    //     status: "sent",
-    //     payload: {
-    //         subject: "Stay hydrated, Super Mom! Drink up!",
-    //         message: "",
-    //         action: "none",
-    //     },
-    //     createdAt: new Date().toISOString(),
-    //         updatedAt: new Date().toISOString(),
-    //         read: false,
-    // }
+    const notifications: Notification[] = users.map((user) => {
+        return {
+            type: "notification",
+            status: "sent",
+            payload: {
+                subject: "Stay hydrated, Super Mom! Drink up!",
+                message: "",
+                action: "none",
+            },
+            userId: user._id,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            read: false
+        }
+    })
 
-    // Notifications
+    await Notifications.insertMany(notifications)
 }
+
+export const notificationDailyMidMorning = async () => {
+    const users = await Users.find().toArray()
+
+    if (!users) {
+        console.log("No User found")
+        return;
+    }
+
+const notifications: Notification[] = users.map((user) => {
+        return {
+            type: "notification",
+            status: "sent",
+            payload: {
+                subject: "Time for a little stretch! Here’s your daily move.",
+                message: "",
+                action: "none",
+            },
+            userId: user._id,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            read: false
+        }
+    })
+
+
+    await Notifications.insertMany(notifications)
+}
+
+export const notificationDailyEvening = async () => {
+    const users = await Users.find().toArray()
+
+    if (!users) {
+        console.log("No User found")
+        return;
+    }
+
+const notifications: Notification[] = users.map((user) => {
+        return {
+            type: "notification",
+            status: "sent",
+            payload: {
+                subject: "Feel those kicks? Track your baby's dance here.",
+                message: "",
+                action: "none",
+            },
+            userId: user._id,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            read: false
+        }
+    })
+
+
+    await Notifications.insertMany(notifications)
+}
+
+export const notificationDailyMidday = async () => {
+    const users = await Users.find().toArray()
+
+    if (!users) {
+        console.log("No User found")
+        return;
+    }
+
+const notifications: Notification[] = users.map((user) => {
+        return {
+            type: "notification",
+            status: "sent",
+            payload: {
+                subject: "Feeling things? Update your symptoms!",
+                message: "",
+                action: "none",
+            },
+            userId: user._id,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            read: false
+        }
+    })
+
+
+    await Notifications.insertMany(notifications)
+}
+
