@@ -12,7 +12,7 @@ import { UserWithId, Users } from './models/user'
 import { ObjectId } from 'mongodb'
 import config from './config'
 import cron from 'node-cron'
-import { notificationEveryFourHours } from './api/notifications/notification.job'
+import { notificationEveryFourHours, notificationDailyMidMorning, notificationDailyEvening, notificationDailyMidday } from './api/notifications/notification.job'
 
 require('dotenv').config()
 
@@ -104,7 +104,18 @@ app.get<{}, MessageResponse>('/', (req, res) => {
   })
 })
 
-cron.schedule("0 */4 * * *", notificationEveryFourHours)
+cron.schedule("0 */4 * * *", notificationEveryFourHours, {
+  timezone: "Asia/Kolkata"
+})
+cron.schedule("0 9 * * *", notificationDailyMidMorning, {
+  timezone: "Asia/Kolkata"
+})
+cron.schedule("0 17 * * *", notificationDailyEvening, {
+  timezone: "Asia/Kolkata"
+})
+cron.schedule("0 12 * * *", notificationDailyMidday, {
+  timezone: "Asia/Kolkata"
+})
 
 app.use('/api/v1', api)
 // app.use('', api)
