@@ -12,6 +12,7 @@ import { getUserCalendarEvent } from '../../utils/calendar'
 import config from '../../config'
 import { ActiveUsers } from '../../models/activeUser'
 import { Payments } from '../payments/payment.model'
+import NotificationService from '../../services/notification'
 
 type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
   tokens: {
@@ -23,10 +24,12 @@ type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
 type Me = Omit<UserWithId, 'password' | 'salt' | 'googleAccessToken' | 'googleRefreshToken'> & { week: string, partner: boolean, partnerAvatarUrl?: (string | null) }
 
 export async function signUp(
-  req: Request<{}, AuthUser, Omit<User, 'salt'> & { token?: string }>,
-  res: Response<AuthUser>,
+  req: Request<{}, { message: string, status: string }, Omit<User, 'salt'> & { token?: string }>,
+  res: Response<{ message: string, status: string }>,
   next: NextFunction
 ) {
+  const origin = req.headers.origin
+
   try {
     // check if user with this email already exists
     const isMatch = await findUserByEmail(req.body.email)
@@ -34,7 +37,7 @@ export async function signUp(
       res.status(422)
       throw new Error('User with this email already exists')
     }
-    
+
     const { token, ...rest } = req.body
     let partnerId = undefined
     if (token) {
@@ -44,20 +47,57 @@ export async function signUp(
       partnerId = new ObjectId(decoded.userId)
     }
     const user = await createUser({ ...rest, partnerId })
-    const accessToken = generateToken({ userId: user._id, type: 'ACCESS' })
-    const refreshToken = generateToken({ userId: user._id, type: 'REFRESH' }, { expiresIn: '30d' })
+
+    const verifyTokenLink = generateToken({ userId: user._id, type: 'VERIFY' }, { expiresIn: '30d' })
+    const verificationLink = `https://api.babysteps.world/api/v1/auth/verify?token=${verifyTokenLink}&origin=${origin}`
+
+    const notificationService = new NotificationService
+    notificationService.sendTemplateEmail({
+      template: "signup",
+      email: user.email,
+      loginLink: verificationLink,
+      username: user.name
+    })
+    // const accessToken = generateToken({ userId: user._id, type: 'ACCESS' })
+    // const refreshToken = generateToken({ userId: user._id, type: 'REFRESH' }, { expiresIn: '30d' })
     res.status(201)
     res.json({
-      ...user,
-      tokens: {
-        access: accessToken,
-        refresh: refreshToken,
-      },
+      message: 'Please verify your account by clicking on the link sent to your email',
+      status: 'OK'
     })
   } catch (err) {
     next(err)
   }
 }
+
+export async function verifyAccount(
+  req: Request<{}, {}, {}, { token: string, origin: string}>,
+  res: Response<{}>,
+  next: NextFunction
+) {
+  try {
+    const decoded = verifyToken(req.query.token) as {
+      userId: string
+      type: string
+    }
+
+    if (decoded.type && decoded.type !== 'VERIFY') {
+      res.status(400)
+      throw new Error('Invalid token type')
+    }
+
+    const user = await Users.findOneAndUpdate(new ObjectId(decoded.userId), { $set: { verified: true } })
+    if (!user) {
+      res.status(404)
+      throw new Error('User not found')
+    }
+
+    res.redirect(`${req.query.origin}/signin`)
+  } catch (err) {
+    next(err)
+  }
+}
+
 
 
 
@@ -171,7 +211,7 @@ export function googleCalandarAuth(req: Request, res: Response, next: NextFuncti
 
   //     return done('No user found with this email...')
   //   }));
-  
+
   // next();
 }
 
@@ -207,7 +247,7 @@ export async function googleCalanderAuthCallback(req: Request<{}, {}, {}, { code
         oauth2Client.setCredentials(tokens)
 
         // oauth2Client.getAccessToken()
-  
+
         // Get all calendar event from the admin
         const userCalendarEvents = await getUserCalendarEvent(user.value!)
 
@@ -245,7 +285,7 @@ export async function googleCalanderAuthCallback(req: Request<{}, {}, {}, { code
             events.push(event)
           })
         })
-  
+
         // const event = {
         //   summary: 'TEsting an event from the google calander',
         //   start: {
@@ -275,15 +315,15 @@ export async function googleCalanderAuthCallback(req: Request<{}, {}, {}, { code
             throw error;
           }
         }));
-  
-  
+
+
         res.status(200)
         return res.send(result)
-      } 
+      }
     }
 
     res.status(200)
-    return res.send({ message: "Email not found..."})
+    return res.send({ message: "Email not found..." })
   })
 
   // oauth2Client.getTokenInfo(tokens.access_token)
@@ -343,7 +383,7 @@ export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunc
       await Users.updateOne({ _id: req.user._id }, { $set: { referralId: referralId } });
       req.user.referralId = referralId;
     }
-    
+
     // Add the user to the active users
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -363,10 +403,10 @@ export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunc
     }
 
     res.status(200)
-    res.json({ 
-      ...req.user!, 
-      week: week.toString(), 
-      partner, 
+    res.json({
+      ...req.user!,
+      week: week.toString(),
+      partner,
       partnerAvatarUrl
     })
   } catch (err) {

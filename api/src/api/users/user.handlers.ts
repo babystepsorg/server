@@ -85,12 +85,15 @@ export async function invitePartner(
   next: NextFunction
 ) {
   const origin = req.headers.origin
+  const user = req.user!
+
+  const role = user.role === "caregiver" ? "nurturer" : "caregiver"
   
   try {
     const userId = req.params.id
     const token = generateToken({ type: 'PARTNER', userId }, { expiresIn: '2hr' })
     const email = req.body.email
-    const loginLink = `${origin ?? config.CLIENT_URL}/signup?token=${token}`
+    const loginLink = `${origin ?? config.CLIENT_URL}/signup?token=${token}&email=${email}&stage=${user.stage}&role=${role}`
     const notificationService = new NotificationService()
     await notificationService.sendTemplateEmail({
       email,
