@@ -74,7 +74,8 @@ passport.use(
       googleId: profile.id,
       googleAccessToken: accessToken,
       googleRefreshToken: refreshToken,
-      avatarUrl: profile._json.picture
+      avatarUrl: profile._json.picture,
+      verified: true
     }
     const newUser = await Users.insertOne(userObj)
 
@@ -82,7 +83,8 @@ passport.use(
       const user = {
         _id: newUser.insertedId,
         ...userObj,
-        root: true
+        root: true,
+        verified: true
       }
       return done(null, user as Omit<UserWithId, "password" | "salt"> & { root: boolean })
     }
