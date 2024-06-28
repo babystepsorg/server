@@ -112,6 +112,12 @@ export async function logIn(
       res.status(404)
       throw new Error('User not found')
     }
+
+    if (!user.verified) {
+      res.status(401)
+      throw new Error('Email not verified')
+    }
+
     const isMatch = await comparePassword(req.body.password!, user.password!)
     if (!isMatch) {
       res.status(422)
