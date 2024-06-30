@@ -10,4 +10,4 @@ router.get(
     NotificationHandler.getAllNotifications
 )
 
-export default Router
+export default router

@@ -21,7 +21,7 @@ export const getCurrentWeek = (stage: string, createdAt: string) => {
   let currentWeek = getWeekNumber(new Date())
 
   if (currentStage === 'pre-conception') {
-    currentWeek = (currentWeek - createdAtWeek)
+    currentWeek = (currentWeek - createdAtWeek) + 1
     if (currentWeek > 4) {
       currentWeek = 4
     }
@@ -54,6 +54,33 @@ export const getCurrentWeekFromConsiveDate = (consiveDate: string, createdAt: st
 export const getDaysOfWeekForWeek = ({weekNumber, createdAt, consiveDate}: {weekNumber: number, createdAt?: Date, consiveDate?: Date}) => {
   const daysInWeek = 7;
   const daysOfWeek = [];
+
+  if (consiveDate) {
+    let givenDate = new Date(consiveDate);
+    let currentDate = new Date();
+  
+    givenDate.setHours(0, 0, 0, 0);
+    currentDate.setHours(0, 0, 0, 0);
+  
+    let weeks = 40; // Initialize weeks to 0, as the current week is considered as the first week.
+  
+    // Check if givenDate is greater than currentDate, as we want to find past dates.
+    while (weeks !== weekNumber) {
+      givenDate.setDate(givenDate.getDate() - 7);
+      weeks -= 1;
+    }
+  
+    const targetWeekStart = new Date(givenDate);
+    targetWeekStart.setHours(0, 0, 0, 0)
+  
+    for (let i = 0; i < daysInWeek * 4; i++) {
+      const date = new Date(targetWeekStart);
+      daysOfWeek.push(date);
+      date.setDate(targetWeekStart.getDate() + i);
+    }
+
+    return daysOfWeek
+  } 
 
   const startDate = new Date()
   // return 4 weeks from current date
@@ -95,6 +122,33 @@ export const getDaysOfWeekFromWeekAndConsiveDate = ({ weekNumber, consiveDate, c
   const daysInWeek = 7;
   const daysOfWeek = []
 
+  if (consiveDate) {
+    let givenDate = new Date(consiveDate);
+    let currentDate = new Date();
+  
+    givenDate.setHours(0, 0, 0, 0);
+    currentDate.setHours(0, 0, 0, 0);
+  
+    let weeks = 40; // Initialize weeks to 0, as the current week is considered as the first week.
+  
+    // Check if givenDate is greater than currentDate, as we want to find past dates.
+    while (weeks !== weekNumber) {
+      givenDate.setDate(givenDate.getDate() - 7);
+      weeks -= 1;
+    }
+  
+    const targetWeekStart = new Date(givenDate);
+    targetWeekStart.setHours(0, 0, 0, 0)
+  
+    for (let i = 0; i < daysInWeek * 4; i++) {
+      const date = new Date(targetWeekStart);
+      daysOfWeek.push(date);
+      date.setDate(targetWeekStart.getDate() + i);
+    }
+
+    return daysOfWeek
+  } 
+
   const startDate = new Date()
   // return 4 weeks from current date
   for (let i = 0; i < daysInWeek * 4; ++i) {
@@ -104,33 +158,6 @@ export const getDaysOfWeekFromWeekAndConsiveDate = ({ weekNumber, consiveDate, c
   }
 
   return daysOfWeek
-
-  // if (consiveDate) {
-  //   let givenDate = new Date(consiveDate);
-  //   let currentDate = new Date();
-  
-  //   givenDate.setHours(0, 0, 0, 0);
-  //   currentDate.setHours(0, 0, 0, 0);
-  
-  //   let weeks = 40; // Initialize weeks to 0, as the current week is considered as the first week.
-  
-  //   // Check if givenDate is greater than currentDate, as we want to find past dates.
-  //   while (weeks !== weekNumber) {
-  //     givenDate.setDate(givenDate.getDate() - 7);
-  //     weeks -= 1;
-  //   }
-  
-  //   const targetWeekStart = new Date(givenDate);
-  //   targetWeekStart.setHours(0, 0, 0, 0)
-  
-  //   for (let i = 0; i < daysInWeek * 4; i++) {
-  //     const currentDate = new Date(targetWeekStart);
-  //     daysOfWeek.push(currentDate);
-  //     currentDate.setDate(targetWeekStart.getDate() + i);
-  //   }
-
-  //   return daysOfWeek
-  // } 
 
   // if (createdAt) {
   //   const createdAtDate = new Date(createdAt)
