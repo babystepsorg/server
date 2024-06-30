@@ -2,7 +2,7 @@ import * as SibApiV3Sdk from '@sendinblue/client'
 import config from '../config'
 
 type SendTemplate = {
-  template?: 'invite-partner'
+  template?: 'invite-partner' | 'signup'
   username: string
   loginLink: string
   email: string
@@ -27,7 +27,8 @@ class NotificationService {
     loginLink,
     username,
   }: SendTemplate) {
-    this.sendSmtpEmail.subject = `${username} is inviting you to be his partner`
+    const subject = template === "invite-partner" ? `${username} is inviting you to be his partner` : `${username} please verify your account` 
+    this.sendSmtpEmail.subject = subject
     this.sendSmtpEmail.templateId = 2
     this.sendSmtpEmail.params = {
       USERNAME: username,

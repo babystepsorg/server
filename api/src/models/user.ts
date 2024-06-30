@@ -31,6 +31,8 @@ export const User = z.object({
   // razorpayCustomerId: z.string().optional(),
   razorpaySubscriptionId: z.string().optional(),
   razorpayPlanId: z.string().optional(),
+  // verification
+  verified: z.boolean().default(false),
   createdAt: z.string().datetime().default(new Date().toISOString()),
   updatedAt: z.string().datetime().default(new Date().toISOString()),
 })

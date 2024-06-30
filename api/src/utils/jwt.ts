@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 type JWTOptions = {
   expiresIn?: string | number
 }
-type TokenType = 'ACCESS' | 'REFRESH' | 'FORGET' | 'PARTNER'
+type TokenType = 'ACCESS' | 'REFRESH' | 'FORGET' | 'PARTNER' | 'VERIFY'
 
 type Data = {
   [key: string]: any

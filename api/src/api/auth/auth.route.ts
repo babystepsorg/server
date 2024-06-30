@@ -42,6 +42,17 @@ router.post(
 )
 
 router.get(
+  '/verify',
+  validateRequest({
+    query: z.object({
+      token: z.string().min(1, 'Token is required'),
+      origin: z.string().min(1, 'Origin is required')
+    }),
+  }),
+  AuthHandler.verifyAccount
+)
+
+router.get(
   '/google',
   AuthHandler.googleAuth
 )
