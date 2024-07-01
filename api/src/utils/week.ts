@@ -69,8 +69,6 @@ export const getDaysOfWeekForWeek = ({weekNumber, createdAt, consiveDate}: {week
       weeks -= 1;
       givenDate.setDate(givenDate.getDate() - 7);
     }
-
-    console.log({ weeks })
   
     const targetWeekStart = new Date(givenDate);
     targetWeekStart.setHours(0, 0, 0, 0)
@@ -80,8 +78,6 @@ export const getDaysOfWeekForWeek = ({weekNumber, createdAt, consiveDate}: {week
       daysOfWeek.push(date);
       date.setDate(targetWeekStart.getDate() + i);
     }
-
-    console.log("Days of week:: - ", daysOfWeek)
 
     return daysOfWeek
   } 
@@ -140,8 +136,6 @@ export const getDaysOfWeekFromWeekAndConsiveDate = ({ weekNumber, consiveDate, c
       weeks -= 1;
       givenDate.setDate(givenDate.getDate() - 7);
     }
-
-    console.log({ weeks })
   
     const targetWeekStart = new Date(givenDate);
     targetWeekStart.setHours(0, 0, 0, 0)
@@ -151,8 +145,6 @@ export const getDaysOfWeekFromWeekAndConsiveDate = ({ weekNumber, consiveDate, c
       daysOfWeek.push(date);
       date.setDate(targetWeekStart.getDate() + i);
     }
-
-    console.log("Days of Week:: ", daysOfWeek)
 
     return daysOfWeek
   } 
