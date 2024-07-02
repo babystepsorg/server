@@ -24,8 +24,8 @@ type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
 type Me = Omit<UserWithId, 'password' | 'salt' | 'googleAccessToken' | 'googleRefreshToken'> & { week: string, partner: boolean, partnerAvatarUrl?: (string | null) }
 
 export async function signUp(
-  req: Request<{}, { message: string, status: string }, Omit<User, 'salt'> & { token?: string }>,
-  res: Response<{ message: string, status: string }>,
+  req: Request<{}, AuthUser, Omit<User, 'salt'> & { token?: string }>,
+  res: Response<AuthUser>,
   next: NextFunction
 ) {
   const origin = req.headers.origin
@@ -48,22 +48,33 @@ export async function signUp(
     }
     const user = await createUser({ ...rest, partnerId })
 
-    const verifyTokenLink = generateToken({ userId: user._id, type: 'VERIFY' }, { expiresIn: '30d' })
-    const verificationLink = `https://api.babysteps.world/api/v1/auth/verify?token=${verifyTokenLink}&origin=${origin}`
+    // const verifyTokenLink = generateToken({ userId: user._id, type: 'VERIFY' }, { expiresIn: '30d' })
+    // const verificationLink = `https://api.babysteps.world/api/v1/auth/verify?token=${verifyTokenLink}&origin=${origin}`
 
-    const notificationService = new NotificationService
-    notificationService.sendTemplateEmail({
-      template: "signup",
-      email: user.email,
-      loginLink: verificationLink,
-      username: user.name
-    })
-    // const accessToken = generateToken({ userId: user._id, type: 'ACCESS' })
-    // const refreshToken = generateToken({ userId: user._id, type: 'REFRESH' }, { expiresIn: '30d' })
-    res.status(201)
+    // const notificationService = new NotificationService
+    // notificationService.sendTemplateEmail({
+    //   template: "signup",
+    //   email: user.email,
+    //   loginLink: verificationLink,
+    //   username: user.name
+    // })
+    // // const accessToken = generateToken({ userId: user._id, type: 'ACCESS' })
+    // // const refreshToken = generateToken({ userId: user._id, type: 'REFRESH' }, { expiresIn: '30d' })
+    // res.status(201)
+    // res.json({
+    //   message: 'Please verify your account by clicking on the link sent to your email',
+    //   status: 'OK'
+    // })
+
+    const accessToken = generateToken({ userId: user._id, type: 'ACCESS' })
+    const refreshToken = generateToken({ userId: user._id, type: 'REFRESH' }, { expiresIn: '30d' })
+    res.status(200)
     res.json({
-      message: 'Please verify your account by clicking on the link sent to your email',
-      status: 'OK'
+      ...user,
+      tokens: {
+        access: accessToken,
+        refresh: refreshToken,
+      },
     })
   } catch (err) {
     next(err)
@@ -113,10 +124,10 @@ export async function logIn(
       throw new Error('User not found')
     }
 
-    if (!user.verified) {
-      res.status(401)
-      throw new Error('Email not verified')
-    }
+    // if (!user.verified) {
+    //   res.status(401)
+    //   throw new Error('Email not verified')
+    // }
 
     const isMatch = await comparePassword(req.body.password!, user.password!)
     if (!isMatch) {
