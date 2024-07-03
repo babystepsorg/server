@@ -192,6 +192,12 @@ export const getAll = async (
     const currentDate = new Date()
     currentDate.setHours(0, 0, 0, 0)
 
+    const currentDateStart = new Date(currentDate);
+    currentDateStart.setHours(0, 0, 0, 0);
+
+    const currentDateEnd = new Date(currentDate);
+    currentDateEnd.setHours(23, 59, 59, 999);
+
     // Map the tasks to their respective days
     const result = days.map((day, index) => {
       const tasks = []
@@ -222,9 +228,9 @@ export const getAll = async (
         }
 
         const taskDate: Date = new Date(td);
-        taskDate.setHours(0, 0, 0, 0);
+        // taskDate.setHours(0, 0, 0, 0);
 
-        return taskDate.getTime() == day.getTime();
+        return taskDate >= currentDateStart && taskDate <= currentDateEnd;
       })
       tasks.push(...foundTasks)
 
@@ -235,9 +241,9 @@ export const getAll = async (
         }
 
         const taskDate: Date = new Date(td);
-        taskDate.setHours(0, 0, 0, 0);
+        // taskDate.setHours(0, 0, 0, 0);
 
-        return taskDate.getTime() == day.getTime();
+        return taskDate >= currentDateStart && taskDate <= currentDateEnd;
       })
       tasks.push(...foundTasks)
 
