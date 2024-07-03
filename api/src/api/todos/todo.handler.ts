@@ -155,7 +155,14 @@ export const getAll = async (
     ])
 
     const userTodosWithoutAdmin = userTodos.filter((todo) => todo.adminTodo === undefined)
-    const userTodosWithAdmin = userTodos.filter((todo) => todo.adminTodo !== undefined)
+    const userTodosWithAdmin = userTodos.filter((todo) => todo.adminTodo !== undefined).map(todo => {
+       const userId = req.user!._id
+      const me = userId.toString() === todo.userId.toString()
+      return {
+        ...todo,
+        me
+      }
+    })
 
     for (const userAdminTodo of userTodosWithAdmin) {
       const adminTodo = adminTodos.find(
@@ -165,10 +172,13 @@ export const getAll = async (
       if (adminTodo) {
         const { _id, ...rest } = userAdminTodo
         const adminTodoIndex = adminTodos.indexOf((adminTodo as any))
+        const userId = req.user!._id
+        const me = userId.toString() === rest.userId.toString()
         const updatedTodo = {
           ...adminTodo,
           ...rest,
           overdue: false,
+          me
         }
 
         adminTodos[adminTodoIndex] = updatedTodo

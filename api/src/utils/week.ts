@@ -182,30 +182,30 @@ export const getWeekFromUser = async (user: Omit<UserWithId, 'password' | 'salt'
     let week = getCurrentWeek(user.stage, user.createdAt)
     let date;
     let days: Array<Date> = [];
-    if (user?.partnerId && user.root === false) {
-      const partneredUser = await Users.findOne({ _id: user.partnerId });
-      if (partneredUser) {
-        week = getCurrentWeek(partneredUser.stage, partneredUser.createdAt)
-        date = partneredUser.createdAt
-        week = reqWeek ? reqWeek : week
+    // if (user?.partnerId && user.root === false) {
+    //   const partneredUser = await Users.findOne({ _id: user.partnerId });
+    //   if (partneredUser) {
+    //     week = getCurrentWeek(partneredUser.stage, partneredUser.createdAt)
+    //     date = partneredUser.createdAt
+    //     week = reqWeek ? reqWeek : week
 
-        if (calander) {
-          days = getDaysOfWeekFromWeekAndConsiveDate({ weekNumber: week, createdAt: date?.toLocaleString()})
-        }
-      }
+    //     if (calander) {
+    //       days = getDaysOfWeekFromWeekAndConsiveDate({ weekNumber: week, createdAt: date?.toLocaleString()})
+    //     }
+    //   }
 
-      if (partneredUser?.consiveDate) {
-        const cw = getCurrentWeekFromConsiveDate(partneredUser.consiveDate, partneredUser.createdAt)
-        week = cw.week
-        date = cw.date
+    //   if (partneredUser?.consiveDate) {
+    //     const cw = getCurrentWeekFromConsiveDate(partneredUser.consiveDate, partneredUser.createdAt)
+    //     week = cw.week
+    //     date = cw.date
 
-        week = reqWeek ? reqWeek : week
+    //     week = reqWeek ? reqWeek : week
 
-        if (calander) {
-          days = getDaysOfWeekFromWeekAndConsiveDate({ weekNumber: week, consiveDate: date?.toLocaleString()})
-        }
-      }
-    } else {
+    //     if (calander) {
+    //       days = getDaysOfWeekFromWeekAndConsiveDate({ weekNumber: week, consiveDate: date?.toLocaleString()})
+    //     }
+    //   }
+    // } else {
       week = getCurrentWeek(user.stage, user.createdAt)
       date = user.createdAt
 
@@ -226,7 +226,7 @@ export const getWeekFromUser = async (user: Omit<UserWithId, 'password' | 'salt'
           days = getDaysOfWeekFromWeekAndConsiveDate({ weekNumber: week, consiveDate: date?.toLocaleString()})
         }
       }
-    }
+    // }
 
     if (user?.email === "demo@babysteps.world") {
       return { week: 10, days }
