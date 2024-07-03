@@ -16,15 +16,13 @@ export const getAll = async (
   let userCreationDate = req.user!.createdAt
   let userConsiveDate = req.user!.consiveDate
 
-  if (req.user!.partnerId) {
-    const partnerUser = await Users.findOne({ _id: new ObjectId(req.user!.partnerId) })
-    if (partnerUser) {
-      userCreationDate = partnerUser.createdAt
-      userConsiveDate = partnerUser.consiveDate
-    }
-  }
-
-  console.log({ userConsiveDate, userCreationDate })
+  // if (req.user!.partnerId) {
+  //   const partnerUser = await Users.findOne({ _id: new ObjectId(req.user!.partnerId) })
+  //   if (partnerUser) {
+  //     userCreationDate = partnerUser.createdAt
+  //     userConsiveDate = partnerUser.consiveDate
+  //   }
+  // }
 
   // const reqWeek = req.query.week ? parseInt(req.query.week) : undefined
   // let { week } = await getWeekFromUser(req.user!, reqWeek, true)

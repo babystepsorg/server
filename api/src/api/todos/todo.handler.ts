@@ -211,6 +211,16 @@ export const createOne = async (
   next: NextFunction
 ) => {
   try {
+    const completionDate = req.body.completionDate
+    if (completionDate) {
+      const date = new Date(completionDate)
+      const hours = date.getHours()
+      if (hours === 0) {
+        date.setHours(18)
+      }
+      req.body.completionDate = date.toISOString()
+    }
+    
     const insertedTodo = await UserTodos.insertOne({
       ...req.body,
       userId: req.user!._id,

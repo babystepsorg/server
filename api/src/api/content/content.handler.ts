@@ -51,8 +51,6 @@ export const getContent = async (
       const reqWeek = req.query.week ? parseInt(req.query.week) : undefined
       const { week } = await getWeekFromUser(req.user!, reqWeek)
 
-      console.log({ week })
-
       const userSymptoms = await UserSymptoms.aggregate([
 				{
 					$match: {

@@ -77,6 +77,23 @@ export async function validateAuthentication(req: Request, res: Response, next: 
     let root = false;
     if (!partner) {
       const foundUser = await Users.findOne({ partnerId: rest!._id })
+
+      // check the concieveDate
+      const userConsiveDate = user.consiveDate
+      const userDueDateAddedAt = user?.dueDateAddedAt
+
+      const foundUserConsiveDate = foundUser?.consiveDate
+      const foundUserDueDateAddedAt = foundUser?.dueDateAddedAt
+
+      if (userDueDateAddedAt && foundUserDueDateAddedAt) {
+        const userDueDateAddedAtDate = new Date(userDueDateAddedAt)
+        const foundUserDueDateAddedAtDate = new Date(foundUserDueDateAddedAt)
+
+        if (foundUserDueDateAddedAtDate > userDueDateAddedAtDate) {
+          rest.consiveDate = foundUserConsiveDate
+        }
+      }
+
       // if (foundUser) {
       rest.partnerId = foundUser?._id ?? undefined
       const payment = await Payments.findOne({ user_id: new ObjectId(rest!._id) })
@@ -96,7 +113,24 @@ export async function validateAuthentication(req: Request, res: Response, next: 
         rest.subscriptionStatus = (payment?.subscription_status as any) ?? foundUser.subscriptionStatus
         rest.razorpayPlanId = payment?.razorpay_plan_id ?? foundUser.razorpayPlanId
         rest.razorpaySubscriptionId = payment?.subscription_id ?? foundUser.razorpaySubscriptionId
+        rest.createdAt = foundUser.createdAt
         root = false
+
+        // check the concieveDate
+        const userConsiveDate = user.consiveDate
+        const userDueDateAddedAt = user?.dueDateAddedAt
+
+        const foundUserConsiveDate = foundUser?.consiveDate
+        const foundUserDueDateAddedAt = foundUser?.dueDateAddedAt
+
+        if (userDueDateAddedAt && foundUserDueDateAddedAt) {
+          const userDueDateAddedAtDate = new Date(userDueDateAddedAt)
+          const foundUserDueDateAddedAtDate = new Date(foundUserDueDateAddedAt)
+
+          if (foundUserDueDateAddedAtDate > userDueDateAddedAtDate) {
+            rest.consiveDate = foundUserConsiveDate
+          }
+        }
       }
     }
 
