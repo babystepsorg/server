@@ -20,6 +20,7 @@ export const User = z.object({
   subscriptionCode: z.string().optional(),
   referredBy: z.string().optional(),
   consiveDate: z.string().datetime().optional(),
+  dueDateAddedAt: z.string().datetime().optional(),
   googleId: z.string().optional(),
   googleAccessToken: z.string().optional(),
   googleRefreshToken: z.string().optional(),

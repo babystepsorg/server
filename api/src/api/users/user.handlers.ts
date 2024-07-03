@@ -54,6 +54,7 @@ export async function updateOne(
   
   if (req.body.consiveDate) {
     req.body.stage = "pregnancy"
+    req.body.dueDateAddedAt = new Date().toISOString()
   }
 
   try {

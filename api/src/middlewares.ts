@@ -77,16 +77,16 @@ export async function validateAuthentication(req: Request, res: Response, next: 
     let root = false;
     if (!partner) {
       const foundUser = await Users.findOne({ partnerId: rest!._id })
-      if (foundUser) {
-        rest.partnerId = foundUser._id
-        const payment = await Payments.findOne({ user_id: new ObjectId(rest!._id) })
-        rest.subscriptionEndDate = payment?.subscription_end_at?.toString() ?? foundUser.subscriptionEndDate
-        rest.subscriptionStartDate = payment?.subscription_start_at?.toString() ?? foundUser.subscriptionStartDate
-        rest.subscriptionStatus = (payment?.subscription_status as any) ?? foundUser.subscriptionStatus
-        rest.razorpayPlanId = payment?.razorpay_plan_id ?? foundUser.razorpayPlanId
-        rest.razorpaySubscriptionId = payment?.subscription_id ?? foundUser.razorpaySubscriptionId
-        root = true
-      }
+      // if (foundUser) {
+      rest.partnerId = foundUser?._id ?? undefined
+      const payment = await Payments.findOne({ user_id: new ObjectId(rest!._id) })
+      rest.subscriptionEndDate = payment?.subscription_end_at?.toString() ?? user?.subscriptionEndDate
+      rest.subscriptionStartDate = payment?.subscription_start_at?.toString() ?? user?.subscriptionStartDate
+      rest.subscriptionStatus = (payment?.subscription_status as any) ?? user?.subscriptionStatus
+      rest.razorpayPlanId = payment?.razorpay_plan_id ?? user?.razorpayPlanId
+      rest.razorpaySubscriptionId = payment?.subscription_id ?? user?.razorpaySubscriptionId
+      root = true
+      // }
     } else {
       const foundUser = await Users.findOne({ _id: rest.partnerId })
       if (foundUser) {
