@@ -20,6 +20,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@openpanel/express": "^0.0.9-beta",
     "@sendinblue/client": "^3.3.1",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",

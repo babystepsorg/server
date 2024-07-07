@@ -13,6 +13,7 @@ import { ObjectId } from 'mongodb'
 import config from './config'
 import cron from 'node-cron'
 import { notificationEveryFourHours, notificationDailyMidMorning, notificationDailyEvening, notificationDailyMidday, notificationWeeklyEvening } from './api/notifications/notification.job'
+import createOpenpanelMiddleware from '@openpanel/express';
 
 require('dotenv').config()
 
@@ -23,6 +24,34 @@ app.use(helmet())
 app.use(cors())
 app.use(express.json())
 app.use(passport.initialize())
+app.use(
+  createOpenpanelMiddleware({
+    clientId: '6113b3a0-5339-4852-b2b6-ed30c7f96d74',
+    clientSecret: 'sec_9d84ec6534ce6b62b008',
+    getProfileId(req) {
+      return req?.user?._id?.toString() ?? ""
+    }
+  })
+);
+
+app.use((req, res, next) => {
+  res.on('finish', () => {
+    req.op.event('api-call', {
+      method: req.method,
+      url: req.originalUrl,
+      headers: req.headers,
+      requestBody: req.body,
+      responseStatus: res.statusCode,
+      responseBody: res.locals.data || null,
+    });
+  });
+  next();
+});
+
+
+// req.op.event('sign-up', {
+//   email: req.body.email,
+// });
 
 const GoogleStrategy = strategy.Strategy;
 
