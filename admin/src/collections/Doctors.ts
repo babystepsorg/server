@@ -42,7 +42,7 @@ const Doctors: CollectionConfig = {
       name: 'image',
       type: 'upload',
       relationTo: 'media',
-      required: true,
+      required: false,
     },
     {
       name: 'location',
@@ -50,8 +50,33 @@ const Doctors: CollectionConfig = {
     },
     {
       name: 'tags',
-      type: 'relationship',
-      relationTo: 'tags',
+      type: 'select',
+      options: [
+        {
+          label: "Judgment Free",
+          value: "judgment-free",
+        },
+        {
+          label: "Sex Positive",
+          value: "sex-positive",
+        },
+        {
+          label: "Queer Friendly",
+          value: "queer-friendly",
+        },
+        {
+          label: "Safe Space",
+          value: "safe-space",
+        },
+        {
+          label: "Reassuring",
+          value: "reassuring",
+        },
+        {
+          label: "Good Listner",
+          value: "good-listener",
+        }
+      ],
       hasMany: true,
       admin: {
         position: 'sidebar'
