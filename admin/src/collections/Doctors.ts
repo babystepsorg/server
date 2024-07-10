@@ -49,7 +49,8 @@ const Doctors: CollectionConfig = {
       type: 'text',
     },
     {
-      name: 'tags',
+      name: 'doctor-tags',
+      label: "Doctor Tags",
       type: 'select',
       options: [
         {
@@ -77,6 +78,12 @@ const Doctors: CollectionConfig = {
           value: "good-listener",
         }
       ],
+      hasMany: true,
+    },
+    {
+      name: 'tags',
+      type: 'relationship',
+      relationTo: 'tags',
       hasMany: true,
       admin: {
         position: 'sidebar'
