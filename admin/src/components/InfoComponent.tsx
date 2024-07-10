@@ -74,7 +74,7 @@ const InfoComponent: AdminViewComponent = () => {
         <div style={{ marginTop: '1rem' }}>
           <h2>Products</h2>
         <ul>
-          {data?.products?.map((doc: any) => (
+          {data?.products?.docs?.map((doc: any) => (
           <li>
             {doc.name}
           </li>
