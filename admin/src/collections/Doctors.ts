@@ -49,7 +49,7 @@ const Doctors: CollectionConfig = {
       type: 'text',
     },
     {
-      name: 'doctor-tags',
+      name: 'doctor_tags',
       label: "Doctor Tags",
       type: 'select',
       options: [
