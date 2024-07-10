@@ -114,7 +114,7 @@ const start = async (): Promise<void> => {
           }
         }),
         payload.find({
-          collection: 'content',
+          collection: 'contents',
           where: {
             weeks: {
               in: [req.params.id]
