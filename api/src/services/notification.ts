@@ -6,6 +6,7 @@ type SendTemplate = {
   username: string
   loginLink: string
   email: string
+  params?: Record<string, string>
 }
 
 class NotificationService {
@@ -26,11 +27,12 @@ class NotificationService {
     email,
     loginLink,
     username,
+    params
   }: SendTemplate) {
-    const subject = template === "invite-partner" ? `${username} is inviting you to be his partner` : `${username} please verify your account` 
+    const subject = template === "invite-partner" ? `${username} is inviting you to be his partner` : template === "signup" ? "Welcome to BabySteps: Your Journey Begins Now" : `${username} please verify your account`
     this.sendSmtpEmail.subject = subject
-    this.sendSmtpEmail.templateId = 2
-    this.sendSmtpEmail.params = {
+    this.sendSmtpEmail.templateId = template === "signup" ? 1 : 2
+    this.sendSmtpEmail.params = params ? params : {
       USERNAME: username,
       LOGIN_URL: loginLink,
     }

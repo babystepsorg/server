@@ -66,6 +66,19 @@ export async function signUp(
     //   status: 'OK'
     // })
 
+    // Send Email to the user
+    //
+    const notificationService = new NotificationService()
+    notificationService.sendTemplateEmail({
+      email: user.email,
+      loginLink: "",
+      template: "signup",
+      params: {
+        NAME: user.name
+      },
+      username: req.user?.name!,
+    })
+
     const accessToken = generateToken({ userId: user._id, type: 'ACCESS' })
     const refreshToken = generateToken({ userId: user._id, type: 'REFRESH' }, { expiresIn: '30d' })
     res.status(200)
@@ -82,7 +95,7 @@ export async function signUp(
 }
 
 export async function verifyAccount(
-  req: Request<{}, {}, {}, { token: string, origin: string}>,
+  req: Request<{}, {}, {}, { token: string, origin: string }>,
   res: Response<{}>,
   next: NextFunction
 ) {
@@ -219,7 +232,7 @@ export function googleCalandarAuth(req: Request, res: Response, next: NextFuncti
   //     clientSecret: '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',
   //     callbackURL: 'http://localhost:5000/api/v1/auth/google/calendar/callback',
   //     passReqToCallback: true,
-  //   }, 
+  //   },
   //   async (req, accessToken, refreshToken, profile, done) => {
   //     const user = await Users.findOneAndUpdate({ email: profile._json.email! }, { $set: { googleId: profile.id, googleAccessToken: accessToken, googleRefreshToken: refreshToken } });
   //     if (user.ok) {

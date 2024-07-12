@@ -36,7 +36,7 @@ app.use(
 
 app.use((req, res, next) => {
   res.on('finish', () => {
-    req.op.event('api-call', {
+    req.op.event(req.originalUrl.split('/v1/').pop() ?? "api-url", {
       method: req.method,
       url: req.originalUrl,
       headers: req.headers,
