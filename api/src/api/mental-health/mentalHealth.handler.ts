@@ -41,7 +41,7 @@ export const getPartnerInfo = async (
     if (partnerId) {
       const mentalHealth = await Mentalhealths.find({
         userId: new ObjectId(partnerId),
-      }).sort({ createdAt: -1 }).limit(1)
+      }).sort({ createdAt: -1 }).limit(1).toArray()
 
       if (!mentalHealth) {
         res.status(404)
