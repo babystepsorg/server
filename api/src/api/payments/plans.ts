@@ -1,4 +1,3 @@
-
 export const pricingPlans = [
   {
     type: "Monthly Plan",
@@ -8,8 +7,8 @@ export const pricingPlans = [
     buttonText: "Oh, you're cheap like that!",
     planId: "plan_OTfcOwTpNeN7tZ",
     free_trial: 7 * 24 * 60 * 60, // one week in seconds
-    discountPlanId: "plan_OTfdZJcx33GMpy",
-    discountPrice: "₹249",
+    discountPlanId: "plan_OZdR9rsKa7uyA6",
+    discountPrice: "₹240",
     total_count: 9,
     features: [
       "7-days free trial",
@@ -26,8 +25,8 @@ export const pricingPlans = [
     planId: "plan_OTfeA9ulkvC9KV",
     free_trial: 14 * 24 * 60 * 60,
     total_count: 3,
-    discountPlanId: "plan_OTfejhWxy07kr8",
-    discountPrice: "₹599",
+    discountPlanId: "plan_OZdRqaBH3qdIn5",
+    discountPrice: "₹560",
     features: [
       "14-day free trail",
       "Access to all features",
@@ -44,11 +43,12 @@ export const pricingPlans = [
     planId: "plan_OTffcoJtdpZPsZ",
     free_trial: 30 * 24 * 60 * 60,
     total_count: 1,
-    discountPlanId: "plan_OTffy7LfwHXZ0Z",
-    discountPrice: "₹1599",
+    discountPlanId: "plan_OZdSYxhn9fQUbf",
+    discountPrice: "₹1440",
     features: [
+      "1-month free trial",
       "Access to all features",
-      "Use for multiple children",
+      "Add a partner for free",
       "Use for multiple children",
     ],
   },

@@ -7,6 +7,8 @@ import { verifyWebhook } from './verifyRequest';
 import { insertOrUpdatePayment } from './payment';
 import { ObjectId } from 'mongodb';
 import { Payments } from './payment.model';
+import NotificationService from '../../services/notification';
+import { Users } from '../../models/user';
 
 const instance = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID!,
@@ -47,9 +49,9 @@ export async function createSubscription(req: Request, res: Response, next: Next
 export async function applyDiscountCode(req: Request, res: Response, next: NextFunction) {
   try {
     const { discountCode, planId } = req.body;
-    
+
     const PLAN = pricingPlans.find((plan) => plan.planId === planId);
-  
+
     if (!PLAN) {
       res.status(400);
       throw new Error('Invalid plan');
@@ -60,12 +62,12 @@ export async function applyDiscountCode(req: Request, res: Response, next: NextF
       res.send({ discount: true })
     }
 
-    const doctor = await Specialists.findOne({ referralId: discountCode })  
+    const doctor = await Specialists.findOne({ referralId: discountCode })
     if (!doctor) {
       res.status(400);
       throw new Error('Invalid discount code');
     }
-  
+
     res.status(200);
     res.json({ discount: true }); // Return a discount of 10% if the discount code matches
   } catch (err) {
@@ -124,81 +126,96 @@ export async function cancelSubscription(req: Request, res: Response, next: Next
 }
 
 export async function razorpayWebhook(
-    req: Request,
-    res: Response,
-    next: NextFunction
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) {
-    const razorpaySignature = req.headers['x-razorpay-signature']?.toString() 
+  const razorpaySignature = req.headers['x-razorpay-signature']?.toString()
 
-    if (!razorpaySignature) {
-        res.status(400)
-        throw new Error("Request is invalid")
+  if (!razorpaySignature) {
+    res.status(400)
+    throw new Error("Request is invalid")
+  }
+
+  const body = req.body
+
+  const verified = verifyWebhook(JSON.stringify(body), razorpaySignature)
+
+  if (!verified) {
+    res.status(400)
+    throw new Error("Request is invalid")
+  }
+
+  const { event, payload } = body
+  const subscription: Subscriptions.RazorpaySubscription = payload.subscription.entity
+
+  switch (event) {
+    case "subscription.authenticated": {
+      const user = await Users.findOne({ _id: new ObjectId(subscription.notes!.userId as string) })
+
+      if (user) {
+        const notificationService = new NotificationService()
+        notificationService.sendTemplateEmail({
+          email: user.email,
+          loginLink: "",
+          template: "subscription.purchase",
+          params: {
+            NAME: user.name
+          },
+          username: user.name,
+        })
+      }
+
+      const payment = insertOrUpdatePayment(subscription)
+      return res.status(200).send(payment)
     }
-
-    const body = req.body
-    
-    const verified = verifyWebhook(JSON.stringify(body), razorpaySignature)
-
-    if (!verified) {
-        res.status(400)
-        throw new Error("Request is invalid")
+    case "subscription.activated": {
+      // Handle subscription activation
+      const payment = insertOrUpdatePayment(subscription)
+      return res.status(200).send(payment)
     }
-
-    const { event, payload } = body
-    const subscription: Subscriptions.RazorpaySubscription = payload.subscription.entity
-
-    switch(event) {
-        case "subscription.authenticated": {
-            const payment = insertOrUpdatePayment(subscription)
-            return res.status(200).send(payment)
-        }
-        case "subscription.activated": {
-            // Handle subscription activation
-            const payment = insertOrUpdatePayment(subscription)
-            return res.status(200).send(payment)
-        }
-        case "subscription.charged": {
-            // Handle subscription charge
-            const payment = insertOrUpdatePayment(subscription)
-            return res.status(200).send(payment)
-        }
-        case "subscription.completed": {
-            // Handle subscription completion
-            const payment = insertOrUpdatePayment(subscription)
-            return res.status(200).send(payment)
-        }
-        case "subscription.updated": {
-            // Handle subscription update
-            const payment = insertOrUpdatePayment(subscription)
-            return res.status(200).send(payment)
-        }
-        case "subscription.pending": {
-            // Handle subscription pending
-            const payment = insertOrUpdatePayment(subscription)
-            return res.status(200).send(payment)
-        }
-        case "subscription.halted": {
-            // Handle subscription halted
-            const payment = insertOrUpdatePayment(subscription)
-            return res.status(200).send(payment)
-        }
-        case "subscription.cancelled": {
-            // Handle subscription cancellation
-            const payment = insertOrUpdatePayment(subscription)
-            return res.status(200).send(payment)
-        }
-        case "subscription.paused": {
-            // Handle subscription pause
-            const payment = insertOrUpdatePayment(subscription)
-            return res.status(200).send(payment)
-        }
-        case "subscription.resumed": {
-            // Handle subscription resume
-            const payment = insertOrUpdatePayment(subscription)
-            return res.status(200).send(payment)
-        } 
-        default: {
-          throw new Error("Nothing matches")
-        }
+    case "subscription.charged": {
+      // Handle subscription charge
+      const payment = insertOrUpdatePayment(subscription)
+      return res.status(200).send(payment)
     }
+    case "subscription.completed": {
+      // Handle subscription completion
+      const payment = insertOrUpdatePayment(subscription)
+      return res.status(200).send(payment)
+    }
+    case "subscription.updated": {
+      // Handle subscription update
+      const payment = insertOrUpdatePayment(subscription)
+      return res.status(200).send(payment)
+    }
+    case "subscription.pending": {
+      // Handle subscription pending
+      const payment = insertOrUpdatePayment(subscription)
+      return res.status(200).send(payment)
+    }
+    case "subscription.halted": {
+      // Handle subscription halted
+      const payment = insertOrUpdatePayment(subscription)
+      return res.status(200).send(payment)
+    }
+    case "subscription.cancelled": {
+      // Handle subscription cancellation
+      const payment = insertOrUpdatePayment(subscription)
+      return res.status(200).send(payment)
+    }
+    case "subscription.paused": {
+      // Handle subscription pause
+      const payment = insertOrUpdatePayment(subscription)
+      return res.status(200).send(payment)
+    }
+    case "subscription.resumed": {
+      // Handle subscription resume
+      const payment = insertOrUpdatePayment(subscription)
+      return res.status(200).send(payment)
+    }
+    default: {
+      throw new Error("Nothing matches")
+    }
+  }
 }
