@@ -34,6 +34,7 @@ const passport_1 = __importDefault(require("passport"));
 const passport_google_oauth20_1 = __importDefault(require("passport-google-oauth20"));
 const middlewares = __importStar(require("./middlewares"));
 const api_1 = __importDefault(require("./api"));
+const internals_1 = __importDefault(require("./api/internals"));
 const user_1 = require("./models/user");
 const config_1 = __importDefault(require("./config"));
 const node_cron_1 = __importDefault(require("node-cron"));
@@ -137,22 +138,26 @@ app.get('/', (req, res) => {
         message: '🦄🌈✨👋🌎🌍🌏✨🌈🦄',
     });
 });
-node_cron_1.default.schedule("0 */4 * * *", notification_job_1.notificationEveryFourHours, {
-    timezone: "Asia/Kolkata"
-});
-node_cron_1.default.schedule("0 9 * * *", notification_job_1.notificationDailyMidMorning, {
-    timezone: "Asia/Kolkata"
-});
-node_cron_1.default.schedule("0 17 * * *", notification_job_1.notificationDailyEvening, {
-    timezone: "Asia/Kolkata"
-});
-node_cron_1.default.schedule("0 12 * * *", notification_job_1.notificationDailyMidday, {
-    timezone: "Asia/Kolkata"
-});
-node_cron_1.default.schedule("0 19 * * 1", notification_job_1.notificationWeeklyEvening, {
+// cron.schedule("0 */4 * * *", notificationEveryFourHours, {
+//   timezone: "Asia/Kolkata"
+// })
+// cron.schedule("0 9 * * *", notificationDailyMidMorning, {
+//   timezone: "Asia/Kolkata"
+// })
+// cron.schedule("0 17 * * *", notificationDailyEvening, {
+//   timezone: "Asia/Kolkata"
+// })
+// cron.schedule("0 12 * * *", notificationDailyMidday, {
+//   timezone: "Asia/Kolkata"
+// })
+// cron.schedule("0 19 * * 1", notificationWeeklyEvening, {
+//   timezone: "Asia/Kolkata"
+// })
+node_cron_1.default.schedule("0 0 * * *", notification_job_1.checkForData, {
     timezone: "Asia/Kolkata"
 });
 app.use('/api/v1', api_1.default);
+app.use('/internal', internals_1.default);
 // app.use('', api)
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);

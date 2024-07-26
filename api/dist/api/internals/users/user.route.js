@@ -23,14 +23,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Todos = exports.Todo = void 0;
-const z = __importStar(require("zod"));
-const db_1 = require("../../db");
-exports.Todo = z.object({
-    title: z.string().min(1, 'Title is required'),
-    description: z.string().optional(),
-    priority: z.enum(['1', '2', '3', '4']),
-    week: z.string().optional(),
-});
-exports.Todos = db_1.db.collection('todos');
-//# sourceMappingURL=todo.model.js.map
+const express_1 = require("express");
+const UserHandler = __importStar(require("./user.handler"));
+const middlewares_1 = require("../../../middlewares");
+const zod_1 = require("zod");
+const router = (0, express_1.Router)();
+router.get('/', UserHandler.getAllUsers);
+router.delete('/:id', UserHandler.deleteUser);
+router.get('/status', UserHandler.getUsersStatus);
+router.post('/active-users', (0, middlewares_1.validateRequest)({
+    body: zod_1.z.object({
+        filter: zod_1.z.enum(['daily', 'weekly', 'monthly'])
+    })
+}), UserHandler.getActiveUsersByFilter);
+exports.default = router;
+//# sourceMappingURL=user.route.js.map

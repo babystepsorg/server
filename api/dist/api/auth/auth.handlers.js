@@ -15,6 +15,7 @@ const calendar_1 = require("../../utils/calendar");
 const config_1 = __importDefault(require("../../config"));
 const activeUser_1 = require("../../models/activeUser");
 const notification_1 = __importDefault(require("../../services/notification"));
+const notification_model_1 = require("../notifications/notification.model");
 async function signUp(req, res, next) {
     const origin = req.headers.origin;
     try {
@@ -58,6 +59,19 @@ async function signUp(req, res, next) {
                 NAME: user.name
             },
             username: req.user?.name,
+        });
+        notification_model_1.Notifications.insertOne({
+            type: "notification",
+            status: "sent",
+            payload: {
+                subject: "Welcome to BabySteps! Watch this short video to get started and make the most of your companion",
+                message: "",
+                action: "link",
+            },
+            userId: user._id,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            read: false
         });
         const accessToken = (0, jwt_1.generateToken)({ userId: user._id, type: 'ACCESS' });
         const refreshToken = (0, jwt_1.generateToken)({ userId: user._id, type: 'REFRESH' }, { expiresIn: '30d' });

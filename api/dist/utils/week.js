@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getWeekFromUser = exports.getDaysOfWeekFromWeekAndConsiveDate = exports.getDaysOfWeekForWeek = exports.getCurrentWeekFromConsiveDate = exports.getCurrentWeek = exports.getWeekNumber = void 0;
+exports.getCurrentWeekWithDay = exports.getWeekFromUser = exports.getDaysOfWeekFromWeekAndConsiveDate = exports.getDaysOfWeekForWeek = exports.getCurrentWeekFromConsiveDate = exports.getCurrentWeek = exports.getWeekNumber = void 0;
 const getWeekNumber = (date) => {
     const startOfYear = new Date(date.getFullYear(), 0, 1);
     const startOfWeek = new Date(startOfYear.setDate(startOfYear.getDate() - startOfYear.getDay() + 1));
@@ -194,4 +194,52 @@ const getWeekFromUser = async (user, reqWeek, calander) => {
     }
 };
 exports.getWeekFromUser = getWeekFromUser;
+const getCurrentWeekWithDay = async (user, reqWeek, calander) => {
+    try {
+        let week = (0, exports.getCurrentWeek)(user.stage, user.createdAt);
+        let date;
+        let days = [];
+        // if (user?.partnerId && user.root === false) {
+        //   const partneredUser = await Users.findOne({ _id: user.partnerId });
+        //   if (partneredUser) {
+        //     week = getCurrentWeek(partneredUser.stage, partneredUser.createdAt)
+        //     date = partneredUser.createdAt
+        //     week = reqWeek ? reqWeek : week
+        //     if (calander) {
+        //       days = getDaysOfWeekFromWeekAndConsiveDate({ weekNumber: week, createdAt: date?.toLocaleString()})
+        //     }
+        //   }
+        //   if (partneredUser?.consiveDate) {
+        //     const cw = getCurrentWeekFromConsiveDate(partneredUser.consiveDate, partneredUser.createdAt)
+        //     week = cw.week
+        //     date = cw.date
+        //     week = reqWeek ? reqWeek : week
+        //     if (calander) {
+        //       days = getDaysOfWeekFromWeekAndConsiveDate({ weekNumber: week, consiveDate: date?.toLocaleString()})
+        //     }
+        //   }
+        // } else {
+        week = (0, exports.getCurrentWeek)(user.stage, user.createdAt);
+        date = user.createdAt;
+        if (user?.consiveDate) {
+            const cw = (0, exports.getCurrentWeekFromConsiveDate)(user.consiveDate, user.createdAt);
+            week = cw.week;
+            date = cw.date;
+            week = reqWeek ? reqWeek : week;
+            if (calander) {
+                days = (0, exports.getDaysOfWeekFromWeekAndConsiveDate)({ weekNumber: week, consiveDate: date?.toLocaleString() });
+            }
+        }
+        // }
+        if (user?.email === "demo@babysteps.world") {
+            return { week: 10, days };
+        }
+        const dayOfWeek = new Date().getDay();
+        return { week, days, dayOfWeek };
+    }
+    catch (err) {
+        throw (err);
+    }
+};
+exports.getCurrentWeekWithDay = getCurrentWeekWithDay;
 //# sourceMappingURL=week.js.map

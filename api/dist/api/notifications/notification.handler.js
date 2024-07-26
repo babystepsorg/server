@@ -8,7 +8,8 @@ const getAllNotifications = async (req, res, next) => {
         const limit = req.query.limit ? parseInt(req.query.limit) : 10;
         const notifications = await notification_model_1.Notifications.find({
             userId: req.user._id,
-            status: "sent"
+            status: "sent",
+            createdAt: { $lte: new Date().toISOString() }
         })
             .sort({ createdAt: -1 })
             .skip((page - 1) * limit)
