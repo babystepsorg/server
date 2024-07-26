@@ -13,7 +13,8 @@ export const getAllNotifications = async (
     
     const notifications = await Notifications.find({
       userId: req.user!._id,
-      status: "sent"
+      status: "sent",
+      createdAt: { $lte: new Date().toISOString() }
     })
     .sort({ createdAt: -1 })
     .skip((page - 1) * limit)
