@@ -237,3 +237,60 @@ export const getWeekFromUser = async (user: Omit<UserWithId, 'password' | 'salt'
     throw (err);
   }
 }
+
+
+export const getCurrentWeekWithDay = async (user: Omit<UserWithId, 'password' | 'salt'> & { root: boolean }, reqWeek?: number, calander?: boolean) => {
+  try {
+    let week = getCurrentWeek(user.stage, user.createdAt)
+    let date;
+    let days: Array<Date> = [];
+    // if (user?.partnerId && user.root === false) {
+    //   const partneredUser = await Users.findOne({ _id: user.partnerId });
+    //   if (partneredUser) {
+    //     week = getCurrentWeek(partneredUser.stage, partneredUser.createdAt)
+    //     date = partneredUser.createdAt
+    //     week = reqWeek ? reqWeek : week
+
+    //     if (calander) {
+    //       days = getDaysOfWeekFromWeekAndConsiveDate({ weekNumber: week, createdAt: date?.toLocaleString()})
+    //     }
+    //   }
+
+    //   if (partneredUser?.consiveDate) {
+    //     const cw = getCurrentWeekFromConsiveDate(partneredUser.consiveDate, partneredUser.createdAt)
+    //     week = cw.week
+    //     date = cw.date
+
+    //     week = reqWeek ? reqWeek : week
+
+    //     if (calander) {
+    //       days = getDaysOfWeekFromWeekAndConsiveDate({ weekNumber: week, consiveDate: date?.toLocaleString()})
+    //     }
+    //   }
+    // } else {
+      week = getCurrentWeek(user.stage, user.createdAt)
+      date = user.createdAt
+      
+      if (user?.consiveDate) {
+        const cw  = getCurrentWeekFromConsiveDate(user!.consiveDate, user!.createdAt)
+        week = cw.week
+        date = cw.date
+
+        week = reqWeek ? reqWeek : week
+
+        if (calander) {
+          days = getDaysOfWeekFromWeekAndConsiveDate({ weekNumber: week, consiveDate: date?.toLocaleString()})
+        }
+      }
+    // }
+
+    if (user?.email === "demo@babysteps.world") {
+      return { week: 10, days }
+    }
+    
+    const dayOfWeek = new Date().getDay();
+    return { week, days, dayOfWeek }
+  } catch (err) {
+    throw (err);
+  }
+}

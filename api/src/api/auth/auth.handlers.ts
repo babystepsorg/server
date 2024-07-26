@@ -13,6 +13,7 @@ import config from '../../config'
 import { ActiveUsers } from '../../models/activeUser'
 import { Payments } from '../payments/payment.model'
 import NotificationService from '../../services/notification'
+import { Notifications } from '../notifications/notification.model'
 
 type AuthUser = Omit<UserWithId, 'password' | 'salt'> & {
   tokens: {
@@ -77,6 +78,20 @@ export async function signUp(
         NAME: user.name
       },
       username: req.user?.name!,
+    })
+
+    Notifications.insertOne({
+      type: "notification",
+      status: "sent",
+      payload: {
+          subject: "Welcome to BabySteps! Watch this short video to get started and make the most of your companion",
+          message: "",
+          action: "link",
+      },
+      userId: user._id,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      read: false
     })
 
     const accessToken = generateToken({ userId: user._id, type: 'ACCESS' })

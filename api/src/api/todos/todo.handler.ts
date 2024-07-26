@@ -156,7 +156,7 @@ export const getAll = async (
 
     const userTodosWithoutAdmin = userTodos.filter((todo) => todo.adminTodo === undefined)
     const userTodosWithAdmin = userTodos.filter((todo) => todo.adminTodo !== undefined).map(todo => {
-       const userId = req.user!._id
+      const userId = req.user!._id
       const me = userId.toString() === todo.userId.toString()
       return {
         ...todo,
