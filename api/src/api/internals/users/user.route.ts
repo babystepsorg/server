@@ -22,12 +22,17 @@ router.get(
 
 router.post(
   '/active-users',
-  validateRequest({
-    body: z.object({
-      filter: z.enum(['daily', 'weekly', 'monthly'])
-    })
-  }),
+  // validateRequest({
+  //   body: z.object({
+  //     filter: z.enum(['daily', 'weekly', 'monthly'])
+  //   })
+  // }),
   UserHandler.getActiveUsersByFilter
 );
+
+router.get(
+  '/symptoms',
+  UserHandler.getSymptomsByWeeks
+)
 
 export default router;
