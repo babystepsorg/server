@@ -20,7 +20,7 @@ router.get(
   UserHandler.getUsersStatus
 );
 
-router.post(
+router.get(
   '/active-users',
   // validateRequest({
   //   body: z.object({
@@ -33,6 +33,16 @@ router.post(
 router.get(
   '/symptoms',
   UserHandler.getSymptomsByWeeks
+)
+
+router.get(
+  '/checklists',
+  UserHandler.getChecklistsByWeeks
+)
+
+router.get(
+  '/specialists',
+  UserHandler.getSpecialistsAdded
 )
 
 export default router;

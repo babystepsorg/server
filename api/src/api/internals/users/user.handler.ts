@@ -6,6 +6,8 @@ import { ParamsWithId } from "../../../interfaces/ParamsWithId";
 import { ObjectId } from "mongodb";
 import { getWeekFromUser } from "../../../utils/week";
 import { UserSymptoms } from "../../../models/usersymptoms";
+import { UserTodos } from "../../../models/userTodo";
+import { SelectedSpecialist, SelectedSpecialists } from "../../../models/selectedSpecialit";
 
 export async function getAllUsers(
   req: Request,
@@ -97,7 +99,10 @@ export async function getSymptomsByWeeks(
   next: NextFunction
 ) {
   try {
-    const userSymtpoms = await UserSymptoms.aggregate([
+    const userSymptoms = await UserSymptoms.aggregate([
+      {
+        $match: {}
+      },
       {
         $lookup: {
           from: "symptoms",
@@ -106,7 +111,10 @@ export async function getSymptomsByWeeks(
           as: "symptom"
         }
       },
-    ]).toArray()
+      {
+        $unwind: "$symptom"
+      }
+    ]).toArray();
 
     const symptomsByWeeksAndUsers: {
       week: string,
@@ -114,23 +122,99 @@ export async function getSymptomsByWeeks(
       symptoms: Set<string>
     }[] = []
 
-    userSymtpoms.map(symptom => {
+    userSymptoms.map(symptom => {
       const week = symptom.week
       const user = symptom.userId
-      const symptomtitle = symptom.symptom.title
+      const symptomName = symptom.symptom.name
 
-      const symptomsByWeeksAndUser = symptomsByWeeksAndUsers.find(symp => symp.week === week)
-      if (symptomsByWeeksAndUser) {
-        symptomsByWeeksAndUser.users.add(user)
-        symptomsByWeeksAndUser.symptoms.add(symptomtitle)
-      } else {
-        symptomsByWeeksAndUsers.push({
-          week,
-          users: new Set([user]),
-          symptoms: new Set([symptomtitle])
-        })
-      }
+      
+    let weekData = symptomsByWeeksAndUsers.find(w => w.week === week);
+    if (!weekData) {
+      weekData = {
+        week: week,
+        users: new Set(),
+        symptoms: new Set()
+      };
+      symptomsByWeeksAndUsers.push(weekData);
+    }
+    weekData.users.add(user.toString());
+    weekData.symptoms.add(symptomName);
     })
+
+    res.status(200)
+    res.send(symptomsByWeeksAndUsers)
+  } catch (err) {
+    next(err)
+  }
+}
+
+
+// get sypmptoms selected/added in weeks by users
+export async function getChecklistsByWeeks(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userTodos = await UserTodos.aggregate([
+      {
+        $match: {}
+      },
+      {
+        $lookup: {
+          from: "todos",
+          localField: "adminTodo",
+          foreignField: "_id",
+          as: "todo"
+        }
+      },
+      {
+        $unwind: "$todo"
+      }
+    ]).toArray();
+
+    const checklistsByWeeksAndUsers: {
+      week: string,
+      users: Set<string>,
+      checklists: Set<string>
+    }[] = []
+
+    userTodos.map(todo => {
+      const week = todo.week
+      const user = todo.userId
+      const todoTitle = todo.todo.title
+
+      
+    let weekData = checklistsByWeeksAndUsers.find(w => w.week === week);
+    if (!weekData) {
+      weekData = {
+        week: week,
+        users: new Set(),
+        checklists: new Set()
+      };
+      checklistsByWeeksAndUsers.push(weekData);
+    }
+    weekData.users.add(user.toString());
+    weekData.checklists.add(todoTitle);
+    })
+
+    res.status(200)
+    res.send(checklistsByWeeksAndUsers)
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function getSpecialistsAdded(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const specialists = await SelectedSpecialists.find({}).toArray()
+
+    res.status(200)
+    res.send(specialists)
   } catch (err) {
     next(err)
   }
