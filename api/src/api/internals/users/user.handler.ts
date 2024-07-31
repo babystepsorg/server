@@ -118,8 +118,8 @@ export async function getSymptomsByWeeks(
 
     const symptomsByWeeksAndUsers: {
       week: string,
-      users: Set<string>,
-      symptoms: Set<string>
+      users: string[],
+      symptoms: string[]
     }[] = []
 
     userSymptoms.map(symptom => {
@@ -132,13 +132,13 @@ export async function getSymptomsByWeeks(
     if (!weekData) {
       weekData = {
         week: week,
-        users: new Set(),
-        symptoms: new Set()
+        users: [],
+        symptoms: []
       };
       symptomsByWeeksAndUsers.push(weekData);
     }
-    weekData.users.add(user.toString());
-    weekData.symptoms.add(symptomName);
+    weekData.users.push(user.toString());
+    weekData.symptoms.push(symptomName);
     })
 
     res.status(200)
@@ -175,8 +175,8 @@ export async function getChecklistsByWeeks(
 
     const checklistsByWeeksAndUsers: {
       week: string,
-      users: Set<string>,
-      checklists: Set<string>
+      users: string[],
+      checklists: string[]
     }[] = []
 
     userTodos.map(todo => {
@@ -189,13 +189,13 @@ export async function getChecklistsByWeeks(
     if (!weekData) {
       weekData = {
         week: week,
-        users: new Set(),
-        checklists: new Set()
+        users: [],
+        checklists: []
       };
       checklistsByWeeksAndUsers.push(weekData);
     }
-    weekData.users.add(user.toString());
-    weekData.checklists.add(todoTitle);
+    weekData.users.push(user.toString());
+    weekData.checklists.push(todoTitle);
     })
 
     res.status(200)
