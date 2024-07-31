@@ -45,4 +45,14 @@ router.get(
   UserHandler.getSpecialistsAdded
 )
 
+router.get(
+  '/content',
+  UserHandler.getWatchedVideos
+)
+
+router.get(
+  '/mental-health',
+  UserHandler.getUniqueMentalHealth
+)
+
 export default router;

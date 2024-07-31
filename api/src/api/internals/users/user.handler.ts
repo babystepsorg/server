@@ -8,6 +8,8 @@ import { getWeekFromUser } from "../../../utils/week";
 import { UserSymptoms } from "../../../models/usersymptoms";
 import { UserTodos } from "../../../models/userTodo";
 import { SelectedSpecialist, SelectedSpecialists } from "../../../models/selectedSpecialit";
+import { ContentHistories } from "../../../models/contenthistory";
+import { Mentalhealths } from "../../mental-health/mentalHealth.model";
 
 export async function getAllUsers(
   req: Request,
@@ -211,7 +213,30 @@ export async function getSpecialistsAdded(
   next: NextFunction
 ) {
   try {
-    const specialists = await SelectedSpecialists.find({}).toArray()
+    const specialists = await SelectedSpecialists.aggregate([
+      {
+        $match: {}
+      },
+      {
+        $lookup: {
+            from: "doctors",
+            let: { specialistIds: "$specialists" },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $in: ["$_id", "$$specialistIds"]
+                        }
+                    }
+                }
+            ],
+            as: "specialists"
+        }
+    },
+    {
+      $unwind: "$specialists"
+    }
+    ]).toArray()
 
     res.status(200)
     res.send(specialists)
@@ -219,6 +244,58 @@ export async function getSpecialistsAdded(
     next(err)
   }
 }
+
+export async function getWatchedVideos(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const content = await ContentHistories.aggregate([
+      {$match: {}},
+      {$lookup: {
+        from: "contents",
+        localField: "contentId",
+        foreignField: "_id",
+        as: "content"
+      }},
+      {
+        $unwind: "$content"
+      }
+    ]).toArray()
+
+    res.status(200)
+    res.send(content)
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function getUniqueMentalHealth(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const uniqueMentalHealths = await Mentalhealths.aggregate([
+      {
+        $group: {
+          _id: "$userId",
+          uniqueMentalHealth: { $first: "$$ROOT" }
+        }
+      },
+      {
+        $replaceRoot: { newRoot: "$uniqueMentalHealth" }
+      }
+    ]).toArray()
+
+    res.status(200)
+    res.send(uniqueMentalHealths)
+  } catch (err) {
+    next(err)
+  }
+}
+
 
 
 export async function getActiveUsersByFilter(
