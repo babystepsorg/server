@@ -183,7 +183,6 @@ export function googleAuth(req: Request, res: Response, next: NextFunction) {
 }
 
 export function googleAuthCallback(req: Request, res: Response, next: NextFunction) {
-  const origin = req.originalUrl;
   passport.authenticate('google', { failureRedirect: '/api/v1/auth/google' }, (error, user, info) => {
     if (user) {
       const today = new Date();
@@ -192,18 +191,18 @@ export function googleAuthCallback(req: Request, res: Response, next: NextFuncti
       const accessToken = generateToken({ userId: user._id, type: 'ACCESS' })
       const refreshToken = generateToken({ userId: user._id, type: 'REFRESH' }, { expiresIn: '30d' })
       if (newAccount) {
-        return res.redirect(`${origin}/login?access_token=${accessToken}&refresh_token=${refreshToken}&new=${newAccount}&user_id=${user._id}`)
+        return res.redirect(`${config.FRONTEND_URL}/login?access_token=${accessToken}&refresh_token=${refreshToken}&new=${newAccount}&user_id=${user._id}`)
       } else {
-        return res.redirect(`${origin}/login?access_token=${accessToken}&refresh_token=${refreshToken}&new=${newAccount}`)
+        return res.redirect(`${config.FRONTEND_URL}/login?access_token=${accessToken}&refresh_token=${refreshToken}&new=${newAccount}`)
       }
     }
 
     if (error) {
-      return res.redirect(`${origin}/login?error=${error}`)
+      return res.redirect(`${config.FRONTEND_URL}/login?error=${error}`)
     }
 
     if (info) {
-      return res.redirect(`${origin}/login?info=${info}`)
+      return res.redirect(`${config.FRONTEND_URL}/login?info=${info}`)
     }
 
     return res.redirect('/api/v1/auth/google')
