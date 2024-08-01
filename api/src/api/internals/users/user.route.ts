@@ -55,4 +55,9 @@ router.get(
   UserHandler.getUniqueMentalHealth
 )
 
+router.get(
+  '/ouvlation',
+  UserHandler.getOvulation
+)
+
 export default router;

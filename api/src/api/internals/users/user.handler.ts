@@ -10,6 +10,7 @@ import { UserTodos } from "../../../models/userTodo";
 import { SelectedSpecialist, SelectedSpecialists } from "../../../models/selectedSpecialit";
 import { ContentHistories } from "../../../models/contenthistory";
 import { Mentalhealths } from "../../mental-health/mentalHealth.model";
+import { Ovulations } from "../../../models/ovulation";
 
 export async function getAllUsers(
   req: Request,
@@ -291,6 +292,21 @@ export async function getUniqueMentalHealth(
 
     res.status(200)
     res.send(uniqueMentalHealths)
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function getOvulation(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const ovulations = await Ovulations.find({}).toArray()
+
+    res.status(200)
+    res.json(ovulations)
   } catch (err) {
     next(err)
   }
