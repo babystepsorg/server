@@ -11,6 +11,8 @@ import { SelectedSpecialist, SelectedSpecialists } from "../../../models/selecte
 import { ContentHistories } from "../../../models/contenthistory";
 import { Mentalhealths } from "../../mental-health/mentalHealth.model";
 import { Ovulations } from "../../../models/ovulation";
+import { Calanders } from "../../../models/calander";
+import { Payments } from "../../payments/payment.model";
 
 export async function getAllUsers(
   req: Request,
@@ -32,6 +34,16 @@ export async function deleteUser(
 ) {
   try {
     const userId = req.params.id;
+
+    await Promise.all([
+      ContentHistories.deleteMany({ userId: new ObjectId(userId) }),
+      Calanders.deleteMany({ userId: new ObjectId(userId) }),
+      SelectedSpecialists.deleteMany({ userId: new ObjectId(userId) }),
+      UserSymptoms.deleteMany({ userId: new ObjectId(userId) }),
+      UserTodos.deleteMany({ userId: new ObjectId(userId) }),
+      Payments.deleteMany({ user_id: new ObjectId(userId) })
+    ]);
+
     const result = await Users.deleteOne({ _id: new ObjectId(userId) });
 
     if (result.deletedCount === 0) {
