@@ -76,6 +76,7 @@ export async function getUsersStatus(
 
     const usersByWeek: { [week: string]: number } = {};
     const usersByStage: { [stage: string]: number } = {};
+    const userByRole: { [role: string]: number } = {};
 
     for (const user of users) {
       const { password, salt, ...rest } = user;
@@ -89,6 +90,11 @@ export async function getUsersStatus(
 
       if (stage) {
         usersByStage[stage] = (usersByStage[stage] || 0) + 1;
+      }
+
+      const role = user.role
+      if (role) {
+        userByRole[role] = (userByRole[role] || 0) + 1;
       }
 
       if (user.partnerId) {
