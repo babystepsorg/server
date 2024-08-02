@@ -80,7 +80,8 @@ export async function getSymptomsOfWeek(
 
       // Push user symtpoms that are added
       userSymtpomsLeft.forEach(symptom => {
-        const similarSymptoms = userSymtpomsLeft.filter(userSymptom => userSymptom.symptomId.toString() === symptom.symptomId.toString());
+        const symptomId = symptom._id.toString();
+        const similarSymptoms = userSymtpomsLeft.filter(userSymptom => userSymptom.symptomId.toString() === symptomId);
         const userIds = similarSymptoms.map(userSymptom => userSymptom.userId.toString());
         const existingSymptom = symptomsByWeeksAndUsers.find(s => s.symptom === symptom.name);
         if (!existingSymptom) {
