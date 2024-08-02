@@ -14,14 +14,14 @@ export async function getSymptomsOfWeek(
         Symptoms.aggregate([
             {
                 $match: {
-                    weeks: { $in: [new ObjectId(weekId)] }
+                    weeks: { $in: [weekId] }
                 }
             }
         ]).toArray(),
         UserSymptoms.aggregate([
             {
               $match: {
-                week
+                week: parseInt(week)
               }
             },
             {
@@ -37,11 +37,11 @@ export async function getSymptomsOfWeek(
             }
           ]).toArray()
       ])
-  
+
       const symptomsByWeeksAndUsers: {
         users: string[],
         symptom: string,
-        slected: boolean,
+        selected: boolean,
         addeded: boolean
       }[] = []
 
@@ -59,24 +59,24 @@ export async function getSymptomsOfWeek(
           symptomsByWeeksAndUsers.push({
             users: users,
             symptom: symptom.name,
-            slected: true,
+            selected: users.length ? true : false,
             addeded: false
           });
         }
       });
 
       // Push the symptoms that are left
-      symptoms.forEach(symptom => {
-        const existingSymptom = symptomsByWeeksAndUsers.find(s => s.symptom === symptom.name);
-        if (!existingSymptom) {
-          symptomsByWeeksAndUsers.push({
-            users: [],
-            symptom: symptom.name,
-            slected: false,
-            addeded: false
-          });
-        }
-      });
+      // symptoms.forEach(symptom => {
+      //   const existingSymptom = symptomsByWeeksAndUsers.find(s => s.symptom === symptom.name);
+      //   if (!existingSymptom) {
+      //     symptomsByWeeksAndUsers.push({
+      //       users: [],
+      //       symptom: symptom.name,
+      //       selected: false,
+      //       addeded: false
+      //     });
+      //   }
+      // });
 
       // Push user symtpoms that are added
       userSymtpomsLeft.forEach(symptom => {
@@ -87,7 +87,7 @@ export async function getSymptomsOfWeek(
           symptomsByWeeksAndUsers.push({
             users: userIds,
             symptom: symptom.name,
-            slected: false,
+            selected: false,
             addeded: true
           });
         }
