@@ -83,6 +83,15 @@ export async function getSymptomsOfWeek(
         const symptomId = symptom._id.toString();
         const similarSymptoms = userSymtpomsLeft.filter(userSymptom => userSymptom.symptomId.toString() === symptomId);
         const userIds = similarSymptoms.map(userSymptom => userSymptom.userId.toString());
+
+        if (!similarSymptoms) {
+          symptomsByWeeksAndUsers.push({
+            users: [symptom.userId],
+            symptom: symptom.name,
+            selected: false,
+            addeded: true
+          });
+        }
         const existingSymptom = symptomsByWeeksAndUsers.find(s => s.symptom === symptom.name);
         if (!existingSymptom) {
           symptomsByWeeksAndUsers.push({
