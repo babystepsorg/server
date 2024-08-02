@@ -65,6 +65,20 @@ export async function getSymptomsOfWeek(
         }
       });
 
+      // Push the symptoms that are left
+      symptoms.forEach(symptom => {
+        const existingSymptom = symptomsByWeeksAndUsers.find(s => s.symptom === symptom.name);
+        if (!existingSymptom) {
+          symptomsByWeeksAndUsers.push({
+            users: [],
+            symptom: symptom.name,
+            slected: false,
+            addeded: false
+          });
+        }
+      });
+
+      // Push user symtpoms that are added
       userSymtpomsLeft.forEach(symptom => {
         const similarSymptoms = userSymtpomsLeft.filter(userSymptom => userSymptom.symptomId.toString() === symptom.symptomId.toString());
         const userIds = similarSymptoms.map(userSymptom => userSymptom.userId.toString());
