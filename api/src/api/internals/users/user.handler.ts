@@ -66,6 +66,7 @@ export async function getUsersStatus(
     usersByWeek: { [week: string]: number };
     usersByStage: { [stage: string]: number };
     partnerAccounts: number;
+    userByRole: { [role: string]: number }
   }>,
   next: NextFunction
 ) {
@@ -106,7 +107,8 @@ export async function getUsersStatus(
       totalUsers,
       usersByWeek,
       usersByStage,
-      partnerAccounts
+      partnerAccounts,
+      userByRole
     });
   } catch (error) {
     next(error);
