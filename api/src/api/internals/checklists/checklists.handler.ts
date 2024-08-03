@@ -33,7 +33,10 @@ export async function getChecklistsByWeek(
               }
             },
             {
-              $unwind: "$todo"
+              $unwind: {
+                path: "$todo",
+                preserveNullAndEmptyArrays: true
+              }
             }
           ]).toArray()
       ])
