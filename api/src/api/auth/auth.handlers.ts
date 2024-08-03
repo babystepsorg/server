@@ -430,22 +430,22 @@ export async function me(req: Request<{}, Me>, res: Response<Me>, next: NextFunc
     }
 
     // Add the user to the active users
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
+    // const todayStart = new Date();
+    // todayStart.setHours(0, 0, 0, 0);
 
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
+    // const todayEnd = new Date();
+    // todayEnd.setHours(23, 59, 59, 999);
 
-    const exists = await ActiveUsers.findOne({
-      userId: req.user!._id,
-      activityTimestamp: {
-        $gte: todayStart.toISOString(),
-        $lte: todayEnd.toISOString()
-      }
-    });
-    if (!exists) {
-      await ActiveUsers.insertOne({ userId: req.user!._id, activityTimestamp: new Date().toISOString() });
-    }
+    // const exists = await ActiveUsers.findOne({
+    //   userId: req.user!._id,
+    //   activityTimestamp: {
+    //     $gte: todayStart.toISOString(),
+    //     $lte: todayEnd.toISOString()
+    //   }
+    // });
+    // if (!exists) {
+    await ActiveUsers.insertOne({ userId: req.user!._id, activityTimestamp: new Date().toISOString() });
+    // }
 
     res.status(200)
     res.json({
