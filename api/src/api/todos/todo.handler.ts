@@ -221,6 +221,7 @@ export const createOne = async (
   next: NextFunction
 ) => {
   try {
+    const { week } = await getWeekFromUser(req.user!)
     const completionDate = req.body.completionDate
     if (completionDate) {
       const date = new Date(completionDate)
@@ -235,6 +236,7 @@ export const createOne = async (
       ...req.body,
       userId: req.user!._id,
       completed: false,
+      week: req.body.week ?? week.toString()
     })
     if (!insertedTodo.acknowledged) throw new Error('Error inserting todo')
     res.status(201)
