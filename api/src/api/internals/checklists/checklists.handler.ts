@@ -54,10 +54,10 @@ export async function getChecklistsByWeek(
 
       checklists.forEach(checklist => {
         const adminTodo = checklist._id.toString();
-        const userWithChecklists = checklistsLeft.filter(userChecklist => userChecklist.adminTodo.toString() === adminTodo);
+        const userWithChecklists = checklistsLeft.filter(userChecklist => userChecklist?.adminTodo && userChecklist.adminTodo.toString() === adminTodo);
         const users = userWithChecklists.map(userChecklist => userChecklist.userId.toString());
 
-        checklistsLeft = checklistsLeft.filter(userChecklist => userChecklist.adminTodo.toString() !== adminTodo);
+        checklistsLeft = checklistsLeft.filter(userChecklist => userChecklist?.adminTodo && userChecklist.adminTodo.toString() !== adminTodo);
         
         const existingChecklist = checklistsByWeek.find(c => c.checklist === checklist.title);
         const completed = userWithChecklists.filter(userChecklist => userChecklist.completed).length;
@@ -92,7 +92,7 @@ export async function getChecklistsByWeek(
       // Push user symtpoms that are added
       checklistsLeft.forEach(checklist => {
         const adminTodo = checklist.todo._id.toString();
-        const similarChecklists = checklistsLeft.filter(userChecklist => userChecklist.adminTodo.toString() === adminTodo);
+        const similarChecklists = checklistsLeft.filter(userChecklist => userChecklist?.adminTodo && userChecklist.adminTodo.toString() === adminTodo);
         const userIds = similarChecklists.map(userChecklist => userChecklist.userId.toString());
 
         if (!similarChecklists.length) {
