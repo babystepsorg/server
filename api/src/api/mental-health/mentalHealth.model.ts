@@ -7,6 +7,8 @@ export const Mentalhealth = z.object({
   emotion: z.string(),
   description: z.string(),
   userId: z.custom<ObjectId>(),
+  week: z.string(),
+  checkedByPartner: z.boolean().default(false),
   createdAt: z.string().datetime().default(new Date().toISOString())
 })
 

@@ -12,10 +12,11 @@ export const setVideoHistory = async (
   next: NextFunction
 ) => {
   try {
+    const { week } = await getWeekFromUser(req.user!)
     const userId = req.user!._id;
     const history = await ContentHistories.findOneAndUpdate(
       { contentId: new ObjectId(req.body.contentId), userId },
-      { $set: { lastedWatchedAt: new Date().toISOString() } },
+      { $set: { lastedWatchedAt: new Date().toISOString(), week: week.toString() } },
       { upsert: true }
     );
     if (history && history.ok) {

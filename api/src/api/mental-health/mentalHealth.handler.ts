@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { Mentalhealths, Mentalhealth, MentalhealthWithId } from './mentalHealth.model'
 import { UserWithId } from '../../models/user'
 import { ObjectId } from 'mongodb'
+import { getWeekFromUser } from '../../utils/week'
 
 export const saveMentalhealth = async (
   req: Request<{}, MentalhealthWithId, { emotion: string, description: string }>,
@@ -9,13 +10,16 @@ export const saveMentalhealth = async (
   next: NextFunction
 ) => {
   try {
+    const { week } = await getWeekFromUser(req.user!)
     const userId = req.user!._id;
     const { emotion, description } = req.body
     const mentalHealth: Mentalhealth = {
       emotion,
       description,
       userId: new ObjectId(userId),
-      createdAt: new Date().toISOString()
+      week: week.toString(),
+      checkedByPartner: false,
+      createdAt: new Date().toISOString(),
     }
     const result = await Mentalhealths.insertOne(mentalHealth)
     if (!result.acknowledged) {
@@ -39,15 +43,18 @@ export const getPartnerInfo = async (
     const partnerId = req.user!.partnerId
 
     if (partnerId) {
-      const mentalHealth = await Mentalhealths.find({
-        userId: new ObjectId(partnerId),
-      }).sort({ createdAt: -1 }).limit(1).toArray()
+      const updateResult = await Mentalhealths.findOneAndUpdate(
+        { userId: new ObjectId(partnerId) },
+        { $set: { checkedByPartner: true } },
+        { returnDocument: "after" }
+      );
 
-      if (!mentalHealth) {
+      if (!updateResult.value) {
         res.status(404)
         throw new Error("Mental health not found")
       }
-      res.status(200).json(mentalHealth[0])
+      
+      res.status(200).json(updateResult.value)
     }
 
     throw new Error("Parnter not found")

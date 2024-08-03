@@ -6,8 +6,9 @@ export const Ovulation = z.object({
   ovultaionDate: z.string().datetime(),
   fertileWindowStart: z.string().datetime(),
   fertileWindowEnd: z.string().datetime(),
-  createdAt: z.string().datetime().default(new Date().toISOString()).optional(),
   userId: z.custom<ObjectId>(),
+  week: z.string(),
+  createdAt: z.string().datetime().default(new Date().toISOString()).optional(),
 })
 
 export type Ovulation = z.infer<typeof Ovulation>

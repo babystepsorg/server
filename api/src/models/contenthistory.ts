@@ -6,6 +6,7 @@ export const ContentHistory = z.object({
   contentId: z.custom<ObjectId>(),
   userId: z.custom<ObjectId>(),
   lastedWatchedAt: z.string().datetime(),
+  week: z.string()
 })
 
 export type ContentHistory = z.infer<typeof ContentHistory>

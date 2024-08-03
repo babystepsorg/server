@@ -431,9 +431,10 @@ export const createOrUpdateOvulation = async (
   next: NextFunction
 ) => {
   try {
+    const { week } = await getWeekFromUser(req.user!)
     const ovulation = await Ovulations.findOneAndUpdate(
       { userId: req.user!._id }, 
-      { $set: { ...req.body, } }, 
+      { $set: { ...req.body, week: week.toString(), createdAt: new Date().toISOString() } }, 
       { upsert: true }
     )
 
