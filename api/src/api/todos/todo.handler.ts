@@ -236,7 +236,7 @@ export const createOne = async (
       ...req.body,
       userId: req.user!._id,
       completed: false,
-      week: req.body.week ?? week.toString()
+      week: week.toString()
     })
     if (!insertedTodo.acknowledged) throw new Error('Error inserting todo')
     res.status(201)
@@ -256,6 +256,7 @@ export async function updateOne(
 ) {
   try {
     const { admin, ...data } = req.body
+    const { week } = await getWeekFromUser(req.user!)
     if (admin) {
       // check if it already exist
       const adminTodo = await UserTodos.findOne({
@@ -274,6 +275,7 @@ export async function updateOne(
               completionDate: data.completionDate,
               assignPartner: data?.assignPartner ?? false,
               userPriority: data?.userPriority ?? 'normal',
+              week: week.toString()
             },
           }
         )
@@ -291,6 +293,7 @@ export async function updateOne(
         assignPartner: data.assignPartner,
         userPriority: data.userPriority,
         completed: false,
+        week: week.toString()
       })
 
       if (!result.acknowledged) throw new Error('Error while updaing task')
@@ -305,7 +308,10 @@ export async function updateOne(
         $or: [{ userId: req.user!._id }, { userId: req.user!.partnerId }],
       },
       {
-        $set: data,
+        $set: {
+          ...data,
+          week: week.toString()
+        }
       },
       {
         returnDocument: 'after',
@@ -327,6 +333,7 @@ export async function completeOne(
   next: NextFunction
 ) {
   try {
+    const { week } = await getWeekFromUser(req.user!)
     if (req.body.admin) {
       const adminTodo = await UserTodos.findOne({ 
         adminTodo: new ObjectId(req.params.id),
@@ -342,6 +349,7 @@ export async function completeOne(
             $set: {
               completed: true,
               completedOn: new Date().toISOString(),
+              week: week.toString()
             },
           }
         )
@@ -355,6 +363,7 @@ export async function completeOne(
         completedOn: new Date().toISOString(),
         userId: req.user!._id,
         userPriority: 'normal',
+        week: week.toString()
       })
 
       return res.json({ message: 'Task completed sucessfully' })
@@ -368,6 +377,7 @@ export async function completeOne(
         $set: {
           completed: true,
           completedOn: new Date().toISOString(),
+          week: week.toString()
         },
       }
     )
