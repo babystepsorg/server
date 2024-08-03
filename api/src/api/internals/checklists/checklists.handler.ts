@@ -90,36 +90,45 @@ export async function getChecklistsByWeek(
       // });
 
       // Push user symtpoms that are added
+      checklistsLeft = userChecklists.filter(checklist => !checklist.adminTodo)
       checklistsLeft.forEach(checklist => {
-        const adminTodo = checklist.todo._id.toString();
-        const similarChecklists = checklistsLeft.filter(userChecklist => userChecklist?.adminTodo && userChecklist.adminTodo.toString() === adminTodo);
-        const userIds = similarChecklists.map(userChecklist => userChecklist.userId.toString());
-
-        if (!similarChecklists.length) {
-          checklistsByWeek.push({
+        checklistsByWeek.push({
             users: [checklist.userId],
-            checklist: checklist.todo.title,
+            checklist: checklist.title,
             addeded: 1,
             completed: checklist.completed ? 1 : 0,
             assigned: checklist.assignPartner ? 1 : 0,
             dateAdded: checklist.completionDate ? 1 : 0 
-          });
-        }
-        const existingChecklist = checklistsByWeek.find(c => c.checklist === checklist.todo.title);
-        const completed = similarChecklists.filter(userChecklist => userChecklist.completed).length;
-        const assigned = similarChecklists.filter(userChecklist => userChecklist.assignPartner).length;
-        const dateAdded = similarChecklists.filter(userChecklist => userChecklist.completionDate).length
+        });
+        // const adminTodo = checklist.todo._id.toString();
+        // const similarChecklists = checklistsLeft.filter(userChecklist => userChecklist?.adminTodo && userChecklist.adminTodo.toString() === adminTodo);
+        // const userIds = similarChecklists.map(userChecklist => userChecklist.userId.toString());
 
-        if (!existingChecklist) {
-          checklistsByWeek.push({
-            users: userIds,
-            checklist: checklist.todo.title,
-            completed,
-            assigned,
-            dateAdded,
-            addeded: similarChecklists.length
-          });
-        }
+        // if (!similarChecklists.length) {
+        //   checklistsByWeek.push({
+        //     users: [checklist.userId],
+        //     checklist: checklist.todo.title,
+        //     addeded: 1,
+        //     completed: checklist.completed ? 1 : 0,
+        //     assigned: checklist.assignPartner ? 1 : 0,
+        //     dateAdded: checklist.completionDate ? 1 : 0 
+        //   });
+        // }
+        // const existingChecklist = checklistsByWeek.find(c => c.checklist === checklist.todo.title);
+        // const completed = similarChecklists.filter(userChecklist => userChecklist.completed).length;
+        // const assigned = similarChecklists.filter(userChecklist => userChecklist.assignPartner).length;
+        // const dateAdded = similarChecklists.filter(userChecklist => userChecklist.completionDate).length
+
+        // if (!existingChecklist) {
+        //   checklistsByWeek.push({
+        //     users: userIds,
+        //     checklist: checklist.todo.title,
+        //     completed,
+        //     assigned,
+        //     dateAdded,
+        //     addeded: similarChecklists.length
+        //   });
+        // }
       })
   
       
