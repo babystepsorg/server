@@ -70,7 +70,7 @@ export async function signUp(
     // Send Email to the user
     //
     const notificationService = new NotificationService()
-    notificationService.sendTemplateEmail({
+    notificationService.sendEmailWithFetch({
       email: user.email,
       loginLink: "",
       template: "signup",
