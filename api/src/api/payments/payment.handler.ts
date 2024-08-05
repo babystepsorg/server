@@ -155,7 +155,7 @@ export async function razorpayWebhook(
 
       if (user) {
         const notificationService = new NotificationService()
-        notificationService.sendTemplateEmail({
+        notificationService.sendEmailWithFetch({
           email: user.email,
           loginLink: "",
           template: "subscription.purchase",
