@@ -96,7 +96,7 @@ export async function invitePartner(
     const email = req.body.email
     const loginLink = `${origin ?? config.CLIENT_URL}/signup?token=${token}&email=${email}&stage=${user.stage}&role=${role}`
     const notificationService = new NotificationService()
-    await notificationService.sendTemplateEmail({
+    await notificationService.sendEmailWithFetch({
       email,
       loginLink,
       username: req.user?.name!,
