@@ -28,7 +28,7 @@ export async function getChecklistsByWeek(
             },
             {
               $lookup: {
-                from: "contents",
+                from: "content",
                 localField: "contentId",
                 foreignField: "_id",
                 as: "content"

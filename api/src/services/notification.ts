@@ -1,5 +1,5 @@
 import * as SibApiV3Sdk from '@sendinblue/client'
-import axios from "axios";
+import axios from 'axios'
 
 import config from '../config'
 
@@ -44,14 +44,12 @@ class NotificationService {
       },
     ]
     this.sendSmtpEmail.sender = {
-      email: 'info@babysteps.world',
-      name: 'Info <BabySteps>',
+      email: 'noreply@babysteps.world',
+      name: 'No Reply <BabySteps>',
     }
 
     try {
       const response = await this.apiInstance.sendTransacEmail(this.sendSmtpEmail)
-      console.log("Body:: ", response.body)
-      console.log("REs:: ", response.response)
       return response.body
     } catch (err: any) {
       console.log(err)
