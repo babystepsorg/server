@@ -1,4 +1,3 @@
-B
 import { Request, Response, NextFunction } from "express";
 
 import { User, UserWithId, Users } from "../../../models/user";
@@ -8,7 +7,7 @@ import { ObjectId } from "mongodb";
 import { getWeekFromUser } from "../../../utils/week";
 import { UserSymptoms } from "../../../models/usersymptoms";
 import { UserTodos } from "../../../models/userTodo";
-import { SelectedSpecialist, SelectedSpecialists } from "../../../models/selectedSpecialit";
+import { SelectedSpecialists } from "../../../models/selectedSpecialit";
 import { ContentHistories } from "../../../models/contenthistory";
 import { Mentalhealths } from "../../mental-health/mentalHealth.model";
 import { Ovulations } from "../../../models/ovulation";
