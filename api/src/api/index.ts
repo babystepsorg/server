@@ -13,6 +13,7 @@ import specialists from './specialists/specialist.route'
 import mentalHealth from './mental-health/mentalHealth.route'
 import payments from './payments/payment.route'
 import notification from './notifications/notification.route'
+import trackingRouter from './tracking/tracking.route'
 
 const router = express.Router()
 
@@ -34,5 +35,6 @@ router.use('/specialists', specialists)
 router.use('/mental-health', mentalHealth)
 router.use('/payments', payments)
 router.use('/notifications', notification)
+router.use('/track', trackingRouter)
 
 export default router

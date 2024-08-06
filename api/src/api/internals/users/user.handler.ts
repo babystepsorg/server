@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 
-import { User, UserWithId, Users } from "../../../models/user";
+import { UserWithId, Users } from "../../../models/user";
 import { ActiveUsers } from "../../../models/activeUser";
 import { ParamsWithId } from "../../../interfaces/ParamsWithId";
 import { ObjectId } from "mongodb";
@@ -25,7 +25,8 @@ export async function getAllUsers(
       users.map(async (user: UserWithId) => {
         const payments = await Payments.find({ user_id: new ObjectId(user._id) }).limit(1).toArray();
           return { ...user, payment: payments[0] };
-        })
+        }
+      )
     );
     res.status(200).json(usersWithPayments);
   } catch (error) {
