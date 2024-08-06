@@ -1,3 +1,4 @@
+B
 import { Request, Response, NextFunction } from "express";
 
 import { UserWithId, Users } from "../../../models/user";
@@ -21,7 +22,13 @@ export async function getAllUsers(
 ) {
   try {
     const users = await Users.find().toArray();
-    res.status(200).json(users);
+    const usersWithPayments = await Promise.all(
+    users.map(async (user) => {
+	  const payments = await Payments.find({ user_id: user._id }).limit(1).toArray();
+		  return { ...user, payments: payments[0] };
+	})
+    );
+    res.status(200).json(usersWithPayments);
   } catch (error) {
     next(error);
   }
