@@ -1,7 +1,7 @@
 B
 import { Request, Response, NextFunction } from "express";
 
-import { UserWithId, Users } from "../../../models/user";
+import { User, UserWithId, Users } from "../../../models/user";
 import { ActiveUsers } from "../../../models/activeUser";
 import { ParamsWithId } from "../../../interfaces/ParamsWithId";
 import { ObjectId } from "mongodb";
@@ -23,10 +23,10 @@ export async function getAllUsers(
   try {
     const users = await Users.find().toArray();
     const usersWithPayments = await Promise.all(
-    users.map(async (user) => {
-	  const payments = await Payments.find({ user_id: user._id }).limit(1).toArray();
-		  return { ...user, payments: payments[0] };
-	})
+      users.map(async (user: UserWithId) => {
+        const payments = await Payments.find({ user_id: new ObjectId(user._id) }).limit(1).toArray();
+          return { ...user, payment: payments[0] };
+        })
     );
     res.status(200).json(usersWithPayments);
   } catch (error) {
