@@ -60,7 +60,7 @@ export async function getDailyActiveUsers(
         }
       }).toArray();
 
-      return users.length;
+      return { date: date.toISOString().split('T')[0], count: users.length };
     }));
 
     res.status(200).json({ activeUsers });
