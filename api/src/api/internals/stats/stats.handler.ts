@@ -16,16 +16,15 @@ export async function getScreenTimeData(
       {
         $match: {
           trackedAt: {
-            $gte: startDate,
-            $lte: endDate
+            $gte: startDate.toISOString(),
+            $lte: endDate.toISOString()
           }
         }
       },
       {
         $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$trackedAt" } },
-          count: { $sum: 1 },
-          duration: { $sum: "$duration" }
+          totalDuration: { $sum: "$duration" }
         }
       }
     ]).toArray();
