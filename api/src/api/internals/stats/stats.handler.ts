@@ -23,7 +23,7 @@ export async function getScreenTimeData(
       },
       {
         $group: {
-          _id: { $dateFromString: { format: "%Y-%m-%d", date: "$trackedAt" } },
+          _id: { $dateFromString: { format: "%Y-%m-%d", dateString: "$trackedAt" } },
           totalDuration: { $sum: "$duration" }
         }
       }
